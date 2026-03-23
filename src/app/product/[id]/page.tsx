@@ -34,6 +34,13 @@ const stockConfig = {
   },
 } as const
 
+type ProductMeta = Product & {
+  isPromotion?: boolean
+  originalPrice?: number
+  discount?: number
+  specs?: Record<string, string>
+}
+
 export default function ProductPage() {
   const params = useParams()
   const router = useRouter()
@@ -130,6 +137,7 @@ export default function ProductPage() {
 
   if (!product) return null
 
+  const productMeta = product as ProductMeta
   const stock = stockConfig[product.stockStatus] ?? stockConfig["in-stock"]
   const galleryImages = [product.image, product.hoverImage].filter(Boolean)
 
@@ -176,7 +184,7 @@ export default function ProductPage() {
                   {stock.label}
                 </span>
 
-                {product.isPromotion && (
+                {productMeta.isPromotion && (
                   <span className="self-start rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
                     Promotion
                   </span>
@@ -204,15 +212,15 @@ export default function ProductPage() {
                   {product.price.toLocaleString("fr-FR")} DH
                 </span>
 
-                {product.originalPrice && (
+                {productMeta.originalPrice && (
                   <span className="text-lg text-gray-900 line-through">
-                    {product.originalPrice.toLocaleString("fr-FR")} DH
+                    {productMeta.originalPrice.toLocaleString("fr-FR")} DH
                   </span>
                 )}
 
-                {product.discount && (
+                {productMeta.discount && (
                   <span className="rounded bg-red-600 px-2 py-0.5 text-xs font-bold text-white">
-                    -{product.discount}%
+                    -{productMeta.discount}%
                   </span>
                 )}
               </div>
@@ -251,16 +259,16 @@ export default function ProductPage() {
                     !product.inStock
                       ? "cursor-not-allowed bg-gray-100 text-gray-400"
                       : added
-                      ? "bg-emerald-600 text-white"
-                      : "bg-gray-900 text-white hover:bg-gray-800"
+                        ? "bg-emerald-600 text-white"
+                        : "bg-gray-900 text-white hover:bg-gray-800"
                   )}
                 >
                   <ShoppingCart className="h-4 w-4" />
                   {!product.inStock
                     ? "Rupture de Stock"
                     : added
-                    ? "Ajouté au panier ✓"
-                    : "Ajouter au Panier"}
+                      ? "Ajouté au panier ✓"
+                      : "Ajouter au Panier"}
                 </button>
 
                 <Link
@@ -291,8 +299,8 @@ export default function ProductPage() {
                 {tab === "specs"
                   ? "Spécifications"
                   : tab === "description"
-                  ? "Description"
-                  : "Avis Clients"}
+                    ? "Description"
+                    : "Avis Clients"}
               </button>
             ))}
           </div>
@@ -303,8 +311,8 @@ export default function ProductPage() {
 
           {activeTab === "specs" && (
             <div className="max-w-lg divide-y divide-gray-100">
-              {product.specs && Object.keys(product.specs).length > 0 ? (
-                Object.entries(product.specs).map(([key, val]) => (
+              {productMeta.specs && Object.keys(productMeta.specs).length > 0 ? (
+                Object.entries(productMeta.specs).map(([key, val]) => (
                   <div key={key} className="flex gap-4 py-3">
                     <span className="w-40 text-sm font-medium text-gray-500">{key}</span>
                     <span className="text-sm font-semibold text-gray-800">{val}</span>
