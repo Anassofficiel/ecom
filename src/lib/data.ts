@@ -1,4 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
+ // ─────────────────────────────────────────────────────────────────────────────
 // ELECTRO MANAGER — Central Data Store
 // Edit this file to update all products, packs, categories, and promos.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -390,3 +390,6 @@ export function getTotalPages(items: Product[], perPage = PRODUCTS_PER_PAGE) {
 export function getPromotionProducts(): Product[] {
     return products.filter((p) => promotionProductIds.includes(p.id) && p.discount && p.discount > 0);
 }
+export function getProductById(id: string): Product | undefined {
+    return products.find((p) => p.id === id)
+}  

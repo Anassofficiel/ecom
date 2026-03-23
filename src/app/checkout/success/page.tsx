@@ -1,26 +1,18 @@
 "use client"
 
 import * as React from "react"
-
 import Link from "next/link"
 import { CheckCircle, ShoppingBag, Package, Home } from "lucide-react"
-
-function generateOrderId() {
-    return "ES-" + Math.random().toString(36).substring(2, 8).toUpperCase()
-}
+import { useSearchParams } from "next/navigation"
 
 export default function OrderSuccessPage() {
-    const [orderId, setOrderId] = React.useState("")
-    React.useEffect(() => {
-        setOrderId(generateOrderId())
-    }, [])
+    const searchParams = useSearchParams()
+    const orderId = searchParams.get("orderId") || "—"
 
     return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-16">
             <div className="w-full max-w-lg">
-                {/* Success card */}
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 text-center">
-                    {/* Icon */}
                     <div className="flex justify-center mb-6">
                         <div className="bg-emerald-100 rounded-full p-4">
                             <CheckCircle className="h-12 w-12 text-emerald-600" />
@@ -32,16 +24,19 @@ export default function OrderSuccessPage() {
                         Merci d'avoir choisi Electro Manager. Votre commande a été enregistrée avec succès.
                     </p>
 
-                    {/* Order number */}
                     <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6">
                         <p className="text-xs text-gray-500 mb-1">Numéro de Commande</p>
-                        <p className="text-2xl font-bold text-red-600 tracking-widest">{orderId}</p>
-                        <p className="text-xs text-gray-400 mt-1">Conservez ce numéro pour le suivi de votre commande</p>
+                        <p className="text-2xl font-bold text-red-600 tracking-widest">#{orderId}</p>
+                        <p className="text-xs text-gray-400 mt-1">
+                            Conservez ce numéro pour le suivi de votre commande
+                        </p>
                     </div>
 
-                    {/* What happens next */}
                     <div className="text-left space-y-3 mb-8">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Et ensuite ?</p>
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">
+                            Et ensuite ?
+                        </p>
+
                         {[
                             { icon: CheckCircle, label: "Commande confirmée", done: true },
                             { icon: Package, label: "Préparation de votre colis", done: false },

@@ -8,155 +8,162 @@ import type { Product } from "@/lib/data"
 import { cn } from "@/lib/utils"
 
 interface ProductCardProps {
-    product: Product
-    className?: string
-    showPromoBadge?: boolean
+  product: Product
+  className?: string
+  showPromoBadge?: boolean
 }
 
 const stockConfig = {
-    "in-stock": { label: "En Stock", className: "bg-emerald-100 text-emerald-700" },
-    "low-stock": { label: "Stock Limité", className: "bg-amber-100 text-amber-700" },
-    "out-of-stock": { label: "Rupture", className: "bg-red-100 text-red-600" },
-}
+  "in-stock": { label: "En Stock", className: "bg-emerald-100 text-emerald-700" },
+  "low-stock": { label: "Stock Limité", className: "bg-amber-100 text-amber-700" },
+  "out-of-stock": { label: "Rupture", className: "bg-red-100 text-red-600" },
+} as const
 
-export function ProductCard({ product, className, showPromoBadge = false }: ProductCardProps) {
-    const addItem = useCart((state) => state.addItem)
-    const [added, setAdded] = React.useState(false)
+export function ProductCard({
+  product,
+  className,
+  showPromoBadge = false,
+}: ProductCardProps) {
+  const addItem = useCart((state) => state.addItem)
+  const [added, setAdded] = React.useState(false)
 
-    const stock = stockConfig[product.stockStatus] ?? stockConfig["in-stock"]
-    const hasDiscount = !!product.discount || (!!product.originalPrice && product.originalPrice > product.price)
-    const isPromo = showPromoBadge && hasDiscount
+  const productId = String(product.id)
+  const productImage = product.image || "/placeholder.png"
+  const productRating = typeof product.rating === "number" ? product.rating : 0
+  const productReviews = typeof product.reviews === "number" ? product.reviews : 0
 
-    const handleAddToCart = (e: React.MouseEvent) => {
-        e.preventDefault()
-        if (!product.inStock) return
+  const stock =
+    stockConfig[product.stockStatus as keyof typeof stockConfig] ??
+    stockConfig["in-stock"]
 
-        addItem({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            image: product.image,
-            quantity: 1,
-            category: product.category,
-        })
+  const hasDiscount =
+    !!product.discount ||
+    (!!product.originalPrice && product.originalPrice > product.price)
 
-        setAdded(true)
-        setTimeout(() => setAdded(false), 1500)
-    }
+  const isPromo = showPromoBadge && hasDiscount
+  const displayDiscount = product.discount ?? 0
 
-    return (
-        <div
-            className={cn(
-                "group flex flex-col overflow-hidden rounded-2xl border bg-white transition-all duration-300",
-                isPromo
-                    ? "border-red-200 shadow-sm hover:-translate-y-1 hover:border-red-400 hover:shadow-[0_12px_35px_rgba(220,38,38,0.18)]"
-                    : "border-gray-200 hover:-translate-y-1 hover:shadow-lg",
-                className
-            )}
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (!product.inStock) return
+
+    addItem({
+      id: productId,
+      name: product.name,
+      price: product.price,
+      image: productImage,
+      quantity: 1,
+      category: product.category,
+    })
+
+    setAdded(true)
+    setTimeout(() => setAdded(false), 1500)
+  }
+
+  return (
+    <div
+      className={cn(
+        "group flex flex-col overflow-hidden rounded-2xl border bg-white transition-all duration-300",
+        isPromo
+          ? "border-red-200 shadow-sm hover:-translate-y-1 hover:border-red-400 hover:shadow-[0_12px_35px_rgba(220,38,38,0.18)]"
+          : "border-gray-200 hover:-translate-y-1 hover:shadow-lg",
+        className
+      )}
+    >
+      <Link
+        href={`/product/${productId}`}
+        className="relative block aspect-square overflow-hidden bg-gradient-to-b from-gray-50 to-white"
+      >
+        {isPromo && (
+          <div className="absolute left-3 top-3 z-30 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-pink-500 to-red-500 px-3 py-1 text-[12px] font-extrabold text-white shadow-lg">
+            <Tag className="h-3.5 w-3.5" />
+            <span>{displayDiscount > 0 ? `${displayDiscount}% OFF` : "OFFRE"}</span>
+          </div>
+        )}
+
+        {isPromo && (
+          <div className="absolute right-3 top-3 z-30 rounded-lg bg-gradient-to-r from-pink-500 to-rose-500 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white shadow-lg">
+            OFFRE SPÉCIALE
+          </div>
+        )}
+
+        {isPromo && (
+          <div className="absolute left-4 top-14 z-30 flex h-14 w-14 items-center justify-center rounded-full border-4 border-red-300 bg-gradient-to-b from-red-400 to-red-600 text-white shadow-xl">
+            <Gift className="h-7 w-7" />
+          </div>
+        )}
+
+        {hasDiscount && !isPromo && (
+          <div className="absolute left-3 top-3 z-20 rounded-full bg-red-600 px-2.5 py-1 text-[11px] font-bold text-white shadow-md">
+            -{displayDiscount > 0 ? displayDiscount : 0}%
+          </div>
+        )}
+
+        <img
+          src={productImage}
+          alt={product.name}
+          className="h-full w-full object-contain p-4 transition-transform duration-500 group-hover:scale-105"
+          loading="lazy"
+        />
+      </Link>
+
+      <div className="flex flex-1 flex-col p-4">
+        <span
+          className={cn(
+            "mb-3 self-start rounded-full px-3 py-1 text-[11px] font-semibold",
+            stock.className
+          )}
         >
-            {/* Image */}
-            <Link
-                href={`/product/${product.id}`}
-                className="relative block aspect-square overflow-hidden bg-gradient-to-b from-gray-50 to-white"
-            >
-                {/* Main promo badge */}
-                {isPromo && (
-                    <div className="absolute left-3 top-3 z-30 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-pink-500 to-red-500 px-3 py-1 text-[12px] font-extrabold text-white shadow-lg">
-                        <Tag className="h-3.5 w-3.5" />
-                        <span>50% OFF</span>
-                    </div>
-                )}
+          {stock.label}
+        </span>
 
-                {/* Secondary promo badge */}
-                {isPromo && (
-                    <div className="absolute right-3 top-3 z-30 rounded-lg bg-gradient-to-r from-pink-500 to-rose-500 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white shadow-lg">
-                        OFFRE SPÉCIALE
-                    </div>
-                )}
+        <Link
+          href={`/product/${productId}`}
+          className="mb-3 line-clamp-2 min-h-[48px] text-[15px] font-extrabold leading-6 text-slate-800 transition-colors hover:text-red-600"
+        >
+          {product.name}
+        </Link>
 
-                {/* Gift badge */}
-                {isPromo && (
-                    <div className="absolute left-4 top-14 z-30 flex h-14 w-14 items-center justify-center rounded-full border-4 border-red-300 bg-gradient-to-b from-red-400 to-red-600 text-white shadow-xl">
-                        <Gift className="h-7 w-7" />
-                    </div>
-                )}
-
-                {/* Normal discount badge when not promo section */}
-                {hasDiscount && !isPromo && (
-                    <div className="absolute left-3 top-3 z-20 rounded-full bg-red-600 px-2.5 py-1 text-[11px] font-bold text-white shadow-md">
-                        -50%
-                    </div>
-                )}
-
-                <img
-                    src={product.image}
-                    alt={product.name}
-                    className="h-full w-full object-contain p-4 transition-transform duration-500 group-hover:scale-105"
-                    loading="lazy"
-                />
-            </Link>
-
-            {/* Info */}
-            <div className="flex flex-1 flex-col p-4">
-                {/* Stock */}
-                <span
-                    className={cn(
-                        "mb-3 self-start rounded-full px-3 py-1 text-[11px] font-semibold",
-                        stock.className
-                    )}
-                >
-                    {stock.label}
-                </span>
-
-                {/* Name */}
-                <Link
-                    href={`/product/${product.id}`}
-                    className="mb-3 line-clamp-2 min-h-[48px] text-[15px] font-extrabold leading-6 text-slate-800 transition-colors hover:text-red-600"
-                >
-                    {product.name}
-                </Link>
-
-                {/* Rating */}
-                <div className="mb-3 flex items-center gap-2">
-                    <div className="flex gap-0.5">
-                        {[1, 2, 3, 4, 5].map((s) => (
-                            <Star key={s} className="h-4 w-4 fill-amber-400 text-amber-400" />
-                        ))}
-                    </div>
-                    <span className="text-[13px] font-bold text-slate-700">4.8</span>
-                    <span className="text-[13px] text-slate-400">({product.reviews})</span>
-                </div>
-
-                {/* Price */}
-                <div className="mt-auto mb-4 flex items-end gap-3">
-                    <span className="text-[18px] font-extrabold tracking-tight text-red-600">
-                        {product.price.toLocaleString("fr-FR")} DH
-                    </span>
-
-                    {product.originalPrice && (
-                        <span className="text-[13px] font-semibold text-slate-800 line-through opacity-80">
-                            {product.originalPrice.toLocaleString("fr-FR")} DH
-                        </span>
-                    )}
-                </div>
-
-                {/* Add to cart */}
-                <button
-                    onClick={handleAddToCart}
-                    disabled={!product.inStock || added}
-                    className={cn(
-                        "flex h-12 w-full items-center justify-center gap-2 rounded-xl text-sm font-extrabold transition-all duration-200",
-                        product.inStock
-                            ? added
-                                ? "bg-emerald-600 text-white shadow-md"
-                                : "bg-red-600 text-white shadow-md hover:bg-red-700 hover:shadow-lg"
-                            : "cursor-not-allowed bg-gray-100 text-gray-400"
-                    )}
-                >
-                    <ShoppingCart className="h-4 w-4" />
-                    {!product.inStock ? "Rupture" : added ? "Ajouté ✓" : "Ajouter"}
-                </button>
-            </div>
+        <div className="mb-3 flex items-center gap-2">
+          <div className="flex gap-0.5">
+            {[1, 2, 3, 4, 5].map((s) => (
+              <Star key={s} className="h-4 w-4 fill-amber-400 text-amber-400" />
+            ))}
+          </div>
+          <span className="text-[13px] font-bold text-slate-700">
+            {productRating.toFixed(1)}
+          </span>
+          <span className="text-[13px] text-slate-400">({productReviews})</span>
         </div>
-    )
+
+        <div className="mb-4 mt-auto flex items-end gap-3">
+          <span className="text-[18px] font-extrabold tracking-tight text-red-600">
+            {product.price.toLocaleString("fr-FR")} DH
+          </span>
+
+          {product.originalPrice && (
+            <span className="text-[13px] font-semibold text-slate-800 line-through opacity-80">
+              {product.originalPrice.toLocaleString("fr-FR")} DH
+            </span>
+          )}
+        </div>
+
+        <button
+          onClick={handleAddToCart}
+          disabled={!product.inStock || added}
+          className={cn(
+            "flex h-12 w-full items-center justify-center gap-2 rounded-xl text-sm font-extrabold transition-all duration-200",
+            product.inStock
+              ? added
+                ? "bg-emerald-600 text-white shadow-md"
+                : "bg-red-600 text-white shadow-md hover:bg-red-700 hover:shadow-lg"
+              : "cursor-not-allowed bg-gray-100 text-gray-400"
+          )}
+        >
+          <ShoppingCart className="h-4 w-4" />
+          {!product.inStock ? "Rupture" : added ? "Ajouté ✓" : "Ajouter"}
+        </button>
+      </div>
+    </div>
+  )
 }
