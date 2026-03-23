@@ -21,6 +21,7 @@ export interface Product {
   description: string;
   specs?: Record<string, string>;
   isPromotion?: boolean;
+  isActive?: boolean;
 }
 
 export interface Pack {
