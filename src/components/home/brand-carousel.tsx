@@ -1,3 +1,9 @@
+//brand-carousel غالبًا كيخدم بهاد الطريقة:
+
+//كياخذ ليستة ديال البراندات (name + logo + link).
+//كيدور عليهم بـ map() وكيصاوب card/logo لكل brand.
+//كيعرضهم فواحد slider أفقي كيتحرك يمين/ليسار.
+
 "use client"
 
 import * as React from "react"

@@ -1,3 +1,5 @@
+//categories-se...: غالبًا section ديال التصنيفات.
+
 "use client"
 
 import * as React from "react"
