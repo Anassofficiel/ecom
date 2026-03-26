@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
     },
-    sitemap: 'https://veneziaelectro.vercel.app/sitemap.xml',
+    sitemap: 'https://venziaelectro.vercel.app/sitemap.xml',
   }
 }
