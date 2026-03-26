@@ -1,50 +1,45 @@
 import type { MetadataRoute } from 'next'
+import { products } from '@/lib/data'
+
+const baseUrl = 'https://veneziaelectro.vercel.app'
+
+// categories اللي تأكدنا بلي خدامين دابا
+const categorySlugs = [
+  'refrigerators',
+  'washing-machines',
+  'televisions',
+  'air-fryers',
+  'coffee-machines',
+  'kitchen-appliances',
+]
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://veniziaelectro.vercel.app/'
+  const now = new Date()
 
-  return [
+  const staticPages: MetadataRoute.Sitemap = [
     {
       url: `${baseUrl}/`,
-      lastModified: new Date(),
+      lastModified: now,
       changeFrequency: 'daily',
       priority: 1,
     },
-    {
-      url: `${baseUrl}/category/refrigerators`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/category/washing-machines`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/category/televisions`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/category/air-fryers`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/category/coffee-machines`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/category/kitchen-appliances`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.8,
-    },
   ]
+
+  const categoryPages: MetadataRoute.Sitemap = categorySlugs.map((slug) => ({
+    url: `${baseUrl}/category/${slug}`,
+    lastModified: now,
+    changeFrequency: 'daily',
+    priority: 0.9,
+  }))
+
+  const productPages: MetadataRoute.Sitemap = products
+    .filter((product) => product.isActive !== false)
+    .map((product) => ({
+      url: `${baseUrl}/product/${product.id}`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    }))
+
+  return [...staticPages, ...categoryPages, ...productPages]
 }
