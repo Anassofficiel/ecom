@@ -24,7 +24,7 @@ function OrderSuccessContent() {
           </h1>
 
           <p className="text-gray-500 text-sm mb-6">
-            Merci d'avoir choisi Electro Manager. Votre commande a été enregistrée
+            Merci d'avoir choisi Electro Mostafa. Votre commande a été enregistrée
             avec succès.
           </p>
 
@@ -86,10 +86,10 @@ function OrderSuccessContent() {
         <p className="text-center text-xs text-gray-400 mt-6">
           Des questions ? Contactez-nous à{" "}
           <a
-            href="mailto:support@electromanager.ma"
+            href="mailto:support@electromostafa.ma"
             className="text-red-600 hover:underline"
           >
-            support@electromanager.ma
+            support@electromostafa.ma
           </a>
         </p>
       </div>

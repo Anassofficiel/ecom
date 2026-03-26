@@ -5,12 +5,12 @@ import { motion, AnimatePresence } from "framer-motion"
 
 const slides = [
   {
-    title: "Électroménager Premium",
+    title: "Electro Mostafa Premium",
     subtitle: "Le confort moderne pour votre maison",
     description:
-      "Découvrez notre sélection d’électroménager au Maroc : réfrigérateurs, fours, lave-linge, télévisions et appareils de cuisine avec design moderne et livraison rapide.",
+      "Découvrez notre sélection d’Electro Mostafa au Maroc : réfrigérateurs, fours, lave-linge, télévisions et appareils de cuisine avec design moderne et livraison rapide.",
     image: "https://i.postimg.cc/zfjCpvhL/image.png",
-    alt: "Cuisine moderne avec électroménager premium chez Electro Mostafa",
+    alt: "Cuisine moderne avec Electro Mostafa premium chez Electro Mostafa",
     color: "bg-zinc-900",
   },
   {
@@ -20,7 +20,7 @@ const slides = [
       "Explorez nos lave-linge, lave-vaisselle et appareils économiques conçus pour allier performance, faible consommation et excellent rapport qualité-prix.",
     image:
       "https://delivery-p28264-e87620.adobeaemcloud.com/adobe/assets/urn:aaid:aem:3de12754-7ea9-4718-91d3-d768b2a7fde2/as/SubZero-Wolf-JV-04.avif?assetname=SubZero-Wolf-JV-04.png",
-    alt: "Appareils électroménagers économes en énergie pour la maison",
+    alt: "Appareils Electro Mostafas économes en énergie pour la maison",
     color: "bg-blue-900",
   },
   {

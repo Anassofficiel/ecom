@@ -202,7 +202,7 @@ export function PromotionsSection() {
                 </h3>
 
                 <p className="mt-2 max-w-xl text-sm text-white/80 sm:text-base">
-                  Sur une sélection d&apos;appareils électroménagers premium
+                  Sur une sélection d&apos;appareils Electro Mostafa premium
                 </p>
               </div>
 

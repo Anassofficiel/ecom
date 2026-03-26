@@ -496,8 +496,8 @@ export default function ProductPage() {
             <div className="max-w-3xl space-y-4 text-gray-600">
               <p className="leading-relaxed">{product.description}</p>
               <p className="text-sm leading-6">
-                Ce produit appartient à notre catégorie {categoryLabel.toLowerCase()} chez Venezia
-                Electro Maroc. Il est sélectionné pour sa qualité, son design et son rapport
+                Ce produit appartient à notre catégorie {categoryLabel.toLowerCase()} chez Electro 
+                Mostafa Maroc. Il est sélectionné pour sa qualité, son design et son rapport
                 qualité-prix.
               </p>
             </div>

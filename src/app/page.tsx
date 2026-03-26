@@ -50,7 +50,7 @@ export default function HomePage() {
     url: `${BASE_URL}/`,
     inLanguage: "fr-MA",
     description:
-      "Boutique d'électroménager au Maroc : réfrigérateurs, lave-linge, télévisions, fours et petit électroménager.",
+      "Boutique d'électroménager Mostafa au Maroc : réfrigérateurs, lave-linge, télévisions, fours et petit électroménager.",
   }
 
   return (
@@ -70,7 +70,7 @@ export default function HomePage() {
             </span>
 
             <h1 className="mt-3 text-2xl md:text-3xl font-black tracking-tight text-gray-900">
-              Électroménager premium pour votre maison
+              Électroménager Mostafa premium pour votre maison
             </h1>
 
             <p className="mt-3 text-sm md:text-base leading-7 text-gray-600">
@@ -91,7 +91,7 @@ export default function HomePage() {
       <section className="container mx-auto px-4 py-10">
         <div className="rounded-2xl border border-red-100 bg-white p-5 md:p-6">
           <h2 className="text-lg md:text-xl font-bold text-gray-900">
-            Votre magasin d&apos;électroménager au Maroc
+            Votre magasin d&apos;électroménager Mostafa au Maroc
           </h2>
 
           <p className="mt-3 text-sm md:text-base leading-7 text-gray-600">

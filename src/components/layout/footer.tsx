@@ -34,7 +34,7 @@ export function Footer() {
                 <div className="space-y-6">
                     <Link href="/" className="flex items-center">
                         <span className="text-2xl font-black italic text-primary tracking-tighter">
-                            ELECTRO MANAGER
+                            ELECTRO MOSTAFA
                         </span>
                     </Link>
                     <p className="text-sm leading-relaxed">
@@ -94,7 +94,7 @@ export function Footer() {
                     </div>
                     <div className="flex gap-3 text-sm">
                         <Mail className="h-5 w-5 text-primary shrink-0" />
-                        <span>contact@electromanager.ma</span>
+                        <span>contact@electromostafa.ma</span>
                     </div>
                 </div>
             </div>
@@ -103,7 +103,7 @@ export function Footer() {
 
             {/* Bottom Footer */}
             <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
-                <p>© {new Date().getFullYear()} ELECTRO MANAGER. Tous droits réservés.</p>
+                <p>© {new Date().getFullYear()} ELECTRO MOSTAFA. Tous droits réservés.</p>
                 <div className="flex gap-6">
                     <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>
                     <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>

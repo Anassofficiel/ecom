@@ -153,7 +153,7 @@ export function CategoriesSection() {
           </span>
           <h2 className="mb-2 text-3xl font-bold text-gray-900">Catégories</h2>
           <p className="text-sm text-gray-500">
-            Explorez notre sélection d&apos;appareils électroménagers premium
+            Explorez notre sélection d&apos;appareils Electro Mostafa premium
           </p>
         </div>
 

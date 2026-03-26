@@ -6,13 +6,13 @@ const storesContent = [
   {
     id: "casa",
     city: "Casablanca",
-    title: "Venezia Electro — Casablanca",
+    title: "Electro Mostafa — Casablanca",
     image:
       "https://commons.wikimedia.org/wiki/Special:FilePath/Sunrise%20in%20Casablanca%20with%20Hassan%20II%20Mosque.jpg",
     imageAlt:
-      "Showroom Venezia Electro à Casablanca - électroménager et électronique au Maroc",
+      "Showroom Electro Mostafa à Casablanca - électroménager et électronique au Maroc",
     caption:
-      "Retrouvez Venezia Electro à Casablanca pour découvrir notre sélection d’électroménager, TV et équipements pour la maison.",
+      "Retrouvez Electro Mostafa à Casablanca pour découvrir notre sélection d’électroménager, TV et équipements pour la maison.",
     address: "Bd Bassatine, Tit Mellil, Casablanca",
     hours: "Lun–Sam: 9h00 – 19h00 | Dim: 10h00 – 17h00",
     phone: "+212 5 22 000 000",
@@ -21,11 +21,11 @@ const storesContent = [
   {
     id: "marrakech",
     city: "Marrakech",
-    title: "Venezia Electro — Marrakech",
+    title: "Electro Mostafa — Marrakech",
     image:
       "https://commons.wikimedia.org/wiki/Special:FilePath/Maroc%20Marrakech%20Jemaa-el-Fna%20Luc%20Viatour.JPG",
     imageAlt:
-      "Showroom Venezia Electro à Marrakech - électroménager et électronique au Maroc",
+      "Showroom Electro Mostafa à Marrakech - électroménager et électronique au Maroc",
     caption:
       "Visitez notre showroom de Marrakech pour découvrir nos offres en électroménager, télévision et petit équipement de cuisine.",
     address: "Route de Quamassa, près de la Rue du Sport, Marrakech",
@@ -83,11 +83,11 @@ export function StoresSection() {
           </span>
 
           <h2 className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl">
-            Visitez Nos Showrooms Venezia Electro
+            Visitez Nos Showrooms Electro Mostafa
           </h2>
 
           <p className="mx-auto max-w-3xl text-sm text-gray-500 md:text-base">
-            Découvrez nos magasins Venezia Electro à Casablanca et Marrakech pour
+            Découvrez nos magasins Electro Mostafa à Casablanca et Marrakech pour
             trouver réfrigérateurs, lave-linge, télévisions, fours et petit
             électroménager dans un cadre moderne, accueillant et premium.
           </p>
@@ -112,7 +112,7 @@ export function StoresSection() {
 
                 <div className="absolute left-4 top-4">
                   <span className="inline-flex items-center rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-gray-900 shadow backdrop-blur-sm">
-                    Venezia Electro
+                    Electro Mostafa
                   </span>
                 </div>
 
@@ -164,7 +164,7 @@ export function StoresSection() {
         </div>
 
         <div className="mx-auto mt-8 max-w-5xl rounded-2xl border border-red-100 bg-white p-5 text-sm leading-7 text-gray-600 md:p-6">
-          Venezia Electro vous accueille dans ses showrooms au Maroc pour vous
+          Electro Mostafa vous accueille dans ses showrooms au Maroc pour vous
           faire découvrir une large sélection d’électroménager, téléviseurs,
           équipements de cuisine et offres spéciales. Visitez nos magasins pour
           comparer les produits, profiter des promotions et obtenir des conseils
