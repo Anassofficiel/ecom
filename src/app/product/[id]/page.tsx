@@ -130,8 +130,8 @@ export default function ProductPage() {
 
     const cleanDescription = stripEmojis(product.description)
     const categoryLabel = categoryDisplayName(product.category)
-    const title = `${product.name} | ${categoryLabel} au Maroc | Venezia Electro Maroc`
-    const description = `${product.name} chez Venezia Electro au Maroc. Prix: ${product.price.toLocaleString(
+    const title = `${product.name} | ${categoryLabel} au Maroc | Electro Mostafa Maroc`
+    const description = `${product.name} chez Electro Mostafa au Maroc. Prix: ${product.price.toLocaleString(
       "fr-FR"
     )} DH. ${cleanDescription}`.slice(0, 160)
 
@@ -373,7 +373,7 @@ export default function ProductPage() {
               </h1>
 
               <p className="max-w-2xl text-sm leading-6 text-gray-600">
-                Achetez {product.name} chez Venezia Electro au Maroc. {cleanDescription}
+                Achetez {product.name} chez Electro Mostafa au Maroc. {cleanDescription}
               </p>
 
               <div className="flex items-center gap-2">
@@ -422,7 +422,7 @@ export default function ProductPage() {
               <div className="rounded-2xl border border-red-100 bg-red-50/50 p-4 text-sm leading-6 text-gray-700">
                 <strong className="text-gray-900">{product.name}</strong> fait partie de notre
                 sélection premium de {categoryLabel.toLowerCase()} au Maroc, avec livraison rapide,
-                disponibilité en stock selon arrivage et service client Venezia Electro.
+                disponibilité en stock selon arrivage et service client Electro Mostafa.
               </div>
 
               <div className="flex flex-col gap-3 pt-2">

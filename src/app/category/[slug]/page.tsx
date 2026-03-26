@@ -30,52 +30,52 @@ const categorySeoMap: Record<
     displayName: "Réfrigérateurs",
     title: "Réfrigérateurs au Maroc",
     description:
-      "Découvrez les meilleurs réfrigérateurs Venezia Electro au Maroc : rétro, combinés, top freezer et side by side avec livraison rapide et garantie.",
+      "Découvrez les meilleurs réfrigérateurs Electro Mostafa au Maroc : rétro, combinés, top freezer et side by side avec livraison rapide et garantie.",
     intro:
-      "Découvrez notre sélection de réfrigérateurs Venezia Electro au Maroc : modèles rétro, combinés, top freezer et side by side, avec livraison rapide et garantie.",
+      "Découvrez notre sélection de réfrigérateurs Electro Mostafa au Maroc : modèles rétro, combinés, top freezer et side by side, avec livraison rapide et garantie.",
   },
   "washing-machines": {
     dataCategory: "Washing Machines",
     displayName: "Lave-linge",
     title: "Machines à laver au Maroc",
     description:
-      "Découvrez nos machines à laver Venezia Electro au Maroc : front load, semi-automatiques et grande capacité avec programmes vapeur et livraison rapide.",
+      "Découvrez nos machines à laver Electro Mostafa au Maroc : front load, semi-automatiques et grande capacité avec programmes vapeur et livraison rapide.",
     intro:
-      "Explorez notre gamme de machines à laver Venezia Electro : modèles front load, semi-automatiques et grande capacité, conçus pour le confort quotidien.",
+      "Explorez notre gamme de machines à laver Electro Mostafa : modèles front load, semi-automatiques et grande capacité, conçus pour le confort quotidien.",
   },
   "televisions": {
     dataCategory: "Televisions",
     displayName: "Télévisions",
     title: "Télévisions et Smart TV au Maroc",
     description:
-      "Achetez des télévisions et Smart TV Venezia Electro au Maroc : Google TV, Android TV, 4K QLED et modèles grand écran avec livraison rapide.",
+      "Achetez des télévisions et Smart TV Electro Mostafa au Maroc : Google TV, Android TV, 4K QLED et modèles grand écran avec livraison rapide.",
     intro:
-      "Retrouvez nos télévisions et Smart TV Venezia Electro : écrans 4K, Google TV, Android TV et modèles adaptés au salon, à la chambre ou au bureau.",
+      "Retrouvez nos télévisions et Smart TV Electro Mostafa : écrans 4K, Google TV, Android TV et modèles adaptés au salon, à la chambre ou au bureau.",
   },
   "air-fryers": {
     dataCategory: "Air Fryers",
     displayName: "Friteuses à Air",
     title: "Friteuses à air au Maroc",
     description:
-      "Découvrez les meilleures friteuses à air chez Venezia Electro au Maroc : modèles compacts et digitaux pour une cuisine saine et rapide.",
+      "Découvrez les meilleures friteuses à air chez Electro Mostafa au Maroc : modèles compacts et digitaux pour une cuisine saine et rapide.",
     intro:
-      "Préparez des repas plus sains avec nos friteuses à air Venezia Electro : modèles pratiques, rapides et adaptés à la cuisine quotidienne.",
+      "Préparez des repas plus sains avec nos friteuses à air Electro Mostafa : modèles pratiques, rapides et adaptés à la cuisine quotidienne.",
   },
   "coffee-machines": {
     dataCategory: "Coffee Machines",
     displayName: "Cafetières",
     title: "Machines à café au Maroc",
     description:
-      "Découvrez les machines à café et cafetières Venezia Electro au Maroc : expresso, capsules et modèles automatiques pour les amateurs de café.",
+      "Découvrez les machines à café et cafetières Electro Mostafa au Maroc : expresso, capsules et modèles automatiques pour les amateurs de café.",
     intro:
-      "Découvrez notre sélection de machines à café Venezia Electro : cafetières expresso, capsules et modèles automatiques pour un café de qualité à la maison.",
+      "Découvrez notre sélection de machines à café Electro Mostafa : cafetières expresso, capsules et modèles automatiques pour un café de qualité à la maison.",
   },
   "kitchen-appliances": {
     dataCategory: "Kitchen Appliances",
     displayName: "Cuisine & Petit Électroménager",
     title: "Petit électroménager de cuisine au Maroc",
     description:
-      "Achetez le meilleur petit électroménager de cuisine chez Venezia Electro au Maroc : blenders, grills, bouilloires, hottes, chauffe-eau et plus.",
+      "Achetez le meilleur petit électroménager de cuisine chez Electro Mostafa au Maroc : blenders, grills, bouilloires, hottes, chauffe-eau et plus.",
     intro:
       "Retrouvez notre sélection d'appareils de cuisine et petit électroménager : blenders, grills, bouilloires, hottes, chauffe-eau et autres essentiels du quotidien.",
   },
@@ -102,8 +102,8 @@ export default function CategoryPage() {
         dataCategory: fallbackCategoryName,
         displayName: fallbackCategoryName,
         title: `${fallbackCategoryName} au Maroc`,
-        description: `Découvrez notre sélection de ${fallbackCategoryName.toLowerCase()} chez Venezia Electro au Maroc avec livraison rapide et produits premium.`,
-        intro: `Découvrez notre sélection de ${fallbackCategoryName.toLowerCase()} chez Venezia Electro au Maroc.`,
+        description: `Découvrez notre sélection de ${fallbackCategoryName.toLowerCase()} chez Electro Mostafa au Maroc avec livraison rapide et produits premium.`,
+        intro: `Découvrez notre sélection de ${fallbackCategoryName.toLowerCase()} chez Electro Mostafa au Maroc.`,
       }
     )
   }, [slug, fallbackCategoryName])
@@ -113,7 +113,7 @@ export default function CategoryPage() {
   const [currentPage, setCurrentPage] = React.useState(1)
 
   React.useEffect(() => {
-    const pageTitle = `${seo.title} | Venezia Electro Maroc`
+    const pageTitle = `${seo.title} | Electro Mostafa Maroc`
     document.title = pageTitle
 
     let metaDescription = document.querySelector(
@@ -254,7 +254,7 @@ export default function CategoryPage() {
         ) : (
           <>
             <div className="mb-6 rounded-2xl border border-red-100 bg-white p-4 text-sm leading-6 text-gray-700">
-              <strong className="text-gray-900">Venezia Electro Maroc :</strong>{" "}
+              <strong className="text-gray-900">Electro Mostafa Maroc :</strong>{" "}
               trouvez les meilleurs {seo.displayName.toLowerCase()} avec promotions,
               livraison rapide et produits sélectionnés pour la maison moderne.
             </div>

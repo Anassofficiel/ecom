@@ -12,9 +12,9 @@ const BASE_URL = "https://veneziaelectro.vercel.app"
 export default function HomePage() {
   React.useEffect(() => {
     const title =
-      "Venezia Electro Maroc | Électroménager, TV, Réfrigérateurs et Machines à laver"
+      "Electro Mostafa Maroc | Électroménager, TV, Réfrigérateurs et Machines à laver"
     const description =
-      "Achetez électroménager, téléviseurs, réfrigérateurs, machines à laver, fours et petits appareils chez Venezia Electro au Maroc. Produits premium, promotions et livraison rapide."
+      "Achetez électroménager, téléviseurs, réfrigérateurs, machines à laver, fours et petits appareils chez Electro Mostafa au Maroc. Produits premium, promotions et livraison rapide."
 
     document.title = title
 
@@ -46,7 +46,7 @@ export default function HomePage() {
   const websiteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Venezia Electro Maroc",
+    name: "Electro Mostafa Maroc",
     url: `${BASE_URL}/`,
     inLanguage: "fr-MA",
     description:
@@ -66,7 +66,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-5xl rounded-3xl border border-red-100 bg-white/95 backdrop-blur shadow-lg p-6 md:p-8">
           <div className="max-w-3xl">
             <span className="inline-block rounded-full bg-red-50 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-red-600">
-              Venezia Electro Maroc
+              Electro Mostafa Maroc
             </span>
 
             <h1 className="mt-3 text-2xl md:text-3xl font-black tracking-tight text-gray-900">
@@ -77,7 +77,7 @@ export default function HomePage() {
               Découvrez notre sélection de réfrigérateurs, machines à laver,
               télévisions, fours, cafetières, friteuses à air et petit
               électroménager au Maroc. Profitez de promotions exclusives,
-              packs avantageux et livraison rapide avec Venezia Electro.
+              packs avantageux et livraison rapide avec Electro Mostafa.
             </p>
           </div>
         </div>
@@ -95,7 +95,7 @@ export default function HomePage() {
           </h2>
 
           <p className="mt-3 text-sm md:text-base leading-7 text-gray-600">
-            Chez Venezia Electro, nous proposons une large gamme d&apos;appareils pour la
+            Chez Electro Mostafa, nous proposons une large gamme d&apos;appareils pour la
             maison : électroménager de cuisine, téléviseurs, réfrigérateurs,
             lave-linge, fours et équipements pratiques pour le quotidien.
           </p>

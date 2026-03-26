@@ -10,7 +10,7 @@ const slides = [
     description:
       "Découvrez notre sélection d’électroménager au Maroc : réfrigérateurs, fours, lave-linge, télévisions et appareils de cuisine avec design moderne et livraison rapide.",
     image: "https://i.postimg.cc/zfjCpvhL/image.png",
-    alt: "Cuisine moderne avec électroménager premium chez Venezia Electro",
+    alt: "Cuisine moderne avec électroménager premium chez Electro Mostafa",
     color: "bg-zinc-900",
   },
   {
@@ -49,7 +49,7 @@ export function Hero() {
   return (
     <section
       className="relative h-[80vh] min-h-[600px] w-full overflow-hidden bg-black"
-      aria-label="Présentation des collections Venezia Electro"
+      aria-label="Présentation des collections Electro Mostafa"
     >
       <AnimatePresence mode="wait">
         <motion.div
@@ -80,7 +80,7 @@ export function Hero() {
             className="space-y-6"
           >
             <span className="inline-block rounded-full border border-primary/30 bg-primary/20 px-4 py-1 text-xs font-bold uppercase tracking-widest text-primary">
-              Venezia Electro Maroc
+              Electro Mostafa Maroc
             </span>
 
             <h2 className="text-4xl font-black uppercase italic leading-tight tracking-tighter text-white md:text-6xl xl:text-7xl">
@@ -111,7 +111,7 @@ export function Hero() {
 
       <div className="absolute right-[-100px] top-1/2 hidden -translate-y-1/2 rotate-90 xl:block">
         <span className="select-none whitespace-nowrap text-8xl font-black uppercase tracking-widest text-white/5">
-          VENEZIA ELECTRO
+          Electro Mostafa
         </span>
       </div>
     </section>

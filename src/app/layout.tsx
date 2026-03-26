@@ -17,13 +17,13 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   metadataBase: new URL("https://veneziaelectro.vercel.app"),
   title: {
-    default: "Venezia Electro Maroc | Électroménager, TV, Réfrigérateurs et Machines à laver",
-    template: "%s | Venezia Electro Maroc",
+    default: "Electro Mostafa Maroc | Électroménager, TV, Réfrigérateurs et Machines à laver",
+    template: "%s | Electro Mostafa Maroc",
   },
   description:
-    "Achetez électroménager, téléviseurs, réfrigérateurs, machines à laver, fours et petits appareils chez Venezia Electro au Maroc. Produits premium, promotions et livraison rapide.",
+    "Achetez électroménager, téléviseurs, réfrigérateurs, machines à laver, fours et petits appareils chez Electro Mostafa au Maroc. Produits premium, promotions et livraison rapide.",
   keywords: [
-    "Venezia Electro",
+    "Electro Mostafa",
     "électroménager Maroc",
     "réfrigérateurs Maroc",
     "machines à laver Maroc",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
-  applicationName: "Venezia Electro Maroc",
+  applicationName: "Electro Mostafa Maroc",
   robots: {
     index: true,
     follow: true,
@@ -50,17 +50,17 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: "https://veneziaelectro.vercel.app",
-    siteName: "Venezia Electro Maroc",
-    title: "Venezia Electro Maroc | Électroménager, TV, Réfrigérateurs et Machines à laver",
+    siteName: "Electro Mostafa Maroc",
+    title: "Electro Mostafa Maroc | Électroménager, TV, Réfrigérateurs et Machines à laver",
     description:
-      "Découvrez les meilleurs appareils électroménagers chez Venezia Electro au Maroc : réfrigérateurs, lave-linge, téléviseurs, fours et plus encore.",
+      "Découvrez les meilleurs appareils électroménagers chez Electro Mostafa au Maroc : réfrigérateurs, lave-linge, téléviseurs, fours et plus encore.",
     locale: "fr_MA",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Venezia Electro Maroc | Électroménager, TV, Réfrigérateurs et Machines à laver",
+    title: "Electro Mostafa Maroc | Électroménager, TV, Réfrigérateurs et Machines à laver",
     description:
-      "Produits premium, promotions et livraison rapide chez Venezia Electro au Maroc.",
+      "Produits premium, promotions et livraison rapide chez Electro Mostafa au Maroc.",
   },
 };
 

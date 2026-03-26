@@ -56,7 +56,7 @@ export function Header() {
               <span className="text-gray-200 opacity-60">•</span>
               <span>Livraison Rapide</span>
               <span className="text-gray-200 opacity-60">•</span>
-              <span className="font-extrabold text-white">ELECTRO MANAGER</span>
+              <span className="font-extrabold text-white">ELECTRO MOSTAFA</span>
               <span className="text-gray-200 opacity-60">•</span>
               <span>Service Client 7j/7</span>
               <span className="text-gray-200 opacity-60">•</span>
@@ -73,7 +73,7 @@ export function Header() {
               <span className="text-gray-200 opacity-60">•</span>
               <span>Livraison Rapide</span>
               <span className="text-gray-200 opacity-60">•</span>
-              <span className="font-extrabold text-white">ELECTRO MANAGER</span>
+              <span className="font-extrabold text-white">ELECTRO MOSTAFA</span>
               <span className="text-gray-200 opacity-60">•</span>
               <span>Service Client 7j/7</span>
               <span className="text-gray-200 opacity-60">•</span>
@@ -93,7 +93,7 @@ export function Header() {
 
             <Link href="/" className="flex-shrink-0">
               <span className="text-xl font-black text-red-600 uppercase tracking-tight leading-none">
-                ELECTRO<br className="hidden" /> MANAGER
+                ELECTRO<br className="hidden" /> MOSTAFA
               </span>
             </Link>
 
