@@ -41,42 +41,6 @@ export default function HomePage() {
     }
 
     canonical.setAttribute("href", `${BASE_URL}/`)
-
-    const ensureMeta = (selector: string, attrs: Record<string, string>) => {
-      let el = document.head.querySelector(selector) as HTMLMetaElement | null
-
-      if (!el) {
-        el = document.createElement("meta")
-        Object.entries(attrs).forEach(([key, value]) => el!.setAttribute(key, value))
-        document.head.appendChild(el)
-      }
-
-      return el
-    }
-
-    const ogTitle = ensureMeta('meta[property="og:title"]', { property: "og:title" })
-    ogTitle.setAttribute("content", title)
-
-    const ogDescription = ensureMeta('meta[property="og:description"]', {
-      property: "og:description",
-    })
-    ogDescription.setAttribute("content", description)
-
-    const ogUrl = ensureMeta('meta[property="og:url"]', { property: "og:url" })
-    ogUrl.setAttribute("content", `${BASE_URL}/`)
-
-    const ogType = ensureMeta('meta[property="og:type"]', { property: "og:type" })
-    ogType.setAttribute("content", "website")
-
-    const twitterTitle = ensureMeta('meta[name="twitter:title"]', {
-      name: "twitter:title",
-    })
-    twitterTitle.setAttribute("content", title)
-
-    const twitterDescription = ensureMeta('meta[name="twitter:description"]', {
-      name: "twitter:description",
-    })
-    twitterDescription.setAttribute("content", description)
   }, [])
 
   const websiteJsonLd = {
@@ -96,22 +60,29 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
       />
 
-      <section className="bg-white border-b border-gray-100">
-        <div className="container mx-auto px-4 py-6">
-          <h1 className="text-2xl md:text-3xl font-black tracking-tight text-gray-900">
-            Venezia Electro Maroc
-          </h1>
+      <Hero />
 
-          <p className="mt-3 max-w-4xl text-sm md:text-base leading-7 text-gray-600">
-            Découvrez notre sélection d&apos;électroménager au Maroc : réfrigérateurs,
-            machines à laver, télévisions, fours, cafetières, friteuses à air et petit
-            électroménager. Profitez de promotions, packs avantageux et livraison rapide
-            chez Venezia Electro.
-          </p>
+      <section className="container mx-auto px-4 -mt-10 relative z-20">
+        <div className="mx-auto max-w-5xl rounded-3xl border border-red-100 bg-white/95 backdrop-blur shadow-lg p-6 md:p-8">
+          <div className="max-w-3xl">
+            <span className="inline-block rounded-full bg-red-50 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-red-600">
+              Venezia Electro Maroc
+            </span>
+
+            <h1 className="mt-3 text-2xl md:text-3xl font-black tracking-tight text-gray-900">
+              Électroménager premium pour votre maison
+            </h1>
+
+            <p className="mt-3 text-sm md:text-base leading-7 text-gray-600">
+              Découvrez notre sélection de réfrigérateurs, machines à laver,
+              télévisions, fours, cafetières, friteuses à air et petit
+              électroménager au Maroc. Profitez de promotions exclusives,
+              packs avantageux et livraison rapide avec Venezia Electro.
+            </p>
+          </div>
         </div>
       </section>
 
-      <Hero />
       <CategoriesSection />
       <PromotionsSection />
       <PacksSection />
@@ -125,10 +96,8 @@ export default function HomePage() {
 
           <p className="mt-3 text-sm md:text-base leading-7 text-gray-600">
             Chez Venezia Electro, nous proposons une large gamme d&apos;appareils pour la
-            maison : électroménager de cuisine, téléviseurs, réfrigérateurs, lave-linge,
-            fours et équipements pratiques pour le quotidien. Notre objectif est de vous
-            offrir des produits fiables, un bon rapport qualité-prix et une expérience
-            d&apos;achat simple.
+            maison : électroménager de cuisine, téléviseurs, réfrigérateurs,
+            lave-linge, fours et équipements pratiques pour le quotidien.
           </p>
         </div>
       </section>
