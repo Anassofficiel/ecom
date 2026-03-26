@@ -13,6 +13,74 @@ import { Pagination } from "@/components/ui/pagination"
 import Link from "next/link"
 import { ChevronRight } from "lucide-react"
 
+const BASE_URL = "https://veneziaelectro.vercel.app"
+
+const categorySeoMap: Record<
+  string,
+  {
+    dataCategory: string
+    displayName: string
+    title: string
+    description: string
+    intro: string
+  }
+> = {
+  "refrigerators": {
+    dataCategory: "Refrigerators",
+    displayName: "Réfrigérateurs",
+    title: "Réfrigérateurs au Maroc",
+    description:
+      "Découvrez les meilleurs réfrigérateurs Venezia Electro au Maroc : rétro, combinés, top freezer et side by side avec livraison rapide et garantie.",
+    intro:
+      "Découvrez notre sélection de réfrigérateurs Venezia Electro au Maroc : modèles rétro, combinés, top freezer et side by side, avec livraison rapide et garantie.",
+  },
+  "washing-machines": {
+    dataCategory: "Washing Machines",
+    displayName: "Lave-linge",
+    title: "Machines à laver au Maroc",
+    description:
+      "Découvrez nos machines à laver Venezia Electro au Maroc : front load, semi-automatiques et grande capacité avec programmes vapeur et livraison rapide.",
+    intro:
+      "Explorez notre gamme de machines à laver Venezia Electro : modèles front load, semi-automatiques et grande capacité, conçus pour le confort quotidien.",
+  },
+  "televisions": {
+    dataCategory: "Televisions",
+    displayName: "Télévisions",
+    title: "Télévisions et Smart TV au Maroc",
+    description:
+      "Achetez des télévisions et Smart TV Venezia Electro au Maroc : Google TV, Android TV, 4K QLED et modèles grand écran avec livraison rapide.",
+    intro:
+      "Retrouvez nos télévisions et Smart TV Venezia Electro : écrans 4K, Google TV, Android TV et modèles adaptés au salon, à la chambre ou au bureau.",
+  },
+  "air-fryers": {
+    dataCategory: "Air Fryers",
+    displayName: "Friteuses à Air",
+    title: "Friteuses à air au Maroc",
+    description:
+      "Découvrez les meilleures friteuses à air chez Venezia Electro au Maroc : modèles compacts et digitaux pour une cuisine saine et rapide.",
+    intro:
+      "Préparez des repas plus sains avec nos friteuses à air Venezia Electro : modèles pratiques, rapides et adaptés à la cuisine quotidienne.",
+  },
+  "coffee-machines": {
+    dataCategory: "Coffee Machines",
+    displayName: "Cafetières",
+    title: "Machines à café au Maroc",
+    description:
+      "Découvrez les machines à café et cafetières Venezia Electro au Maroc : expresso, capsules et modèles automatiques pour les amateurs de café.",
+    intro:
+      "Découvrez notre sélection de machines à café Venezia Electro : cafetières expresso, capsules et modèles automatiques pour un café de qualité à la maison.",
+  },
+  "kitchen-appliances": {
+    dataCategory: "Kitchen Appliances",
+    displayName: "Cuisine & Petit Électroménager",
+    title: "Petit électroménager de cuisine au Maroc",
+    description:
+      "Achetez le meilleur petit électroménager de cuisine chez Venezia Electro au Maroc : blenders, grills, bouilloires, hottes, chauffe-eau et plus.",
+    intro:
+      "Retrouvez notre sélection d'appareils de cuisine et petit électroménager : blenders, grills, bouilloires, hottes, chauffe-eau et autres essentiels du quotidien.",
+  },
+}
+
 export default function CategoryPage() {
   const params = useParams()
   const slug = decodeURIComponent((params?.slug as string) ?? "")
@@ -22,15 +90,56 @@ export default function CategoryPage() {
     []
   )
 
-  const categoryName = React.useMemo(() => {
+  const fallbackCategoryName = React.useMemo(() => {
     return slug
       .replace(/-/g, " ")
       .replace(/\b\w/g, (c) => c.toUpperCase())
   }, [slug])
 
+  const seo = React.useMemo(() => {
+    return (
+      categorySeoMap[slug] ?? {
+        dataCategory: fallbackCategoryName,
+        displayName: fallbackCategoryName,
+        title: `${fallbackCategoryName} au Maroc`,
+        description: `Découvrez notre sélection de ${fallbackCategoryName.toLowerCase()} chez Venezia Electro au Maroc avec livraison rapide et produits premium.`,
+        intro: `Découvrez notre sélection de ${fallbackCategoryName.toLowerCase()} chez Venezia Electro au Maroc.`,
+      }
+    )
+  }, [slug, fallbackCategoryName])
+
   const [categoryProducts, setCategoryProducts] = React.useState<Product[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [currentPage, setCurrentPage] = React.useState(1)
+
+  React.useEffect(() => {
+    const pageTitle = `${seo.title} | Venezia Electro Maroc`
+    document.title = pageTitle
+
+    let metaDescription = document.querySelector(
+      'meta[name="description"]'
+    ) as HTMLMetaElement | null
+
+    if (!metaDescription) {
+      metaDescription = document.createElement("meta")
+      metaDescription.name = "description"
+      document.head.appendChild(metaDescription)
+    }
+
+    metaDescription.content = seo.description
+
+    let canonical = document.querySelector(
+      'link[rel="canonical"]'
+    ) as HTMLLinkElement | null
+
+    if (!canonical) {
+      canonical = document.createElement("link")
+      canonical.rel = "canonical"
+      document.head.appendChild(canonical)
+    }
+
+    canonical.href = `${BASE_URL}/category/${slug}`
+  }, [seo, slug])
 
   React.useEffect(() => {
     let active = true
@@ -39,7 +148,7 @@ export default function CategoryPage() {
       try {
         setIsLoading(true)
 
-        const exact = await getProductsByCategory(categoryName)
+        const exact = getProductsByCategory(seo.dataCategory)
 
         if (!active) return
 
@@ -48,11 +157,7 @@ export default function CategoryPage() {
           return
         }
 
-        const fallbackCategory = slug
-          .replace(/-/g, " ")
-          .replace(/\b\w/g, (c) => c.toUpperCase())
-
-        const fallback = await getProductsByCategory(fallbackCategory)
+        const fallback = getProductsByCategory(fallbackCategoryName)
 
         if (!active) return
 
@@ -76,7 +181,7 @@ export default function CategoryPage() {
     return () => {
       active = false
     }
-  }, [slug, categoryName, normalize])
+  }, [slug, seo.dataCategory, fallbackCategoryName, normalize])
 
   React.useEffect(() => {
     setCurrentPage(1)
@@ -104,13 +209,16 @@ export default function CategoryPage() {
               Accueil
             </Link>
             <ChevronRight className="h-3 w-3" />
-            <span className="font-medium text-gray-900">{categoryName}</span>
+            <span className="font-medium text-gray-900">{seo.displayName}</span>
           </nav>
 
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">{categoryName}</h1>
-              <p className="mt-1 text-sm text-gray-500">
+            <div className="max-w-3xl">
+              <h1 className="text-2xl font-bold text-gray-900">{seo.displayName}</h1>
+
+              <p className="mt-2 text-sm leading-6 text-gray-600">{seo.intro}</p>
+
+              <p className="mt-2 text-sm text-gray-500">
                 {isLoading ? "Chargement..." : `${categoryProducts.length} produits disponibles`}
               </p>
             </div>
@@ -145,6 +253,12 @@ export default function CategoryPage() {
           </div>
         ) : (
           <>
+            <div className="mb-6 rounded-2xl border border-red-100 bg-white p-4 text-sm leading-6 text-gray-700">
+              <strong className="text-gray-900">Venezia Electro Maroc :</strong>{" "}
+              trouvez les meilleurs {seo.displayName.toLowerCase()} avec promotions,
+              livraison rapide et produits sélectionnés pour la maison moderne.
+            </div>
+
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-4">
               {pageProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />

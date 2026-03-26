@@ -15,8 +15,53 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Electro Manager | Premium Home Appliances & Kitchen Store",
-  description: "Découvrez les meilleurs appareils électroménagers chez Electro Manager — Réfrigérateurs, Lave-linge, TV, Fours et plus au Maroc.",
+  metadataBase: new URL("https://veneziaelectro.vercel.app"),
+  title: {
+    default: "Venezia Electro Maroc | Électroménager, TV, Réfrigérateurs et Machines à laver",
+    template: "%s | Venezia Electro Maroc",
+  },
+  description:
+    "Achetez électroménager, téléviseurs, réfrigérateurs, machines à laver, fours et petits appareils chez Venezia Electro au Maroc. Produits premium, promotions et livraison rapide.",
+  keywords: [
+    "Venezia Electro",
+    "électroménager Maroc",
+    "réfrigérateurs Maroc",
+    "machines à laver Maroc",
+    "TV Maroc",
+    "fours Maroc",
+    "petit électroménager Maroc",
+    "Venezia Maroc",
+  ],
+  alternates: {
+    canonical: "/",
+  },
+  applicationName: "Venezia Electro Maroc",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  openGraph: {
+    type: "website",
+    url: "https://veneziaelectro.vercel.app",
+    siteName: "Venezia Electro Maroc",
+    title: "Venezia Electro Maroc | Électroménager, TV, Réfrigérateurs et Machines à laver",
+    description:
+      "Découvrez les meilleurs appareils électroménagers chez Venezia Electro au Maroc : réfrigérateurs, lave-linge, téléviseurs, fours et plus encore.",
+    locale: "fr_MA",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Venezia Electro Maroc | Électroménager, TV, Réfrigérateurs et Machines à laver",
+    description:
+      "Produits premium, promotions et livraison rapide chez Venezia Electro au Maroc.",
+  },
 };
 
 export default function RootLayout({
@@ -30,9 +75,7 @@ export default function RootLayout({
         className={`${inter.variable} ${outfit.variable} font-sans antialiased bg-white text-gray-900`}
       >
         <Header />
-        <main className="min-h-screen pt-[170px]">
-          {children}
-        </main>
+        <main className="min-h-screen pt-[170px]">{children}</main>
         <Footer />
       </body>
     </html>

@@ -18,6 +18,7 @@ import { useCart } from "@/lib/store"
 import { cn } from "@/lib/utils"
 
 const WHATSAPP_NUMBER = "212608788782"
+const BASE_URL = "https://veneziaelectro.vercel.app"
 
 const stockConfig = {
   "in-stock": {
@@ -39,6 +40,37 @@ type ProductMeta = Product & {
   originalPrice?: number
   discount?: number
   specs?: Record<string, string>
+}
+
+function stripEmojis(text: string) {
+  return text
+    .replace(
+      /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu,
+      ""
+    )
+    .replace(/\s+/g, " ")
+    .trim()
+}
+
+function categoryToSlug(category: string) {
+  return category.toLowerCase().replace(/\s+/g, "-")
+}
+
+function categoryDisplayName(category: string) {
+  const map: Record<string, string> = {
+    Refrigerators: "Réfrigérateurs",
+    "Washing Machines": "Lave-linge",
+    Televisions: "Télévisions",
+    "Air Fryers": "Friteuses à Air",
+    "Coffee Machines": "Cafetières",
+    "Kitchen Appliances": "Cuisine & Petit Électroménager",
+    Ovens: "Fours",
+    Dishwashers: "Lave-vaisselle",
+    "Small Appliances": "Petit Électroménager",
+    Cookware: "Ustensiles de Cuisine",
+  }
+
+  return map[category] ?? category
 }
 
 export default function ProductPage() {
@@ -93,6 +125,83 @@ export default function ProductPage() {
     }
   }, [id, router])
 
+  React.useEffect(() => {
+    if (!product) return
+
+    const cleanDescription = stripEmojis(product.description)
+    const categoryLabel = categoryDisplayName(product.category)
+    const title = `${product.name} | ${categoryLabel} au Maroc | Venezia Electro Maroc`
+    const description = `${product.name} chez Venezia Electro au Maroc. Prix: ${product.price.toLocaleString(
+      "fr-FR"
+    )} DH. ${cleanDescription}`.slice(0, 160)
+
+    document.title = title
+
+    const ensureMeta = (selector: string, attrs: Record<string, string>) => {
+      let el = document.head.querySelector(selector) as HTMLMetaElement | null
+
+      if (!el) {
+        el = document.createElement("meta")
+        Object.entries(attrs).forEach(([key, value]) => el!.setAttribute(key, value))
+        document.head.appendChild(el)
+      }
+
+      return el
+    }
+
+    let metaDescription = document.head.querySelector(
+      'meta[name="description"]'
+    ) as HTMLMetaElement | null
+    if (!metaDescription) {
+      metaDescription = document.createElement("meta")
+      metaDescription.setAttribute("name", "description")
+      document.head.appendChild(metaDescription)
+    }
+    metaDescription.setAttribute("content", description)
+
+    let canonical = document.head.querySelector(
+      'link[rel="canonical"]'
+    ) as HTMLLinkElement | null
+    if (!canonical) {
+      canonical = document.createElement("link")
+      canonical.setAttribute("rel", "canonical")
+      document.head.appendChild(canonical)
+    }
+    canonical.setAttribute("href", `${BASE_URL}/product/${product.id}`)
+
+    const ogTitle = ensureMeta('meta[property="og:title"]', { property: "og:title" })
+    ogTitle.setAttribute("content", title)
+
+    const ogDescription = ensureMeta('meta[property="og:description"]', {
+      property: "og:description",
+    })
+    ogDescription.setAttribute("content", description)
+
+    const ogUrl = ensureMeta('meta[property="og:url"]', { property: "og:url" })
+    ogUrl.setAttribute("content", `${BASE_URL}/product/${product.id}`)
+
+    const ogType = ensureMeta('meta[property="og:type"]', { property: "og:type" })
+    ogType.setAttribute("content", "product")
+
+    const ogImage = ensureMeta('meta[property="og:image"]', { property: "og:image" })
+    ogImage.setAttribute("content", product.image)
+
+    const twitterTitle = ensureMeta('meta[name="twitter:title"]', {
+      name: "twitter:title",
+    })
+    twitterTitle.setAttribute("content", title)
+
+    const twitterDescription = ensureMeta('meta[name="twitter:description"]', {
+      name: "twitter:description",
+    })
+    twitterDescription.setAttribute("content", description)
+
+    const twitterImage = ensureMeta('meta[name="twitter:image"]', {
+      name: "twitter:image",
+    })
+    twitterImage.setAttribute("content", product.image)
+  }, [product])
+
   const handleAddToCart = () => {
     if (!product) return
 
@@ -140,6 +249,9 @@ export default function ProductPage() {
   const productMeta = product as ProductMeta
   const stock = stockConfig[product.stockStatus] ?? stockConfig["in-stock"]
   const galleryImages = [product.image, product.hoverImage].filter(Boolean)
+  const categorySlug = categoryToSlug(product.category)
+  const categoryLabel = categoryDisplayName(product.category)
+  const cleanDescription = stripEmojis(product.description)
 
   const whatsappMessage = encodeURIComponent(
     `Bonjour, je suis intéressé par ce produit: ${product.name} (${product.price.toLocaleString(
@@ -149,8 +261,75 @@ export default function ProductPage() {
 
   const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`
 
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    image: galleryImages,
+    description: cleanDescription,
+    sku: product.id,
+    category: product.category,
+    brand: {
+      "@type": "Brand",
+      name: product.name.includes("KOLN") || product.name.includes("KÖLN")
+        ? "KOLN"
+        : product.name.includes("HENSIM")
+          ? "HENSIM"
+          : "VENEZIA",
+    },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: product.rating,
+      reviewCount: product.reviews,
+    },
+    offers: {
+      "@type": "Offer",
+      url: `${BASE_URL}/product/${product.id}`,
+      priceCurrency: "MAD",
+      price: product.price,
+      availability: product.inStock
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+      itemCondition: "https://schema.org/NewCondition",
+    },
+  }
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Accueil",
+        item: `${BASE_URL}/`,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: categoryLabel,
+        item: `${BASE_URL}/category/${categorySlug}`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: product.name,
+        item: `${BASE_URL}/product/${product.id}`,
+      },
+    ],
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+
       <div className="container mx-auto px-4 py-8">
         <nav className="mb-6 flex items-center gap-1.5 text-xs text-gray-500">
           <Link href="/" className="hover:text-red-600">
@@ -158,12 +337,10 @@ export default function ProductPage() {
           </Link>
           <ChevronRight className="h-3 w-3" />
           <Link
-            href={`/category/${encodeURIComponent(
-              product.category.toLowerCase().replace(/\s+/g, "-")
-            )}`}
+            href={`/category/${encodeURIComponent(categorySlug)}`}
             className="hover:text-red-600"
           >
-            {product.category}
+            {categoryLabel}
           </Link>
           <ChevronRight className="h-3 w-3" />
           <span className="line-clamp-1 text-gray-700">{product.name}</span>
@@ -171,7 +348,7 @@ export default function ProductPage() {
 
         <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-6 md:p-10">
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
-            <ProductGallery images={galleryImages} />
+           <ProductGallery images={galleryImages} productName={product.name} />
 
             <div className="flex flex-col gap-5">
               <div className="flex flex-wrap items-center gap-2">
@@ -194,6 +371,10 @@ export default function ProductPage() {
               <h1 className="text-2xl font-bold leading-snug text-gray-900 md:text-3xl">
                 {product.name}
               </h1>
+
+              <p className="max-w-2xl text-sm leading-6 text-gray-600">
+                Achetez {product.name} chez Venezia Electro au Maroc. {cleanDescription}
+              </p>
 
               <div className="flex items-center gap-2">
                 <div className="flex gap-0.5">
@@ -236,6 +417,12 @@ export default function ProductPage() {
                   <ShieldCheck className="h-4 w-4 text-red-600" />
                   Garantie 2 ans
                 </div>
+              </div>
+
+              <div className="rounded-2xl border border-red-100 bg-red-50/50 p-4 text-sm leading-6 text-gray-700">
+                <strong className="text-gray-900">{product.name}</strong> fait partie de notre
+                sélection premium de {categoryLabel.toLowerCase()} au Maroc, avec livraison rapide,
+                disponibilité en stock selon arrivage et service client Venezia Electro.
               </div>
 
               <div className="flex flex-col gap-3 pt-2">
@@ -306,7 +493,14 @@ export default function ProductPage() {
           </div>
 
           {activeTab === "description" && (
-            <p className="max-w-2xl leading-relaxed text-gray-600">{product.description}</p>
+            <div className="max-w-3xl space-y-4 text-gray-600">
+              <p className="leading-relaxed">{product.description}</p>
+              <p className="text-sm leading-6">
+                Ce produit appartient à notre catégorie {categoryLabel.toLowerCase()} chez Venezia
+                Electro Maroc. Il est sélectionné pour sa qualité, son design et son rapport
+                qualité-prix.
+              </p>
+            </div>
           )}
 
           {activeTab === "specs" && (

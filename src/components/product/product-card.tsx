@@ -19,6 +19,10 @@ const stockConfig = {
   "out-of-stock": { label: "Rupture", className: "bg-red-100 text-red-600" },
 } as const
 
+function getProductImageAlt(product: Product) {
+  return `${product.name} - ${product.category} chez Venezia Electro`
+}
+
 export function ProductCard({
   product,
   className,
@@ -31,6 +35,7 @@ export function ProductCard({
   const productImage = product.image || "/placeholder.png"
   const productRating = typeof product.rating === "number" ? product.rating : 0
   const productReviews = typeof product.reviews === "number" ? product.reviews : 0
+  const productAlt = getProductImageAlt(product)
 
   const stock =
     stockConfig[product.stockStatus as keyof typeof stockConfig] ??
@@ -72,6 +77,8 @@ export function ProductCard({
     >
       <Link
         href={`/product/${productId}`}
+        aria-label={`Voir le produit ${product.name}`}
+        title={product.name}
         className="relative block aspect-square overflow-hidden bg-gradient-to-b from-gray-50 to-white"
       >
         {isPromo && (
@@ -101,7 +108,8 @@ export function ProductCard({
 
         <img
           src={productImage}
-          alt={product.name}
+          alt={productAlt}
+          title={product.name}
           className="h-full w-full object-contain p-4 transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
         />
@@ -119,13 +127,15 @@ export function ProductCard({
 
         <Link
           href={`/product/${productId}`}
+          aria-label={`Ouvrir la fiche produit ${product.name}`}
+          title={product.name}
           className="mb-3 line-clamp-2 min-h-[48px] text-[15px] font-extrabold leading-6 text-slate-800 transition-colors hover:text-red-600"
         >
           {product.name}
         </Link>
 
         <div className="mb-3 flex items-center gap-2">
-          <div className="flex gap-0.5">
+          <div className="flex gap-0.5" aria-label={`Note ${productRating.toFixed(1)} sur 5`}>
             {[1, 2, 3, 4, 5].map((s) => (
               <Star key={s} className="h-4 w-4 fill-amber-400 text-amber-400" />
             ))}
@@ -151,6 +161,13 @@ export function ProductCard({
         <button
           onClick={handleAddToCart}
           disabled={!product.inStock || added}
+          aria-label={
+            !product.inStock
+              ? `${product.name} en rupture de stock`
+              : added
+                ? `${product.name} ajouté au panier`
+                : `Ajouter ${product.name} au panier`
+          }
           className={cn(
             "flex h-12 w-full items-center justify-center gap-2 rounded-xl text-sm font-extrabold transition-all duration-200",
             product.inStock
