@@ -16,26 +16,21 @@ const outfit = Outfit({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://veneziaelectro.vercel.app"),
+
   title: {
-    default: "Electro Mostafa Maroc | Électroménager, TV, Réfrigérateurs et Machines à laver",
+    default: "Electro Mostafa Maroc | Électroménager au Maroc",
     template: "%s | Electro Mostafa Maroc",
   },
+
   description:
-    "Achetez électroménager, téléviseurs, réfrigérateurs, machines à laver, fours et petits appareils chez Electro Mostafa au Maroc. Produits premium, promotions et livraison rapide.",
-  keywords: [
-    "Electro Mostafa",
-    "électroménager Maroc",
-    "réfrigérateurs Maroc",
-    "machines à laver Maroc",
-    "TV Maroc",
-    "fours Maroc",
-    "petit électroménager Maroc",
-    "Venezia Maroc",
-  ],
+    "Achetez électroménager, TV, réfrigérateurs, lave-linge et fours chez Electro Mostafa au Maroc. Produits premium, promos et livraison rapide.",
+
   alternates: {
     canonical: "/",
   },
+
   applicationName: "Electro Mostafa Maroc",
+
   robots: {
     index: true,
     follow: true,
@@ -47,20 +42,22 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
+
   openGraph: {
     type: "website",
     url: "https://veneziaelectro.vercel.app",
     siteName: "Electro Mostafa Maroc",
-    title: "Electro Mostafa Maroc | Électroménager, TV, Réfrigérateurs et Machines à laver",
+    title: "Electro Mostafa Maroc | Électroménager au Maroc",
     description:
-      "Découvrez les meilleurs appareils électroménagers chez Electro Mostafa au Maroc : réfrigérateurs, lave-linge, téléviseurs, fours et plus encore.",
+      "Achetez électroménager, TV, réfrigérateurs, lave-linge et fours chez Electro Mostafa au Maroc.",
     locale: "fr_MA",
   },
+
   twitter: {
     card: "summary_large_image",
-    title: "Electro Mostafa Maroc | Électroménager, TV, Réfrigérateurs et Machines à laver",
+    title: "Electro Mostafa Maroc | Électroménager au Maroc",
     description:
-      "Produits premium, promotions et livraison rapide chez Electro Mostafa au Maroc.",
+      "Produits premium, promos et livraison rapide chez Electro Mostafa au Maroc.",
   },
 };
 
