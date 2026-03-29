@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import { useParams } from "next/navigation"
 import {
   getProductsByCategory,
@@ -10,7 +11,6 @@ import {
 } from "@/lib/data"
 import { ProductCard } from "@/components/product/product-card"
 import { Pagination } from "@/components/ui/pagination"
-import Link from "next/link"
 import { ChevronRight } from "lucide-react"
 
 const BASE_URL = "https://veneziaelectro.vercel.app"
@@ -36,7 +36,7 @@ const categorySeoMap: Record<
   },
   "washing-machines": {
     dataCategory: "Washing Machines",
-    displayName: "Lave-linge",
+    displayName: "Machines à laver",
     title: "Machines à laver au Maroc",
     description:
       "Découvrez nos machines à laver Electro Mostafa au Maroc : front load, semi-automatiques et grande capacité avec programmes vapeur et livraison rapide.",
@@ -54,7 +54,7 @@ const categorySeoMap: Record<
   },
   "air-fryers": {
     dataCategory: "Air Fryers",
-    displayName: "Friteuses à Air",
+    displayName: "Friteuses à air",
     title: "Friteuses à air au Maroc",
     description:
       "Découvrez les meilleures friteuses à air chez Electro Mostafa au Maroc : modèles compacts et digitaux pour une cuisine saine et rapide.",
@@ -63,7 +63,7 @@ const categorySeoMap: Record<
   },
   "coffee-machines": {
     dataCategory: "Coffee Machines",
-    displayName: "Cafetières",
+    displayName: "Machines à café",
     title: "Machines à café au Maroc",
     description:
       "Découvrez les machines à café et cafetières Electro Mostafa au Maroc : expresso, capsules et modèles automatiques pour les amateurs de café.",
@@ -78,6 +78,42 @@ const categorySeoMap: Record<
       "Achetez le meilleur petit électroménager de cuisine chez Electro Mostafa au Maroc : blenders, grills, bouilloires, hottes, chauffe-eau et plus.",
     intro:
       "Retrouvez notre sélection d'appareils de cuisine et petit électroménager : blenders, grills, bouilloires, hottes, chauffe-eau et autres essentiels du quotidien.",
+  },
+  "ovens": {
+    dataCategory: "Ovens",
+    displayName: "Fours",
+    title: "Fours au Maroc",
+    description:
+      "Découvrez nos fours, tables de cuisson et appareils de cuisson Electro Mostafa au Maroc avec livraison rapide et produits fiables.",
+    intro:
+      "Retrouvez notre sélection de fours, tables de cuisson et équipements de cuisson Electro Mostafa pour une cuisine moderne et performante.",
+  },
+  "dishwashers": {
+    dataCategory: "Dishwashers",
+    displayName: "Lave-vaisselle",
+    title: "Lave-vaisselle au Maroc",
+    description:
+      "Découvrez les lave-vaisselle Electro Mostafa au Maroc : modèles performants, silencieux et économiques pour la maison moderne.",
+    intro:
+      "Explorez notre sélection de lave-vaisselle Electro Mostafa avec performance, économie d’énergie et praticité au quotidien.",
+  },
+  "small-appliances": {
+    dataCategory: "Small Appliances",
+    displayName: "Petit Électroménager",
+    title: "Petit électroménager au Maroc",
+    description:
+      "Achetez le meilleur petit électroménager chez Electro Mostafa au Maroc : aspirateurs, fers, appareils pratiques et solutions pour la maison.",
+    intro:
+      "Découvrez notre gamme de petit électroménager Electro Mostafa pour faciliter votre quotidien à la maison.",
+  },
+  "cookware": {
+    dataCategory: "Cookware",
+    displayName: "Ustensiles de cuisine",
+    title: "Ustensiles de cuisine au Maroc",
+    description:
+      "Découvrez notre sélection d’ustensiles et accessoires de cuisine chez Electro Mostafa au Maroc avec produits fiables et pratiques.",
+    intro:
+      "Retrouvez des ustensiles et accessoires de cuisine sélectionnés pour accompagner votre quotidien et vos préparations.",
   },
 }
 
@@ -108,12 +144,28 @@ export default function CategoryPage() {
     )
   }, [slug, fallbackCategoryName])
 
-  const [categoryProducts, setCategoryProducts] = React.useState<Product[]>([])
-  const [isLoading, setIsLoading] = React.useState(true)
+  const categoryProducts = React.useMemo(() => {
+    const exact = getProductsByCategory(seo.dataCategory)
+
+    if (exact.length > 0) {
+      return exact
+    }
+
+    const fallback = getProductsByCategory(fallbackCategoryName)
+
+    return fallback.filter((p) => normalize(p.category) === normalize(slug))
+  }, [seo.dataCategory, fallbackCategoryName, normalize, slug])
+
   const [currentPage, setCurrentPage] = React.useState(1)
 
   React.useEffect(() => {
+    setCurrentPage(1)
+  }, [slug])
+
+  React.useEffect(() => {
     const pageTitle = `${seo.title} | Electro Mostafa Maroc`
+    const pageUrl = `${BASE_URL}/category/${slug}`
+
     document.title = pageTitle
 
     let metaDescription = document.querySelector(
@@ -138,57 +190,30 @@ export default function CategoryPage() {
       document.head.appendChild(canonical)
     }
 
-    canonical.href = `${BASE_URL}/category/${slug}`
+    canonical.href = pageUrl
+
+    const setMetaProperty = (property: string, content: string) => {
+      let tag = document.querySelector(
+        `meta[property="${property}"]`
+      ) as HTMLMetaElement | null
+
+      if (!tag) {
+        tag = document.createElement("meta")
+        tag.setAttribute("property", property)
+        document.head.appendChild(tag)
+      }
+
+      tag.setAttribute("content", content)
+    }
+
+    setMetaProperty("og:title", pageTitle)
+    setMetaProperty("og:description", seo.description)
+    setMetaProperty("og:url", pageUrl)
+    setMetaProperty("og:type", "website")
   }, [seo, slug])
 
-  React.useEffect(() => {
-    let active = true
-
-    const loadProducts = async () => {
-      try {
-        setIsLoading(true)
-
-        const exact = getProductsByCategory(seo.dataCategory)
-
-        if (!active) return
-
-        if (exact.length > 0) {
-          setCategoryProducts(exact)
-          return
-        }
-
-        const fallback = getProductsByCategory(fallbackCategoryName)
-
-        if (!active) return
-
-        setCategoryProducts(
-          fallback.filter((p) => normalize(p.category) === normalize(slug))
-        )
-      } catch (error) {
-        console.error("Failed to load category products:", error)
-        if (active) {
-          setCategoryProducts([])
-        }
-      } finally {
-        if (active) {
-          setIsLoading(false)
-        }
-      }
-    }
-
-    loadProducts()
-
-    return () => {
-      active = false
-    }
-  }, [slug, seo.dataCategory, fallbackCategoryName, normalize])
-
-  React.useEffect(() => {
-    setCurrentPage(1)
-  }, [slug])
-
   const totalPages = React.useMemo(() => {
-    return getTotalPages(categoryProducts)
+    return Math.max(1, getTotalPages(categoryProducts))
   }, [categoryProducts])
 
   const pageProducts = React.useMemo(() => {
@@ -200,8 +225,57 @@ export default function CategoryPage() {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
+  const categoryJsonLd = React.useMemo(() => {
+    return {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name: `${seo.displayName} | Electro Mostafa Maroc`,
+      url: `${BASE_URL}/category/${slug}`,
+      description: seo.description,
+      mainEntity: {
+        "@type": "ItemList",
+        itemListElement: categoryProducts.slice(0, 12).map((product, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          url: `${BASE_URL}/product/${product.id}`,
+          name: product.name,
+        })),
+      },
+    }
+  }, [seo, slug, categoryProducts])
+
+  const breadcrumbJsonLd = React.useMemo(() => {
+    return {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Accueil",
+          item: `${BASE_URL}/`,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: seo.displayName,
+          item: `${BASE_URL}/category/${slug}`,
+        },
+      ],
+    }
+  }, [seo.displayName, slug])
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(categoryJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+
       <div className="border-b border-gray-200 bg-white">
         <div className="container mx-auto px-4 py-6">
           <nav className="mb-3 flex items-center gap-1.5 text-xs text-gray-500">
@@ -219,7 +293,9 @@ export default function CategoryPage() {
               <p className="mt-2 text-sm leading-6 text-gray-600">{seo.intro}</p>
 
               <p className="mt-2 text-sm text-gray-500">
-                {isLoading ? "Chargement..." : `${categoryProducts.length} produits disponibles`}
+                {categoryProducts.length > 0
+                  ? `${categoryProducts.length} produits disponibles`
+                  : "Aucun produit disponible pour le moment"}
               </p>
             </div>
           </div>
@@ -227,16 +303,7 @@ export default function CategoryPage() {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        {isLoading ? (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-[320px] animate-pulse rounded-2xl border border-gray-200 bg-white"
-              />
-            ))}
-          </div>
-        ) : categoryProducts.length === 0 ? (
+        {categoryProducts.length === 0 ? (
           <div className="py-24 text-center">
             <p className="mb-2 text-2xl font-bold text-gray-700">
               Aucun produit trouvé
@@ -265,11 +332,13 @@ export default function CategoryPage() {
               ))}
             </div>
 
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            )}
           </>
         )}
       </div>

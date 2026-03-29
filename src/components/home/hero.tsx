@@ -8,20 +8,18 @@ const slides = [
     title: "Electro Mostafa Premium",
     subtitle: "Le confort moderne pour votre maison",
     description:
-      "Découvrez notre sélection d’Electro Mostafa au Maroc : réfrigérateurs, fours, lave-linge, télévisions et appareils de cuisine avec design moderne et livraison rapide.",
+      "Découvrez notre sélection d’électroménager au Maroc : réfrigérateurs, fours, lave-linge, télévisions et appareils de cuisine avec design moderne et livraison rapide.",
     image: "https://i.postimg.cc/zfjCpvhL/image.png",
-    alt: "Cuisine moderne avec Electro Mostafa premium chez Electro Mostafa",
-    color: "bg-zinc-900",
+    alt: "Cuisine moderne avec électroménager premium Electro Mostafa",
   },
   {
     title: "Technologie Éco-Énergétique",
     subtitle: "Économisez l’énergie au quotidien",
     description:
-      "Explorez nos lave-linge, lave-vaisselle et appareils économiques conçus pour allier performance, faible consommation et excellent rapport qualité-prix.",
+      "Explorez nos lave-linge, appareils économiques et équipements performants conçus pour allier faible consommation, efficacité et excellent rapport qualité-prix.",
     image:
       "https://delivery-p28264-e87620.adobeaemcloud.com/adobe/assets/urn:aaid:aem:3de12754-7ea9-4718-91d3-d768b2a7fde2/as/SubZero-Wolf-JV-04.avif?assetname=SubZero-Wolf-JV-04.png",
-    alt: "Appareils Electro Mostafas économes en énergie pour la maison",
-    color: "bg-blue-900",
+    alt: "Appareils électroménagers économes en énergie pour la maison",
   },
   {
     title: "TV & Maison Connectée",
@@ -31,7 +29,6 @@ const slides = [
     image:
       "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?q=80&w=2070&auto=format&fit=crop",
     alt: "Salon moderne avec télévision et équipements électroniques premium",
-    color: "bg-red-900",
   },
 ]
 
@@ -66,6 +63,7 @@ export function Hero() {
             alt={slides[current].alt}
             className="h-full w-full object-cover"
             loading={current === 0 ? "eager" : "lazy"}
+            fetchPriority={current === 0 ? "high" : "auto"}
           />
         </motion.div>
       </AnimatePresence>

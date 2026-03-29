@@ -1,8 +1,5 @@
-//categories-se...: غالبًا section ديال التصنيفات.
-
 "use client"
 
-import * as React from "react"
 import Link from "next/link"
 import { getProductsByCategory, type Product } from "@/lib/data"
 import { ChevronRight } from "lucide-react"
@@ -17,6 +14,16 @@ const categoryImages: Record<string, string> = {
   "Kitchen Appliances": "https://i.postimg.cc/LhdTWz6f/image.png",
 }
 
+const categoryDisplayNames: Record<string, string> = {
+  Refrigerators: "Réfrigérateurs",
+  "Washing Machines": "Machines à laver",
+  Televisions: "Télévisions",
+  Ovens: "Fours",
+  "Air Fryers": "Friteuses à air",
+  "Coffee Machines": "Machines à café",
+  "Kitchen Appliances": "Petit électroménager",
+}
+
 interface CategoryCardProps {
   category: string
 }
@@ -27,79 +34,57 @@ function CategoryCard({ category }: CategoryCardProps) {
     categoryImages[category] ??
     "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?q=80&w=600&auto=format&fit=crop"
 
-  const [allProducts, setAllProducts] = React.useState<Product[]>([])
-  const [isLoading, setIsLoading] = React.useState(true)
-
-  React.useEffect(() => {
-    let active = true
-
-    const loadCategoryProducts = async () => {
-      try {
-        setIsLoading(true)
-        const items = await getProductsByCategory(category)
-
-        if (!active) return
-        setAllProducts(items)
-      } catch (error) {
-        console.error(`Failed to load products for category ${category}:`, error)
-        if (active) setAllProducts([])
-      } finally {
-        if (active) setIsLoading(false)
-      }
-    }
-
-    loadCategoryProducts()
-
-    return () => {
-      active = false
-    }
-  }, [category])
-
+  const displayName = categoryDisplayNames[category] ?? category
+  const allProducts: Product[] = getProductsByCategory(category)
   const previewProducts = allProducts.slice(0, 4)
   const totalProducts = allProducts.length
+
+  const lowestPrice =
+    allProducts.length > 0
+      ? Math.min(...allProducts.map((p) => p.price)).toLocaleString("fr-FR")
+      : null
 
   return (
     <div className="group flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white transition-all duration-300 hover:border-red-200 hover:shadow-lg">
       <Link
         href={`/category/${catSlug}`}
+        aria-label={`Voir la catégorie ${displayName}`}
+        title={displayName}
         className="relative block h-40 overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100"
       >
         <img
           src={image}
-          alt={category}
+          alt={`${displayName} chez Electro Mostafa`}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
         />
 
         <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/60 via-black/10 to-transparent p-4">
           <div>
-            <h3 className="text-base font-bold leading-tight text-white">{category}</h3>
-            <p className="mt-0.5 text-xs text-white/70">
-              {isLoading ? "Chargement..." : `${totalProducts} produits`}
+            <h3 className="text-base font-bold leading-tight text-white">
+              {displayName}
+            </h3>
+            <p className="mt-0.5 text-xs text-white/80">
+              {totalProducts > 0 ? `${totalProducts} produits` : "Produits bientôt disponibles"}
             </p>
           </div>
         </div>
       </Link>
 
       <div className="flex-1 p-3">
-        {isLoading ? (
-          <div className="mb-3 grid grid-cols-4 gap-1.5">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="aspect-square animate-pulse rounded-lg bg-gray-100" />
-            ))}
-          </div>
-        ) : previewProducts.length > 0 ? (
+        {previewProducts.length > 0 ? (
           <div className="mb-3 grid grid-cols-4 gap-1.5">
             {previewProducts.map((product) => (
               <Link
                 key={product.id}
                 href={`/product/${product.id}`}
+                aria-label={`Voir le produit ${product.name}`}
                 title={product.name}
                 className="aspect-square overflow-hidden rounded-lg bg-gray-50 transition-all hover:ring-2 hover:ring-red-400"
               >
                 <img
                   src={product.image}
-                  alt={product.name}
+                  alt={`${product.name} - ${displayName}`}
                   className="h-full w-full object-contain p-1"
                   loading="lazy"
                 />
@@ -112,17 +97,16 @@ function CategoryCard({ category }: CategoryCardProps) {
           </div>
         )}
 
-        {!isLoading && previewProducts.length > 0 && (
+        {lowestPrice && (
           <p className="mb-3 text-[11px] text-gray-400">
             À partir de{" "}
-            <span className="font-bold text-red-600">
-              {Math.min(...allProducts.map((p) => p.price)).toLocaleString("fr-FR")} DH
-            </span>
+            <span className="font-bold text-red-600">{lowestPrice} DH</span>
           </p>
         )}
 
         <Link
           href={`/category/${catSlug}`}
+          aria-label={`Voir tous les produits de ${displayName}`}
           className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-red-600 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-red-700"
         >
           Voir Tous les Produits
@@ -145,15 +129,22 @@ const HOMEPAGE_CATEGORIES = [
 
 export function CategoriesSection() {
   return (
-    <section className="bg-white py-14">
+    <section className="bg-white py-14" aria-labelledby="home-categories-title">
       <div className="container mx-auto px-4">
         <div className="mb-8 text-center">
           <span className="mb-3 inline-block rounded-full bg-red-600 px-3 py-1 text-xs font-bold uppercase tracking-widest text-white">
             Nos Rayons
           </span>
-          <h2 className="mb-2 text-3xl font-bold text-gray-900">Catégories</h2>
+
+          <h2
+            id="home-categories-title"
+            className="mb-2 text-3xl font-bold text-gray-900"
+          >
+            Catégories
+          </h2>
+
           <p className="text-sm text-gray-500">
-            Explorez notre sélection d&apos;appareils Electro Mostafa premium
+            Explorez notre sélection d&apos;électroménager Electro Mostafa au Maroc
           </p>
         </div>
 

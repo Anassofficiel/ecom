@@ -107,37 +107,13 @@ function mapFilterGroup(category: string) {
 }
 
 export function PromotionsSection() {
-  const [allPromo, setAllPromo] = React.useState<Product[]>([])
-  const [isLoading, setIsLoading] = React.useState(true)
   const timer = useCountdown(PROMO_END)
   const [activeTab, setActiveTab] = React.useState("all")
   const [page, setPage] = React.useState(1)
   const itemsPerPage = 5
 
-  React.useEffect(() => {
-    let active = true
-
-    const loadPromotions = async () => {
-      try {
-        setIsLoading(true)
-        const items = await getPromotionProducts()
-
-        if (!active) return
-
-        setAllPromo(items.filter((item) => item.isActive !== false))
-      } catch (error) {
-        console.error("Failed to load promotions:", error)
-        if (active) setAllPromo([])
-      } finally {
-        if (active) setIsLoading(false)
-      }
-    }
-
-    loadPromotions()
-
-    return () => {
-      active = false
-    }
+  const allPromo = React.useMemo(() => {
+    return getPromotionProducts().filter((item) => item.isActive !== false)
   }, [])
 
   const displayed: Product[] = React.useMemo(() => {
@@ -148,7 +124,7 @@ export function PromotionsSection() {
     return allPromo.filter((p) => mapFilterGroup(p.category) === activeTab)
   }, [activeTab, allPromo])
 
-  const totalPages = Math.ceil(displayed.length / itemsPerPage)
+  const totalPages = Math.max(1, Math.ceil(displayed.length / itemsPerPage))
 
   const paginated = React.useMemo(() => {
     const start = (page - 1) * itemsPerPage
@@ -159,18 +135,32 @@ export function PromotionsSection() {
     setPage(1)
   }, [activeTab])
 
+  const scrollToPromotions = () => {
+    document.getElementById("promotions")?.scrollIntoView({ behavior: "smooth" })
+  }
+
   return (
-    <section id="promotions" className="bg-gray-50 py-14">
+    <section
+      id="promotions"
+      className="bg-gray-50 py-14"
+      aria-labelledby="promotions-title"
+    >
       <div className="container mx-auto px-4">
         <div className="mb-8 text-center">
           <span className="mb-3 inline-block rounded-full bg-red-600 px-3 py-1 text-xs font-bold uppercase tracking-widest text-white">
             Offres Limitées
           </span>
-          <h2 className="mb-2 text-3xl font-bold text-gray-900">
+
+          <h2
+            id="promotions-title"
+            className="mb-2 text-3xl font-bold text-gray-900"
+          >
             Promotions en Cours 🔥
           </h2>
-          <p className="text-sm text-gray-500">
-            Des prix exceptionnels pour une durée limitée.
+
+          <p className="mx-auto max-w-2xl text-sm leading-6 text-gray-500">
+            Découvrez nos meilleures promotions Electro Mostafa au Maroc sur une
+            sélection d’appareils électroménagers, TV, cuisine et petit équipement.
           </p>
         </div>
 
@@ -178,8 +168,9 @@ export function PromotionsSection() {
           <div className="absolute inset-0">
             <img
               src="https://i.postimg.cc/C5GxVgsf/image.png"
-              alt="Promotions banner"
+              alt="Bannière promotionnelle Electro Mostafa au Maroc"
               className="h-full w-full scale-105 object-cover opacity-15"
+              loading="lazy"
             />
           </div>
 
@@ -207,7 +198,10 @@ export function PromotionsSection() {
               </div>
 
               <div className="flex w-full flex-col items-center gap-4 sm:gap-5 xl:w-auto xl:flex-row xl:items-center xl:gap-8 xl:pr-2">
-                <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 xl:max-w-[520px]">
+                <div
+                  className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 xl:max-w-[520px]"
+                  aria-label="Compte à rebours des promotions"
+                >
                   {[
                     { val: timer.days, label: "Jours" },
                     { val: timer.hours, label: "Heures" },
@@ -236,8 +230,9 @@ export function PromotionsSection() {
                 <div className="flex w-full shrink-0 items-center justify-center sm:w-[260px] md:w-[300px] xl:w-[300px] 2xl:w-[340px]">
                   <img
                     src="https://i.postimg.cc/C5GxVgsf/image.png"
-                    alt="Promotion visuel"
+                    alt="Visuel des promotions Electro Mostafa"
                     className="h-auto max-h-[130px] w-full rounded-xl object-contain shadow-2xl sm:max-h-[145px] xl:max-h-[165px]"
+                    loading="lazy"
                   />
                 </div>
               </div>
@@ -245,11 +240,17 @@ export function PromotionsSection() {
           </div>
         </div>
 
-        <div className="mb-8 flex flex-wrap justify-center gap-2">
+        <div
+          className="mb-8 flex flex-wrap justify-center gap-2"
+          role="tablist"
+          aria-label="Filtres des promotions"
+        >
           {FILTER_TABS.map((tab) => (
             <button
               key={tab.id}
+              type="button"
               onClick={() => setActiveTab(tab.id)}
+              aria-pressed={activeTab === tab.id}
               className={`flex items-center gap-1.5 rounded-full border-2 px-5 py-2.5 text-sm font-semibold transition-all duration-200 ${
                 activeTab === tab.id
                   ? "border-red-600 bg-red-600 text-white shadow-md"
@@ -262,10 +263,12 @@ export function PromotionsSection() {
           ))}
         </div>
 
-        {isLoading ? (
-          <div className="py-16 text-center text-gray-500">Chargement...</div>
-        ) : displayed.length > 0 ? (
+        {displayed.length > 0 ? (
           <>
+            <div className="mb-4 text-center text-sm text-gray-500">
+              {displayed.length} produit{displayed.length > 1 ? "s" : ""} en promotion
+            </div>
+
             <div className="mb-10 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-5">
               {paginated.map((product) => (
                 <ProductCard key={product.id} product={product} showPromoBadge />
@@ -276,12 +279,11 @@ export function PromotionsSection() {
               <div className="mt-6 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <div className="flex items-center gap-2">
                   <button
+                    type="button"
                     onClick={() => {
                       if (page > 1) {
                         setPage(page - 1)
-                        document
-                          .getElementById("promotions")
-                          ?.scrollIntoView({ behavior: "smooth" })
+                        scrollToPromotions()
                       }
                     }}
                     disabled={page === 1}
@@ -297,12 +299,12 @@ export function PromotionsSection() {
                   {Array.from({ length: totalPages }).map((_, i) => (
                     <button
                       key={i}
+                      type="button"
                       onClick={() => {
                         setPage(i + 1)
-                        document
-                          .getElementById("promotions")
-                          ?.scrollIntoView({ behavior: "smooth" })
+                        scrollToPromotions()
                       }}
+                      aria-label={`Aller à la page ${i + 1}`}
                       className={`flex h-10 w-10 items-center justify-center rounded-lg text-sm font-bold transition-all ${
                         page === i + 1
                           ? "scale-110 bg-red-600 text-white shadow-md"
@@ -314,12 +316,11 @@ export function PromotionsSection() {
                   ))}
 
                   <button
+                    type="button"
                     onClick={() => {
                       if (page < totalPages) {
                         setPage(page + 1)
-                        document
-                          .getElementById("promotions")
-                          ?.scrollIntoView({ behavior: "smooth" })
+                        scrollToPromotions()
                       }
                     }}
                     disabled={page === totalPages}
@@ -345,6 +346,7 @@ export function PromotionsSection() {
               Aucun produit dans cette catégorie
             </p>
             <button
+              type="button"
               onClick={() => setActiveTab("all")}
               className="text-sm font-medium text-red-600 hover:underline"
             >

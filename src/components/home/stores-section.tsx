@@ -1,6 +1,7 @@
-"use client"
-
 import { MapPin, Clock, Phone, ExternalLink } from "lucide-react"
+
+const SITE_URL = "https://veneziaelectro.vercel.app"
+const MAIN_PHONE = "+212 508788782"
 
 const storesContent = [
   {
@@ -15,8 +16,10 @@ const storesContent = [
       "Retrouvez Electro Mostafa à Casablanca pour découvrir notre sélection d’électroménager, TV et équipements pour la maison.",
     address: "Bd Bassatine, Tit Mellil, Casablanca",
     hours: "Lun–Sam: 9h00 – 19h00 | Dim: 10h00 – 17h00",
-    phone: "+212 5 22 000 000",
-    mapUrl: "https://maps.app.goo.gl/QMuaYDA7vNC3jwU99",
+    phone: MAIN_PHONE,
+    mapUrl:
+      "https://www.google.com/maps/place/Bd+Bassatine,+Tit+Mellil/@33.5491441,-7.4848297,17z/data=!4m6!3m5!1s0xda63523cf416c45:0xca8831957dc753a4!8m2!3d33.5491441!4d-7.4822548!16s%2Fg%2F1tk9s3jd?entry=ttu&g_ep=EgoyMDI2MDMyNC4wIKXMDSoASAFQAw%3D%3D",
+    closesWeek: "19:00",
   },
   {
     id: "marrakech",
@@ -28,10 +31,11 @@ const storesContent = [
       "Showroom Electro Mostafa à Marrakech - électroménager et électronique au Maroc",
     caption:
       "Visitez notre showroom de Marrakech pour découvrir nos offres en électroménager, télévision et petit équipement de cuisine.",
-    address: "Route de Quamassa, près de la Rue du Sport, Marrakech",
+    address: "HXP5+R7X, Marrakech, Maroc",
     hours: "Lun–Sam: 9h00 – 19h30 | Dim: 10h00 – 17h00",
-    phone: "+212 5 24 000 000",
-    mapUrl: "https://maps.app.goo.gl/Mkzf7YxzJYzeFyVq6",
+    phone: MAIN_PHONE,
+    mapUrl: "https://www.google.com/maps/search/?api=1&query=31.587111,-8.041778",
+    closesWeek: "19:30",
   },
 ]
 
@@ -40,23 +44,30 @@ export function StoresSection() {
     "@context": "https://schema.org",
     "@graph": storesContent.map((store) => ({
       "@type": "ElectronicsStore",
-      "@id": `https://veneziaelectro.vercel.app/#store-${store.id}`,
+      "@id": `${SITE_URL}/#store-${store.id}`,
       name: store.title,
-      url: "https://veneziaelectro.vercel.app/",
+      url: SITE_URL,
       image: store.image,
       telephone: store.phone,
       address: {
         "@type": "PostalAddress",
-        addressLocality: store.city,
         streetAddress: store.address,
+        addressLocality: store.city,
         addressCountry: "MA",
       },
       openingHoursSpecification: [
         {
           "@type": "OpeningHoursSpecification",
-          dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+          dayOfWeek: [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+          ],
           opens: "09:00",
-          closes: store.city === "Marrakech" ? "19:30" : "19:00",
+          closes: store.closesWeek,
         },
         {
           "@type": "OpeningHoursSpecification",
@@ -70,7 +81,11 @@ export function StoresSection() {
   }
 
   return (
-    <section id="magasins" className="bg-gradient-to-b from-white to-gray-50 py-16">
+    <section
+      id="magasins"
+      className="bg-gradient-to-b from-white to-gray-50 py-16"
+      aria-labelledby="stores-title"
+    >
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(storesJsonLd) }}
@@ -82,7 +97,10 @@ export function StoresSection() {
             Nos Magasins
           </span>
 
-          <h2 className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl">
+          <h2
+            id="stores-title"
+            className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl"
+          >
             Visitez Nos Showrooms Electro Mostafa
           </h2>
 
@@ -95,7 +113,7 @@ export function StoresSection() {
 
         <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-2">
           {storesContent.map((store) => (
-            <div
+            <article
               key={store.id}
               className="group overflow-hidden rounded-[24px] border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
             >
@@ -127,26 +145,33 @@ export function StoresSection() {
               <div className="space-y-4 p-6">
                 <h4 className="text-xl font-bold text-gray-900">{store.title}</h4>
 
-                <div className="flex items-start gap-3 text-sm text-gray-600">
-                  <div className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-red-50">
-                    <MapPin className="h-4 w-4 text-red-600" />
+                <address className="not-italic space-y-4">
+                  <div className="flex items-start gap-3 text-sm text-gray-600">
+                    <div className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-red-50">
+                      <MapPin className="h-4 w-4 text-red-600" />
+                    </div>
+                    <span className="leading-6">{store.address}</span>
                   </div>
-                  <span className="leading-6">{store.address}</span>
-                </div>
 
-                <div className="flex items-start gap-3 text-sm text-gray-600">
-                  <div className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-red-50">
-                    <Clock className="h-4 w-4 text-red-600" />
+                  <div className="flex items-start gap-3 text-sm text-gray-600">
+                    <div className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-red-50">
+                      <Clock className="h-4 w-4 text-red-600" />
+                    </div>
+                    <span className="leading-6">{store.hours}</span>
                   </div>
-                  <span className="leading-6">{store.hours}</span>
-                </div>
 
-                <div className="flex items-center gap-3 text-sm text-gray-600">
-                  <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-red-50">
-                    <Phone className="h-4 w-4 text-red-600" />
+                  <div className="flex items-center gap-3 text-sm text-gray-600">
+                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-red-50">
+                      <Phone className="h-4 w-4 text-red-600" />
+                    </div>
+                    <a
+                      href={`tel:${store.phone.replace(/\s+/g, "")}`}
+                      className="font-semibold text-gray-800 transition-colors hover:text-red-600"
+                    >
+                      {store.phone}
+                    </a>
                   </div>
-                  <span className="font-semibold text-gray-800">{store.phone}</span>
-                </div>
+                </address>
 
                 <a
                   href={store.mapUrl}
@@ -159,7 +184,7 @@ export function StoresSection() {
                   Voir sur la Carte
                 </a>
               </div>
-            </div>
+            </article>
           ))}
         </div>
 
