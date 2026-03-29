@@ -20,16 +20,23 @@ const stockConfig = {
 } as const
 
 function getProductImageAlt(product: Product) {
-  return `${product.name} - ${product.category} chez Venezia Electro`
+  return `${product.name} - ${product.category} chez Electro Mostafa`
 }
 
-export function ProductCard({
+function ProductCardComponent({
   product,
   className,
   showPromoBadge = false,
 }: ProductCardProps) {
   const addItem = useCart((state) => state.addItem)
   const [added, setAdded] = React.useState(false)
+  const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  React.useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    }
+  }, [])
 
   const productId = String(product.id)
   const productImage = product.image || "/placeholder.png"
@@ -48,22 +55,27 @@ export function ProductCard({
   const isPromo = showPromoBadge && hasDiscount
   const displayDiscount = product.discount ?? 0
 
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault()
-    if (!product.inStock) return
+  const handleAddToCart = React.useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault()
+      if (!product.inStock) return
 
-    addItem({
-      id: productId,
-      name: product.name,
-      price: product.price,
-      image: productImage,
-      quantity: 1,
-      category: product.category,
-    })
+      addItem({
+        id: productId,
+        name: product.name,
+        price: product.price,
+        image: productImage,
+        quantity: 1,
+        category: product.category,
+      })
 
-    setAdded(true)
-    setTimeout(() => setAdded(false), 1500)
-  }
+      setAdded(true)
+
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+      timeoutRef.current = setTimeout(() => setAdded(false), 1500)
+    },
+    [addItem, product, productId, productImage]
+  )
 
   return (
     <div
@@ -83,7 +95,7 @@ export function ProductCard({
       >
         {isPromo && (
           <div className="absolute left-3 top-3 z-30 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-pink-500 to-red-500 px-3 py-1 text-[12px] font-extrabold text-white shadow-lg">
-            <Tag className="h-3.5 w-3.5" />
+            <Tag className="h-3.5 w-3.5" aria-hidden="true" />
             <span>{displayDiscount > 0 ? `${displayDiscount}% OFF` : "OFFRE"}</span>
           </div>
         )}
@@ -96,7 +108,7 @@ export function ProductCard({
 
         {isPromo && (
           <div className="absolute left-4 top-14 z-30 flex h-14 w-14 items-center justify-center rounded-full border-4 border-red-300 bg-gradient-to-b from-red-400 to-red-600 text-white shadow-xl">
-            <Gift className="h-7 w-7" />
+            <Gift className="h-7 w-7" aria-hidden="true" />
           </div>
         )}
 
@@ -112,6 +124,9 @@ export function ProductCard({
           title={product.name}
           className="h-full w-full object-contain p-4 transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
+          decoding="async"
+          width={400}
+          height={400}
         />
       </Link>
 
@@ -135,15 +150,18 @@ export function ProductCard({
         </Link>
 
         <div className="mb-3 flex items-center gap-2">
-          <div className="flex gap-0.5" aria-label={`Note ${productRating.toFixed(1)} sur 5`}>
+          <div className="flex gap-0.5" aria-hidden="true">
             {[1, 2, 3, 4, 5].map((s) => (
               <Star key={s} className="h-4 w-4 fill-amber-400 text-amber-400" />
             ))}
           </div>
+          <span className="sr-only">
+            Note {productRating.toFixed(1)} sur 5 basée sur {productReviews} avis
+          </span>
           <span className="text-[13px] font-bold text-slate-700">
             {productRating.toFixed(1)}
           </span>
-          <span className="text-[13px] text-slate-400">({productReviews})</span>
+          <span className="text-[13px] text-slate-500">({productReviews})</span>
         </div>
 
         <div className="mb-4 mt-auto flex items-end gap-3">
@@ -159,6 +177,7 @@ export function ProductCard({
         </div>
 
         <button
+          type="button"
           onClick={handleAddToCart}
           disabled={!product.inStock || added}
           aria-label={
@@ -177,10 +196,12 @@ export function ProductCard({
               : "cursor-not-allowed bg-gray-100 text-gray-400"
           )}
         >
-          <ShoppingCart className="h-4 w-4" />
+          <ShoppingCart className="h-4 w-4" aria-hidden="true" />
           {!product.inStock ? "Rupture" : added ? "Ajouté ✓" : "Ajouter"}
         </button>
       </div>
     </div>
   )
 }
+
+export const ProductCard = React.memo(ProductCardComponent)

@@ -38,27 +38,43 @@ export function Header() {
     setMounted(true)
   }, [])
 
+  React.useEffect(() => {
+    let ticking = false
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setIsScrolled(window.scrollY > 20)
+          ticking = false
+        })
+        ticking = true
+      }
+    }
+
+    handleScroll()
+    window.addEventListener("scroll", handleScroll, { passive: true })
+
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
   const totalItems = mounted ? cart.totalItems() : 0
   const cartItems = mounted ? cart.items : []
   const cartOpen = mounted ? cart.isOpen : false
   const totalPrice = mounted ? cart.totalPrice() : 0
 
-  React.useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20)
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+  const closeMobileMenu = () => setMobileOpen(false)
+  const toggleMobileMenu = () => setMobileOpen((prev) => !prev)
 
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 bg-white transition-shadow duration-300 ${
+        className={`fixed left-0 right-0 top-0 z-50 bg-white transition-shadow duration-300 ${
           isScrolled ? "shadow-md" : "shadow-sm"
         }`}
       >
-        {/* Top ticker */}
+        {/* Top ticker - خليه كما هو كيتحرك */}
         <div className="relative flex overflow-hidden border-b border-red-600 bg-[#ff4d4f] py-1.5 text-white shadow-sm">
-          <div className="animate-ticker-infinite whitespace-nowrap">
+          <div className="animate-ticker-infinite whitespace-nowrap" aria-hidden="true">
             <span className="inline-flex items-center gap-4 px-4">
               <span>Premium Quality</span>
               <span className="text-gray-200 opacity-60">•</span>
@@ -108,7 +124,7 @@ export function Header() {
           <div className="container mx-auto flex h-16 items-center gap-4 px-4">
             <button
               type="button"
-              onClick={() => setMobileOpen(!mobileOpen)}
+              onClick={toggleMobileMenu}
               className="rounded-md p-2 text-gray-600 hover:text-red-600 lg:hidden"
               aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
               aria-expanded={mobileOpen}
@@ -128,7 +144,11 @@ export function Header() {
               </span>
             </Link>
 
-            <div className="relative hidden max-w-lg flex-1 md:flex" role="search" aria-label="Recherche produits">
+            <div
+              className="relative hidden max-w-lg flex-1 md:flex"
+              role="search"
+              aria-label="Recherche produits"
+            >
               <label htmlFor="header-search" className="sr-only">
                 Rechercher un produit
               </label>
@@ -153,14 +173,18 @@ export function Header() {
             <button
               type="button"
               onClick={cart.openCart}
-              aria-label={`Ouvrir le panier${mounted && totalItems > 0 ? `, ${totalItems} article${totalItems > 1 ? "s" : ""}` : ""}`}
+              aria-label={`Ouvrir le panier${
+                mounted && totalItems > 0
+                  ? `, ${totalItems} article${totalItems > 1 ? "s" : ""}`
+                  : ""
+              }`}
               className="relative ml-auto flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700"
             >
               <ShoppingCart className="h-4 w-4" />
               <span className="hidden sm:inline">Panier</span>
 
               {mounted && totalItems > 0 && (
-                <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-yellow-400 text-[10px] font-bold text-gray-900">
+                <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-yellow-400 text-[10px] font-bold text-gray-900">
                   {totalItems}
                 </span>
               )}
@@ -212,7 +236,7 @@ export function Header() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  onClick={() => setMobileOpen(false)}
+                  onClick={closeMobileMenu}
                   className="border-b border-gray-50 px-5 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-red-50 hover:text-red-600"
                 >
                   {item.name}
@@ -225,19 +249,23 @@ export function Header() {
 
       {/* Cart overlay */}
       {cartOpen && (
-        <div
+        <button
+          type="button"
           className="fixed inset-0 z-[60] bg-black/40"
           onClick={cart.closeCart}
-          aria-hidden="true"
+          aria-label="Fermer le panier"
         />
       )}
 
       {/* Cart drawer */}
-      <div
-        className={`fixed top-0 right-0 z-[70] flex h-full w-full flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out sm:w-[400px] ${
-          cartOpen ? "translate-x-0" : "translate-x-full"
+      <aside
+        className={`fixed right-0 top-0 z-[70] flex h-full w-full flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out will-change-transform sm:w-[400px] ${
+          cartOpen ? "translate-x-0 pointer-events-auto" : "translate-x-full pointer-events-none"
         }`}
+        role="dialog"
+        aria-modal="true"
         aria-label="Panier"
+        aria-hidden={!cartOpen}
       >
         <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
           <h2 className="text-lg font-bold text-gray-900">Mon Panier ({totalItems})</h2>
@@ -274,6 +302,9 @@ export function Header() {
                       alt={item.name}
                       className="h-full w-full object-contain p-1"
                       loading="lazy"
+                      decoding="async"
+                      width={64}
+                      height={64}
                     />
                   </div>
 
@@ -351,7 +382,7 @@ export function Header() {
             </Link>
           </div>
         )}
-      </div>
+      </aside>
     </>
   )
 }

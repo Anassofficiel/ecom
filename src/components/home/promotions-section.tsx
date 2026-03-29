@@ -5,19 +5,37 @@ import { getPromotionProducts } from "@/lib/data"
 import type { Product } from "@/lib/data"
 import { ProductCard } from "@/components/product/product-card"
 
+const PROMO_END = new Date("2026-04-01T00:00:00Z")
+const ITEMS_PER_PAGE = 5
+
+const FILTER_TABS = [
+  { id: "all", label: "Voir Tout", emoji: "⭐" },
+  { id: "kitchen", label: "Cuisine", emoji: "🍳" },
+  { id: "laundry", label: "Lavage & Froid", emoji: "🧺" },
+  { id: "tech", label: "TV & Tech", emoji: "📺" },
+  { id: "coffee", label: "Café & Petits Élec.", emoji: "☕" },
+] as const
+
+type FilterTabId = (typeof FILTER_TABS)[number]["id"]
+
 function useCountdown(target: Date) {
-  const [t, setT] = React.useState({ days: 0, hours: 0, mins: 0, secs: 0 })
+  const [time, setTime] = React.useState({
+    days: 0,
+    hours: 0,
+    mins: 0,
+    secs: 0,
+  })
 
   React.useEffect(() => {
     const tick = () => {
       const diff = target.getTime() - Date.now()
 
       if (diff <= 0) {
-        setT({ days: 0, hours: 0, mins: 0, secs: 0 })
+        setTime({ days: 0, hours: 0, mins: 0, secs: 0 })
         return
       }
 
-      setT({
+      setTime({
         days: Math.floor(diff / 86400000),
         hours: Math.floor((diff % 86400000) / 3600000),
         mins: Math.floor((diff % 3600000) / 60000),
@@ -26,11 +44,11 @@ function useCountdown(target: Date) {
     }
 
     tick()
-    const id = setInterval(tick, 1000)
-    return () => clearInterval(id)
+    const id = window.setInterval(tick, 1000)
+    return () => window.clearInterval(id)
   }, [target])
 
-  return t
+  return time
 }
 
 function interleaveProductsByCategory(items: Product[]): Product[] {
@@ -74,17 +92,7 @@ function interleaveProductsByCategory(items: Product[]): Product[] {
   return result
 }
 
-const PROMO_END = new Date("2026-04-01T00:00:00Z")
-
-const FILTER_TABS = [
-  { id: "all", label: "Voir Tout", emoji: "⭐" },
-  { id: "kitchen", label: "Cuisine", emoji: "🍳" },
-  { id: "laundry", label: "Lavage & Froid", emoji: "🧺" },
-  { id: "tech", label: "TV & Tech", emoji: "📺" },
-  { id: "coffee", label: "Café & Petits Élec.", emoji: "☕" },
-]
-
-function mapFilterGroup(category: string) {
+function mapFilterGroup(category: string): Exclude<FilterTabId, "all"> | "other" {
   const c = category.toLowerCase()
 
   if (["kitchen appliances", "ovens", "air fryers", "cookware"].includes(c)) {
@@ -106,29 +114,88 @@ function mapFilterGroup(category: string) {
   return "other"
 }
 
-export function PromotionsSection() {
+const ALL_PROMO_PRODUCTS = getPromotionProducts().filter(
+  (item) => item.isActive !== false
+)
+
+const ALL_INTERLEAVED_PROMO_PRODUCTS = interleaveProductsByCategory([
+  ...ALL_PROMO_PRODUCTS,
+])
+
+function PromotionsCountdown() {
   const timer = useCountdown(PROMO_END)
-  const [activeTab, setActiveTab] = React.useState("all")
+
+  const blocks = [
+    { val: timer.days, label: "Jours" },
+    { val: timer.hours, label: "Heures" },
+    { val: timer.mins, label: "Min" },
+    { val: timer.secs, label: "Sec" },
+  ]
+
+  return (
+    <div className="flex w-full flex-col items-center gap-4 sm:gap-5 xl:w-auto xl:flex-row xl:items-center xl:gap-8 xl:pr-2">
+      <div
+        className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 xl:max-w-[520px]"
+        aria-label="Compte à rebours des promotions"
+        aria-live="polite"
+      >
+        {blocks.map((block, i) => (
+          <React.Fragment key={block.label}>
+            {i > 0 && (
+              <span
+                aria-hidden="true"
+                className="hidden text-2xl font-black text-white/70 sm:inline lg:text-3xl"
+              >
+                :
+              </span>
+            )}
+
+            <div className="min-w-[72px] rounded-2xl border border-white/20 bg-white/15 px-3 py-3 text-center shadow-lg backdrop-blur-md sm:min-w-[82px] sm:px-4 sm:py-4 lg:min-w-[92px]">
+              <span className="block text-2xl font-black leading-none text-white tabular-nums sm:text-3xl">
+                {String(block.val).padStart(2, "0")}
+              </span>
+              <p className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-white/90 sm:text-[11px]">
+                {block.label}
+              </p>
+            </div>
+          </React.Fragment>
+        ))}
+      </div>
+
+      <div className="flex w-full shrink-0 items-center justify-center sm:w-[260px] md:w-[300px] xl:w-[300px] 2xl:w-[340px]">
+        <img
+          src="https://i.postimg.cc/C5GxVgsf/image.png"
+          alt="Visuel des promotions Electro Mostafa"
+          className="h-auto max-h-[130px] w-full rounded-xl object-contain shadow-2xl sm:max-h-[145px] xl:max-h-[165px]"
+          loading="lazy"
+          decoding="async"
+          width={1200}
+          height={675}
+        />
+      </div>
+    </div>
+  )
+}
+
+export function PromotionsSection() {
+  const [activeTab, setActiveTab] = React.useState<FilterTabId>("all")
   const [page, setPage] = React.useState(1)
-  const itemsPerPage = 5
 
-  const allPromo = React.useMemo(() => {
-    return getPromotionProducts().filter((item) => item.isActive !== false)
-  }, [])
-
-  const displayed: Product[] = React.useMemo(() => {
+  const displayed = React.useMemo(() => {
     if (activeTab === "all") {
-      return interleaveProductsByCategory([...allPromo])
+      return ALL_INTERLEAVED_PROMO_PRODUCTS
     }
 
-    return allPromo.filter((p) => mapFilterGroup(p.category) === activeTab)
-  }, [activeTab, allPromo])
+    return ALL_PROMO_PRODUCTS.filter(
+      (product) => mapFilterGroup(product.category) === activeTab
+    )
+  }, [activeTab])
 
-  const totalPages = Math.max(1, Math.ceil(displayed.length / itemsPerPage))
+  const totalPages = Math.max(1, Math.ceil(displayed.length / ITEMS_PER_PAGE))
 
   const paginated = React.useMemo(() => {
-    const start = (page - 1) * itemsPerPage
-    return displayed.slice(start, start + itemsPerPage)
+    const start = (page - 1) * ITEMS_PER_PAGE
+    return displayed.slice(start, start + ITEMS_PER_PAGE)
   }, [displayed, page])
 
   React.useEffect(() => {
@@ -137,6 +204,15 @@ export function PromotionsSection() {
 
   const scrollToPromotions = () => {
     document.getElementById("promotions")?.scrollIntoView({ behavior: "smooth" })
+  }
+
+  const handleTabChange = (tabId: FilterTabId) => {
+    setActiveTab(tabId)
+  }
+
+  const goToPage = (nextPage: number) => {
+    setPage(nextPage)
+    scrollToPromotions()
   }
 
   return (
@@ -171,6 +247,9 @@ export function PromotionsSection() {
               alt="Bannière promotionnelle Electro Mostafa au Maroc"
               className="h-full w-full scale-105 object-cover opacity-15"
               loading="lazy"
+              decoding="async"
+              width={1200}
+              height={675}
             />
           </div>
 
@@ -181,7 +260,7 @@ export function PromotionsSection() {
           <div className="relative z-10 h-full px-5 py-7 sm:px-7 lg:px-10 lg:py-8">
             <div className="flex h-full flex-col gap-6 xl:flex-row xl:items-center xl:justify-between xl:gap-8">
               <div className="max-w-2xl text-white xl:flex-1">
-                <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-white/80 sm:text-xs lg:text-sm">
+                <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-white/90 sm:text-xs lg:text-sm">
                   Fin de la promotion dans :
                 </p>
 
@@ -192,75 +271,40 @@ export function PromotionsSection() {
                   </span>
                 </h3>
 
-                <p className="mt-2 max-w-xl text-sm text-white/80 sm:text-base">
+                <p className="mt-2 max-w-xl text-sm text-white/90 sm:text-base">
                   Sur une sélection d&apos;appareils Electro Mostafa premium
                 </p>
               </div>
 
-              <div className="flex w-full flex-col items-center gap-4 sm:gap-5 xl:w-auto xl:flex-row xl:items-center xl:gap-8 xl:pr-2">
-                <div
-                  className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 xl:max-w-[520px]"
-                  aria-label="Compte à rebours des promotions"
-                >
-                  {[
-                    { val: timer.days, label: "Jours" },
-                    { val: timer.hours, label: "Heures" },
-                    { val: timer.mins, label: "Min" },
-                    { val: timer.secs, label: "Sec" },
-                  ].map((t, i) => (
-                    <React.Fragment key={t.label}>
-                      {i > 0 && (
-                        <span className="hidden text-2xl font-black text-white/60 sm:inline lg:text-3xl">
-                          :
-                        </span>
-                      )}
-
-                      <div className="min-w-[72px] rounded-2xl border border-white/15 bg-white/12 px-3 py-3 text-center shadow-lg backdrop-blur-md sm:min-w-[82px] sm:px-4 sm:py-4 lg:min-w-[92px]">
-                        <span className="block text-2xl font-black leading-none text-white tabular-nums sm:text-3xl">
-                          {String(t.val).padStart(2, "0")}
-                        </span>
-                        <p className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-white/75 sm:text-[11px]">
-                          {t.label}
-                        </p>
-                      </div>
-                    </React.Fragment>
-                  ))}
-                </div>
-
-                <div className="flex w-full shrink-0 items-center justify-center sm:w-[260px] md:w-[300px] xl:w-[300px] 2xl:w-[340px]">
-                  <img
-                    src="https://i.postimg.cc/C5GxVgsf/image.png"
-                    alt="Visuel des promotions Electro Mostafa"
-                    className="h-auto max-h-[130px] w-full rounded-xl object-contain shadow-2xl sm:max-h-[145px] xl:max-h-[165px]"
-                    loading="lazy"
-                  />
-                </div>
-              </div>
+              <PromotionsCountdown />
             </div>
           </div>
         </div>
 
         <div
           className="mb-8 flex flex-wrap justify-center gap-2"
-          role="tablist"
           aria-label="Filtres des promotions"
         >
-          {FILTER_TABS.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id)}
-              aria-pressed={activeTab === tab.id}
-              className={`flex items-center gap-1.5 rounded-full border-2 px-5 py-2.5 text-sm font-semibold transition-all duration-200 ${
-                activeTab === tab.id
-                  ? "border-red-600 bg-red-600 text-white shadow-md"
-                  : "border-gray-200 bg-white text-gray-700 hover:border-red-400 hover:text-red-600"
-              }`}
-            >
-              <span>{tab.emoji}</span>
-              {tab.label}
-            </button>
-          ))}
+          {FILTER_TABS.map((tab) => {
+            const isActive = activeTab === tab.id
+
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => handleTabChange(tab.id)}
+                aria-pressed={isActive}
+                className={`flex items-center gap-1.5 rounded-full border-2 px-5 py-2.5 text-sm font-semibold transition-all duration-200 ${
+                  isActive
+                    ? "border-red-600 bg-red-600 text-white shadow-md"
+                    : "border-gray-200 bg-white text-gray-700 hover:border-red-400 hover:text-red-600"
+                }`}
+              >
+                <span aria-hidden="true">{tab.emoji}</span>
+                {tab.label}
+              </button>
+            )
+          })}
         </div>
 
         {displayed.length > 0 ? (
@@ -281,60 +325,57 @@ export function PromotionsSection() {
                   <button
                     type="button"
                     onClick={() => {
-                      if (page > 1) {
-                        setPage(page - 1)
-                        scrollToPromotions()
-                      }
+                      if (page > 1) goToPage(page - 1)
                     }}
                     disabled={page === 1}
                     className={`h-10 rounded-lg border px-4 text-sm font-bold transition-all ${
                       page === 1
                         ? "cursor-not-allowed border-gray-100 bg-gray-50 text-gray-300"
-                        : "border-gray-200 bg-white text-gray-600 hover:border-red-400 hover:text-red-600"
+                        : "border-gray-200 bg-white text-gray-700 hover:border-red-400 hover:text-red-600"
                     }`}
                   >
                     ← Précédent
                   </button>
 
-                  {Array.from({ length: totalPages }).map((_, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => {
-                        setPage(i + 1)
-                        scrollToPromotions()
-                      }}
-                      aria-label={`Aller à la page ${i + 1}`}
-                      className={`flex h-10 w-10 items-center justify-center rounded-lg text-sm font-bold transition-all ${
-                        page === i + 1
-                          ? "scale-110 bg-red-600 text-white shadow-md"
-                          : "border border-gray-200 bg-white text-gray-600 hover:border-red-400 hover:text-red-600"
-                      }`}
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
+                  {Array.from({ length: totalPages }).map((_, i) => {
+                    const pageNumber = i + 1
+                    const isCurrent = page === pageNumber
+
+                    return (
+                      <button
+                        key={pageNumber}
+                        type="button"
+                        onClick={() => goToPage(pageNumber)}
+                        aria-label={`Aller à la page ${pageNumber}`}
+                        aria-current={isCurrent ? "page" : undefined}
+                        className={`flex h-10 w-10 items-center justify-center rounded-lg text-sm font-bold transition-all ${
+                          isCurrent
+                            ? "scale-110 bg-red-600 text-white shadow-md"
+                            : "border border-gray-200 bg-white text-gray-700 hover:border-red-400 hover:text-red-600"
+                        }`}
+                      >
+                        {pageNumber}
+                      </button>
+                    )
+                  })}
 
                   <button
                     type="button"
                     onClick={() => {
-                      if (page < totalPages) {
-                        setPage(page + 1)
-                        scrollToPromotions()
-                      }
+                      if (page < totalPages) goToPage(page + 1)
                     }}
                     disabled={page === totalPages}
                     className={`h-10 rounded-lg border px-4 text-sm font-bold transition-all ${
                       page === totalPages
                         ? "cursor-not-allowed border-gray-100 bg-gray-50 text-gray-300"
-                        : "border-gray-200 bg-white text-gray-600 hover:border-red-400 hover:text-red-600"
+                        : "border-gray-200 bg-white text-gray-700 hover:border-red-400 hover:text-red-600"
                     }`}
                   >
                     Suivant →
                   </button>
                 </div>
 
-                <p className="text-xs font-medium italic text-gray-400">
+                <p className="text-xs font-medium italic text-gray-500">
                   Page {page} sur {totalPages}
                 </p>
               </div>
@@ -347,7 +388,7 @@ export function PromotionsSection() {
             </p>
             <button
               type="button"
-              onClick={() => setActiveTab("all")}
+              onClick={() => handleTabChange("all")}
               className="text-sm font-medium text-red-600 hover:underline"
             >
               Voir toutes les promotions

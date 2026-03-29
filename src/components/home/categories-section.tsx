@@ -1,7 +1,5 @@
-"use client"
-
 import Link from "next/link"
-import { getProductsByCategory, type Product } from "@/lib/data"
+import { getProductsByCategory } from "@/lib/data"
 import { ChevronRight } from "lucide-react"
 
 const categoryImages: Record<string, string> = {
@@ -24,6 +22,16 @@ const categoryDisplayNames: Record<string, string> = {
   "Kitchen Appliances": "Petit électroménager",
 }
 
+const HOMEPAGE_CATEGORIES = [
+  "Televisions",
+  "Refrigerators",
+  "Ovens",
+  "Washing Machines",
+  "Air Fryers",
+  "Coffee Machines",
+  "Kitchen Appliances",
+]
+
 interface CategoryCardProps {
   category: string
 }
@@ -35,7 +43,7 @@ function CategoryCard({ category }: CategoryCardProps) {
     "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?q=80&w=600&auto=format&fit=crop"
 
   const displayName = categoryDisplayNames[category] ?? category
-  const allProducts: Product[] = getProductsByCategory(category)
+  const allProducts = getProductsByCategory(category)
   const previewProducts = allProducts.slice(0, 4)
   const totalProducts = allProducts.length
 
@@ -45,7 +53,7 @@ function CategoryCard({ category }: CategoryCardProps) {
       : null
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white transition-all duration-300 hover:border-red-200 hover:shadow-lg">
+    <article className="group flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white transition-all duration-300 hover:border-red-200 hover:shadow-lg">
       <Link
         href={`/category/${catSlug}`}
         aria-label={`Voir la catégorie ${displayName}`}
@@ -57,6 +65,9 @@ function CategoryCard({ category }: CategoryCardProps) {
           alt={`${displayName} chez Electro Mostafa`}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
+          decoding="async"
+          width={800}
+          height={500}
         />
 
         <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/60 via-black/10 to-transparent p-4">
@@ -64,14 +75,16 @@ function CategoryCard({ category }: CategoryCardProps) {
             <h3 className="text-base font-bold leading-tight text-white">
               {displayName}
             </h3>
-            <p className="mt-0.5 text-xs text-white/80">
-              {totalProducts > 0 ? `${totalProducts} produits` : "Produits bientôt disponibles"}
+            <p className="mt-0.5 text-xs text-white/85">
+              {totalProducts > 0
+                ? `${totalProducts} produits`
+                : "Produits bientôt disponibles"}
             </p>
           </div>
         </div>
       </Link>
 
-      <div className="flex-1 p-3">
+      <div className="flex flex-1 flex-col p-3">
         {previewProducts.length > 0 ? (
           <div className="mb-3 grid grid-cols-4 gap-1.5">
             {previewProducts.map((product) => (
@@ -87,18 +100,21 @@ function CategoryCard({ category }: CategoryCardProps) {
                   alt={`${product.name} - ${displayName}`}
                   className="h-full w-full object-contain p-1"
                   loading="lazy"
+                  decoding="async"
+                  width={200}
+                  height={200}
                 />
               </Link>
             ))}
           </div>
         ) : (
-          <div className="mb-3 flex h-16 items-center justify-center text-xs text-gray-400">
+          <div className="mb-3 flex h-16 items-center justify-center text-xs text-gray-500">
             Produits bientôt disponibles
           </div>
         )}
 
         {lowestPrice && (
-          <p className="mb-3 text-[11px] text-gray-400">
+          <p className="mb-3 text-[11px] text-gray-500">
             À partir de{" "}
             <span className="font-bold text-red-600">{lowestPrice} DH</span>
           </p>
@@ -110,22 +126,12 @@ function CategoryCard({ category }: CategoryCardProps) {
           className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-red-600 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-red-700"
         >
           Voir Tous les Produits
-          <ChevronRight className="h-3.5 w-3.5" />
+          <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
         </Link>
       </div>
-    </div>
+    </article>
   )
 }
-
-const HOMEPAGE_CATEGORIES = [
-  "Televisions",
-  "Refrigerators",
-  "Ovens",
-  "Washing Machines",
-  "Air Fryers",
-  "Coffee Machines",
-  "Kitchen Appliances",
-]
 
 export function CategoriesSection() {
   return (
