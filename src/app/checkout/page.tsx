@@ -179,6 +179,29 @@ export default function CheckoutPage() {
         throw new Error("Commande créée, mais ID introuvable dans la réponse API.")
       }
 
+      const telegramOrderData = {
+        orderId: order.id,
+        fullName: form.fullName.trim(),
+        phone: form.phone.trim(),
+        city: form.city.trim(),
+        address: form.address.trim(),
+        total,
+        shipping,
+        paymentMethod: "Cash on Delivery",
+        items: cart.items.map((item) => ({
+          image: item.image,
+          title: item.name,
+          qty: item.quantity,
+          price: item.price,
+        })),
+      }
+
+      sessionStorage.setItem("send_order_notification", "1")
+      sessionStorage.setItem(
+        "telegram_order_data",
+        JSON.stringify(telegramOrderData)
+      )
+
       cart.clearCart()
       window.location.href = `/checkout/success?orderId=${order.id}`
     } catch (error) {

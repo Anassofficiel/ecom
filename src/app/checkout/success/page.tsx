@@ -8,6 +8,32 @@ import { useSearchParams } from "next/navigation"
 function OrderSuccessContent() {
   const searchParams = useSearchParams()
   const orderId = searchParams.get("orderId") || "—"
+  const [notificationSent, setNotificationSent] = React.useState(false)
+
+  React.useEffect(() => {
+    const shouldSend = sessionStorage.getItem("send_order_notification")
+    const savedOrderData = sessionStorage.getItem("telegram_order_data")
+
+    if (shouldSend === "1" && savedOrderData) {
+      fetch("/api/telegram-notify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: savedOrderData,
+      })
+        .then(() => {
+          setNotificationSent(true)
+          sessionStorage.removeItem("send_order_notification")
+          sessionStorage.removeItem("telegram_order_data")
+        })
+        .catch((error) => {
+          console.error("Telegram notify error:", error)
+          sessionStorage.removeItem("send_order_notification")
+          sessionStorage.removeItem("telegram_order_data")
+        })
+    }
+  }, [])
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-16">
@@ -37,6 +63,12 @@ function OrderSuccessContent() {
               Conservez ce numéro pour le suivi de votre commande
             </p>
           </div>
+
+          {notificationSent && (
+            <p className="mb-6 text-xs text-emerald-600 font-medium">
+              Notification Telegram envoyée.
+            </p>
+          )}
 
           <div className="text-left space-y-3 mb-8">
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">
