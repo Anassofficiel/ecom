@@ -16,13 +16,14 @@ import { useCart } from "@/lib/store"
 
 const navItems = [
   { name: "🏠 Accueil", href: "/" },
-  { name: "❄️ Réfrigérateurs", href: "/category/refrigerators" },
-  { name: "🧺 Lave-linge", href: "/category/washing-machines" },
   { name: "📺 Télévisions", href: "/category/televisions" },
-  { name: "🍟 Friteuses à Air", href: "/category/air-fryers" },
-  { name: "☕ Cafetières", href: "/category/coffee-machines" },
-  { name: "🍳 Cuisine", href: "/category/kitchen-appliances" },
-  { name: "🔥 Promotions", href: "/#promotions" },
+  { name: "❄️ Réfrigérateurs", href: "/category/refrigerators" },
+  { name: "🔥 Fours", href: "/category/ovens" },
+  { name: "🧺 Machines à laver", href: "/category/washing-machines" },
+  { name: "🍟 Friteuses à air", href: "/category/air-fryers" },
+  { name: "☕ Machines à café", href: "/category/coffee-machines" },
+  { name: "🍳 Petit électroménager", href: "/category/kitchen-appliances" },
+  { name: "🏷️ Promotions", href: "/#promotions" },
   { name: "📍 Nos Magasins", href: "/#magasins" },
   { name: "🎁 Packs / Offres", href: "/#packs" },
 ]
@@ -68,9 +69,8 @@ export function Header() {
   return (
     <>
       <header
-        className={`fixed left-0 right-0 top-0 z-50 bg-white transition-shadow duration-300 ${
-          isScrolled ? "shadow-md" : "shadow-sm"
-        }`}
+        className={`fixed left-0 right-0 top-0 z-50 bg-white transition-shadow duration-300 ${isScrolled ? "shadow-md" : "shadow-sm"
+          }`}
       >
         {/* Top ticker - خليه كما هو كيتحرك */}
         <div className="relative flex overflow-hidden border-b border-red-600 bg-[#ff4d4f] py-1.5 text-white shadow-sm">
@@ -173,11 +173,10 @@ export function Header() {
             <button
               type="button"
               onClick={cart.openCart}
-              aria-label={`Ouvrir le panier${
-                mounted && totalItems > 0
-                  ? `, ${totalItems} article${totalItems > 1 ? "s" : ""}`
-                  : ""
-              }`}
+              aria-label={`Ouvrir le panier${mounted && totalItems > 0
+                ? `, ${totalItems} article${totalItems > 1 ? "s" : ""}`
+                : ""
+                }`}
               className="relative ml-auto flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700"
             >
               <ShoppingCart className="h-4 w-4" />
@@ -259,9 +258,8 @@ export function Header() {
 
       {/* Cart drawer */}
       <aside
-        className={`fixed right-0 top-0 z-[70] flex h-full w-full flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out will-change-transform sm:w-[400px] ${
-          cartOpen ? "translate-x-0 pointer-events-auto" : "translate-x-full pointer-events-none"
-        }`}
+        className={`fixed right-0 top-0 z-[70] flex h-full w-full flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out will-change-transform sm:w-[400px] ${cartOpen ? "translate-x-0 pointer-events-auto" : "translate-x-full pointer-events-none"
+          }`}
         role="dialog"
         aria-modal="true"
         aria-label="Panier"

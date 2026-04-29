@@ -113,6 +113,7 @@ export default function ProductPage() {
   const [activeTab, setActiveTab] = React.useState<"description" | "specs" | "reviews">(
     "description"
   )
+  const [selectedVariantIndex, setSelectedVariantIndex] = React.useState(0)
 
   React.useEffect(() => {
     let active = true
@@ -130,6 +131,7 @@ export default function ProductPage() {
         }
 
         setProduct(foundProduct)
+        setSelectedVariantIndex(0)
       } catch (error) {
         console.error("Failed to load product:", error)
         if (active) {
@@ -159,9 +161,13 @@ export default function ProductPage() {
     const cleanDescription = stripEmojis(product.description)
     const categoryLabel = categoryDisplayName(product.category)
     const pageUrl = `${BASE_URL}/product/${product.id}`
+
+    const selectedVariant = product.variants?.[selectedVariantIndex]
+    const seoPrice = selectedVariant?.price ?? product.price
+
     const title = `${product.name} | ${categoryLabel} au Maroc | Electro Mostafa Maroc`
     const description =
-      `${product.name} chez Electro Mostafa au Maroc. Prix: ${product.price.toLocaleString(
+      `${product.name} chez Electro Mostafa au Maroc. Prix: ${seoPrice.toLocaleString(
         "fr-FR"
       )} DH. ${cleanDescription}`.slice(0, 160)
 
@@ -260,23 +266,7 @@ export default function ProductPage() {
       attrValue: "twitter:image",
       content: product.image,
     })
-  }, [product])
-
-  const handleAddToCart = () => {
-    if (!product) return
-
-    addItem({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.image,
-      quantity: 1,
-      category: product.category,
-    })
-
-    setAdded(true)
-    setTimeout(() => setAdded(false), 1800)
-  }
+  }, [product, selectedVariantIndex])
 
   if (isLoading) {
     return (
@@ -307,17 +297,26 @@ export default function ProductPage() {
   if (!product) return null
 
   const productMeta = product as ProductMeta
+  const selectedVariant = product.variants?.[selectedVariantIndex]
+  const currentPrice = selectedVariant?.price ?? product.price
+  const currentOriginalPrice = selectedVariant?.originalPrice ?? productMeta.originalPrice
+  const currentDiscount = selectedVariant?.discount ?? productMeta.discount
+
   const stock = stockConfig[product.stockStatus] ?? stockConfig["in-stock"]
-  const galleryImages = [product.image, product.hoverImage].filter(Boolean)
+
+  const galleryImages =
+    product.images && product.images.length > 0
+      ? product.images
+      : [product.image, product.hoverImage].filter(Boolean)
+
   const categorySlug = categoryToSlug(product.category)
   const categoryLabel = categoryDisplayName(product.category)
   const cleanDescription = stripEmojis(product.description)
   const productUrl = `${BASE_URL}/product/${product.id}`
 
   const whatsappMessage = encodeURIComponent(
-    `Bonjour, je suis intéressé par ce produit: ${product.name} (${product.price.toLocaleString(
-      "fr-FR"
-    )} DH) — ${productUrl}`
+    `Bonjour, je suis intéressé par ce produit: ${product.name}${selectedVariant ? ` - ${selectedVariant.label}` : ""
+    } (${currentPrice.toLocaleString("fr-FR")} DH) — ${productUrl}`
   )
 
   const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`
@@ -337,16 +336,16 @@ export default function ProductPage() {
     aggregateRating:
       product.reviews > 0
         ? {
-            "@type": "AggregateRating",
-            ratingValue: product.rating,
-            reviewCount: product.reviews,
-          }
+          "@type": "AggregateRating",
+          ratingValue: product.rating,
+          reviewCount: product.reviews,
+        }
         : undefined,
     offers: {
       "@type": "Offer",
       url: productUrl,
       priceCurrency: "MAD",
-      price: product.price,
+      price: currentPrice,
       availability: product.inStock
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock",
@@ -381,6 +380,20 @@ export default function ProductPage() {
         item: productUrl,
       },
     ],
+  }
+
+  const handleAddToCart = () => {
+    addItem({
+      id: selectedVariant ? `${product.id}-${selectedVariant.label}` : product.id,
+      name: selectedVariant ? `${product.name} - ${selectedVariant.label}` : product.name,
+      price: currentPrice,
+      image: product.image,
+      quantity: 1,
+      category: product.category,
+    })
+
+    setAdded(true)
+    setTimeout(() => setAdded(false), 1800)
   }
 
   return (
@@ -457,21 +470,50 @@ export default function ProductPage() {
 
               <div className="flex items-baseline gap-3 border-y border-gray-100 py-3">
                 <span className="text-3xl font-bold text-red-600">
-                  {product.price.toLocaleString("fr-FR")} DH
+                  {currentPrice.toLocaleString("fr-FR")} DH
                 </span>
 
-                {productMeta.originalPrice && (
+                {currentOriginalPrice && (
                   <span className="text-lg text-gray-900 line-through">
-                    {productMeta.originalPrice.toLocaleString("fr-FR")} DH
+                    {currentOriginalPrice.toLocaleString("fr-FR")} DH
                   </span>
                 )}
 
-                {productMeta.discount && (
+                {currentDiscount && (
                   <span className="rounded bg-red-600 px-2 py-0.5 text-xs font-bold text-white">
-                    -{productMeta.discount}%
+                    -{currentDiscount}%
                   </span>
                 )}
               </div>
+
+              {product.variants && product.variants.length > 0 && (
+                <div className="space-y-3">
+                  <div className="text-sm font-semibold text-gray-900">
+                    Choisissez la taille écran :
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {product.variants.map((variant, index) => (
+                      <button
+                        key={`${product.id}-${variant.label}-${index}`}
+                        type="button"
+                        onClick={() => {
+                          setSelectedVariantIndex(index)
+                          setAdded(false)
+                        }}
+                        className={cn(
+                          "rounded-lg border px-4 py-2 text-sm font-semibold transition-colors",
+                          selectedVariantIndex === index
+                            ? "border-red-600 bg-red-600 text-white"
+                            : "border-gray-300 bg-white text-gray-700 hover:border-red-400 hover:text-red-600"
+                        )}
+                      >
+                        {variant.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <p className="text-sm leading-relaxed text-gray-600">{product.description}</p>
 

@@ -55,6 +55,14 @@ function ProductCardComponent({
   const isPromo = showPromoBadge && hasDiscount
   const displayDiscount = product.discount ?? 0
 
+  const isTelevisionWithVariants =
+    product.category === "Televisions" && !!product.variants?.length
+
+  const startingPrice =
+    isTelevisionWithVariants
+      ? Math.min(...product.variants!.map((variant) => variant.price))
+      : product.price
+
   const handleAddToCart = React.useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault()
@@ -63,7 +71,7 @@ function ProductCardComponent({
       addItem({
         id: productId,
         name: product.name,
-        price: product.price,
+        price: startingPrice,
         image: productImage,
         quantity: 1,
         category: product.category,
@@ -74,7 +82,7 @@ function ProductCardComponent({
       if (timeoutRef.current) clearTimeout(timeoutRef.current)
       timeoutRef.current = setTimeout(() => setAdded(false), 1500)
     },
-    [addItem, product, productId, productImage]
+    [addItem, product, productId, productImage, startingPrice]
   )
 
   return (
@@ -166,10 +174,12 @@ function ProductCardComponent({
 
         <div className="mb-4 mt-auto flex items-end gap-3">
           <span className="text-[18px] font-extrabold tracking-tight text-red-600">
-            {product.price.toLocaleString("fr-FR")} DH
+            {isTelevisionWithVariants
+              ? `À partir de ${startingPrice.toLocaleString("fr-FR")} DH`
+              : `${product.price.toLocaleString("fr-FR")} DH`}
           </span>
 
-          {product.originalPrice && (
+          {!isTelevisionWithVariants && product.originalPrice && (
             <span className="text-[13px] font-semibold text-slate-800 line-through opacity-80">
               {product.originalPrice.toLocaleString("fr-FR")} DH
             </span>

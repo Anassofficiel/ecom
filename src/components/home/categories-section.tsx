@@ -58,12 +58,12 @@ function CategoryCard({ category }: CategoryCardProps) {
         href={`/category/${catSlug}`}
         aria-label={`Voir la catégorie ${displayName}`}
         title={displayName}
-        className="relative block h-40 overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100"
+        className="relative block h-[155px] overflow-hidden bg-white"
       >
         <img
           src={image}
           alt={`${displayName} chez Electro Mostafa`}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
           decoding="async"
           width={800}
@@ -83,7 +83,6 @@ function CategoryCard({ category }: CategoryCardProps) {
           </div>
         </div>
       </Link>
-
       <div className="flex flex-1 flex-col p-3">
         {previewProducts.length > 0 ? (
           <div className="mb-3 grid grid-cols-4 gap-1.5">
