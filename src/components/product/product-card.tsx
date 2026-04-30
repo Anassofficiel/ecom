@@ -76,7 +76,6 @@ function ProductCardComponent({
         quantity: 1,
         category: product.category,
       })
-
       setAdded(true)
 
       if (timeoutRef.current) clearTimeout(timeoutRef.current)

@@ -265,6 +265,15 @@ export function Footer() {
             </li>
             <li>
               <Link
+                href="/category/ovens"
+                className="inline-flex items-center gap-2 transition hover:text-red-400"
+              >
+                <ShoppingBag className="h-4 w-4" />
+                Ovens
+              </Link>
+            </li>
+            <li>
+              <Link
                 href="/category/air-fryers"
                 className="inline-flex items-center gap-2 transition hover:text-red-400"
               >

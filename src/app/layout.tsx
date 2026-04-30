@@ -203,7 +203,7 @@ export default function RootLayout({
         />
 
         <Header />
-        <main className="min-h-screen pt-[170px]">{children}</main>
+        <main className="min-h-screen pt-[90px]">{children}</main>
         <Footer />
       </body>
     </html>

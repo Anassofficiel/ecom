@@ -119,65 +119,72 @@ export function Header() {
           </div>
         </div>
 
-        {/* Main header */}
-        <div className="border-b border-gray-100">
-          <div className="container mx-auto flex h-16 items-center gap-4 px-4">
-            <button
-              type="button"
-              onClick={toggleMobileMenu}
-              className="rounded-md p-2 text-gray-600 hover:text-red-600 lg:hidden"
-              aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
-              aria-expanded={mobileOpen}
-              aria-controls="mobile-navigation"
-            >
-              {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
+        <div className="border-b border-gray-100 bg-white">
+          <div className="container mx-auto flex h-12 items-center justify-between px-4">
 
-            <Link
-              href="/"
-              className="flex-shrink-0"
-              aria-label="Retour à l'accueil Electro Mostafa"
-              title="Electro Mostafa Maroc"
-            >
-              <span className="text-xl font-black uppercase leading-none tracking-tight text-red-600">
-                ELECTRO MOSTAFA
-              </span>
-            </Link>
+            {/* LEFT: MENU + LOGO */}
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={toggleMobileMenu}
+                className="rounded-md p-2 text-gray-600 hover:text-red-600 lg:hidden"
+              >
+                {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </button>
 
-            <div
-              className="relative hidden max-w-lg flex-1 md:flex"
-              role="search"
-              aria-label="Recherche produits"
-            >
-              <label htmlFor="header-search" className="sr-only">
-                Rechercher un produit
-              </label>
-              <input
-                id="header-search"
-                type="text"
-                placeholder="Rechercher un produit..."
-                className="h-10 w-full rounded-lg border border-gray-300 pl-10 pr-4 text-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-200"
-              />
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Link href="/" className="flex items-center">
+                <span className="relative inline-block group cursor-pointer">
+
+                  {/* TEXT */}
+                  <span className="relative z-10 text-xl sm:text-2xl font-black tracking-widest uppercase
+    bg-gradient-to-r from-red-600 via-orange-500 to-red-700 
+    bg-[length:200%_200%] bg-clip-text text-transparent
+    animate-gradient-move
+    transition-all duration-300
+    group-hover:scale-105
+    group-hover:drop-shadow-[0_0_10px_rgba(255,0,0,0.6)]
+  ">
+                    ELECTRO MOSTAFA
+                  </span>
+
+                  {/* GLOW LIGHT */}
+                  <span className="absolute inset-0 rounded-md blur-xl opacity-20 
+    bg-gradient-to-r from-red-500 to-orange-500
+    transition-all duration-500
+    group-hover:opacity-40
+    group-hover:scale-110
+  "></span>
+
+                  {/* UNDERLINE ANIMATION */}
+                  <span className="absolute left-0 -bottom-1 h-[2px] w-0 
+    bg-gradient-to-r from-red-600 to-orange-500
+    transition-all duration-500
+    group-hover:w-full
+  "></span>
+
+                </span>
+              </Link>
             </div>
 
-            <a
-              href="tel:+212608788782"
-              className="hidden items-center gap-2 text-sm font-medium text-gray-700 transition-colors hover:text-red-600 xl:flex"
-              aria-label="Appeler Electro Mostafa"
-            >
-              <Phone className="h-4 w-4 text-red-600" />
-              +212 6 08 78 87 82
-            </a>
+            {/* CENTER: NAV (desktop) */}
+            <div className="hidden lg:flex items-center gap-2">
+              {navItems.slice(0, 6).map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-red-600 relative group"
+                >
+                  {item.name}
+                  <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-red-600 transition-all duration-300 group-hover:w-full"></span>
+                </Link>
+              ))}
+            </div>
 
+            {/* RIGHT: PANIER */}
             <button
               type="button"
               onClick={cart.openCart}
-              aria-label={`Ouvrir le panier${mounted && totalItems > 0
-                ? `, ${totalItems} article${totalItems > 1 ? "s" : ""}`
-                : ""
-                }`}
-              className="relative ml-auto flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700"
+              className="relative flex items-center gap-2 rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white shadow-md hover:scale-105 hover:bg-red-700 transition-all duration-200"
             >
               <ShoppingCart className="h-4 w-4" />
               <span className="hidden sm:inline">Panier</span>
@@ -191,52 +198,22 @@ export function Header() {
           </div>
         </div>
 
-        {/* Desktop nav */}
-        <nav
-          className="hidden border-b border-gray-100 bg-white lg:block"
-          aria-label="Navigation principale"
-        >
-          <div className="container mx-auto flex h-11 items-center gap-1 overflow-x-auto px-4">
-            {navItems.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-red-50 hover:text-red-600"
-              >
-                {item.name}
-              </Link>
-            ))}
-          </div>
-        </nav>
+
 
         {/* Mobile nav */}
         {mobileOpen && (
           <div
             id="mobile-navigation"
-            className="border-t border-gray-100 bg-white shadow-lg lg:hidden"
+            className="border-t border-gray-100 bg-white shadow-xl animate-slide-down lg:hidden"
           >
-            <div className="border-b border-gray-100 px-4 py-3">
-              <div className="relative" role="search" aria-label="Recherche mobile">
-                <label htmlFor="mobile-search" className="sr-only">
-                  Rechercher
-                </label>
-                <input
-                  id="mobile-search"
-                  type="text"
-                  placeholder="Rechercher..."
-                  className="h-10 w-full rounded-lg border border-gray-300 pl-10 pr-4 text-sm focus:border-red-500 focus:outline-none"
-                />
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              </div>
-            </div>
 
-            <nav className="flex flex-col py-2" aria-label="Navigation mobile">
+            <nav className="flex flex-col py-3 bg-white">
               {navItems.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
                   onClick={closeMobileMenu}
-                  className="border-b border-gray-50 px-5 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-red-50 hover:text-red-600"
+                  className="flex items-center gap-3 px-6 py-4 text-[15px] font-semibold text-gray-800 border-b border-gray-100 transition-all duration-200 hover:bg-red-50 hover:text-red-600"
                 >
                   {item.name}
                 </Link>
