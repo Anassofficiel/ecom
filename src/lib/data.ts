@@ -13,28 +13,43 @@ export interface ProductVariant {
 }
 
 export interface Product {
-  id: string;
-  name: string;
-  category: string;
-  price: number;
-  originalPrice?: number;
-  discount?: number;
-  variants?: ProductVariant[];
-  rating: number;
-  reviews: number;
-  image: string;
-  hoverImage: string;
-  images?: string[];
-  stockStatus: StockStatus;
-  inStock: boolean;
-  description: string;
-  specs?: Record<string, string>;
-  isPromotion?: boolean;
-  isActive?: boolean;
+  id: string
+  slug?: string
+  name: string
+  category: string
+  price: number
+  originalPrice?: number
+  discount?: number
+  variants?: ProductVariant[]
+  rating: number
+  reviews: number
+  image: string
+  hoverImage: string
+  images?: string[]
+  stockStatus: StockStatus
+  inStock: boolean
+  description: string
+  specs?: Record<string, string>
+  isPromotion?: boolean
+  isActive?: boolean
 }
+
+const slugify = (value: string) =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+
+const withSlug = <T extends { name: string; slug?: string }>(product: T) => ({
+  ...product,
+  slug: product.slug ?? slugify(product.name),
+})
 
 export interface Pack {
   id: string;
+  slug?: string;
   name: string;
   products: string[];
   images: string[];
@@ -53,6 +68,12 @@ export interface StoreLocation {
   phone: string;
   mapUrl: string;
 }
+
+export function getPackBySlug(slug: string) {
+  return packs.find((p) => p.slug === slug)
+}
+
+
 
 // ─── Categories ───────────────────────────────────────────────────────────────
 export const categories = [
@@ -73,6 +94,7 @@ export const products: Product[] = [
   // REFRIGERATORS
   {
     id: "r0",
+    slug: "venezia-ir-540fd-fridge-4-doors-inox",
     name: "VENEZIA IR-540FD Refrigerator 4 Doors Inox",
     category: "Refrigerators",
     price: 7700,
@@ -102,7 +124,8 @@ export const products: Product[] = [
   },
   {
     id: "r1",
-    name: "VENEZIA IR-590DD Refrigerator Double Door Inox",
+    slug: "venezia-ir-590dd-fridge-double-door-inox",
+    name: "VENEZIA Refrigerator Inox",
     category: "Refrigerators",
     price: 7700,
     originalPrice: 8300,
@@ -129,7 +152,8 @@ export const products: Product[] = [
   },
   {
     id: "r2",
-    name: "VENEZIA Refrigerator 200L Bottom Freezer",
+    slug: "venezia-refrigerator-200l-bottom-freezer",
+    name: "VENEZIA Refrigerator Bottom Freezer",
     category: "Refrigerators",
     price: 5000,
     originalPrice: 6399,
@@ -156,7 +180,8 @@ export const products: Product[] = [
   },
   {
     id: "r3",
-    name: "VENEZIA M480N Top Freezer Refrigerator Inox",
+    slug: "venezia-refrigerator-inox",
+    name: "VENEZIA Refrigerator Inox",
     category: "Refrigerators",
     price: 5500,
     originalPrice: 6399,
@@ -182,7 +207,8 @@ export const products: Product[] = [
   },
   {
     id: "r4",
-    name: "VENEZIA DF-50 Refrigerator Silver",
+    slug: "venezia-df-50-refrigerator-silver",
+    name: "VENEZIA Refrigerator Silver",
     category: "Refrigerators",
     price: 3800,
     originalPrice: 4199,
@@ -207,7 +233,8 @@ export const products: Product[] = [
   },
   {
     id: "r5",
-    name: "VENEZIA Top Freezer Refrigerator Inox",
+    slug: "venezia-refrigerator-inox",
+    name: "VENEZIA Refrigerator Inox",
     category: "Refrigerators",
     price: 5300,
     originalPrice: 5699,
@@ -232,7 +259,8 @@ export const products: Product[] = [
   },
   {
     id: "r6",
-    name: "Venizia Side by Side 500L",
+    slug: "venezia-refrigerator-inox",
+    name: "VENEZIA Refrigerator Inox",
     category: "Refrigerators",
     price: 6000,
     originalPrice: 6299,
@@ -259,7 +287,8 @@ export const products: Product[] = [
   },
   {
     id: "r7",
-    name: "Venizia Retro 200L Red",
+    slug: "venezia-refrigerator-red",
+    name: "VENEZIA Refrigerator Red",
     category: "Refrigerators",
     price: 2400,
     originalPrice: 2899,
@@ -286,7 +315,8 @@ export const products: Product[] = [
   },
   {
     id: "r8",
-    name: "VENEZIA G100MBS Refrigerator Inox",
+    slug: "venezia-g100mbs-refrigerator-inox",
+    name: "VENEZIA Refrigerator Inox",
     category: "Refrigerators",
     price: 2200,
     originalPrice: 2699,
@@ -311,7 +341,8 @@ export const products: Product[] = [
   },
   {
     id: "r10",
-    name: "SIVIR SRC-95 Refrigerator Gray",
+    slug: "sivir-src-95-refrigerator-gray",
+    name: "SIVIR Refrigerator Gray",
     category: "Refrigerators",
     price: 1900,
     originalPrice: 2299,
@@ -338,7 +369,8 @@ export const products: Product[] = [
 
   {
     id: "r10prime",
-    name: "SIVIR SRC-95 Refrigerator Gray",
+    slug: "sivir-src-95-refrigerator-gray",
+    name: "SIVIR Refrigerator Gray",
     category: "Refrigerators",
     price: 1900,
     originalPrice: 2299,
@@ -364,7 +396,8 @@ export const products: Product[] = [
   },
   {
     id: "r10prime pro",
-    name: "SIVIR SRC-95 Refrigerator Gray",
+    slug: "sivir-src-95-refrigerator-gray",
+    name: "SIVIR Refrigerator Gray",
     category: "Refrigerators",
     price: 1900,
     originalPrice: 2299,
@@ -391,7 +424,8 @@ export const products: Product[] = [
 
   {
     id: "r10prime pro max",
-    name: "SIVIR SRC-95 Refrigerator Gray",
+    slug: "sivir-src-95-refrigerator-gray",
+    name: "SIVIR Refrigerator Gray",
     category: "Refrigerators",
     price: 1900,
     originalPrice: 2299,
@@ -418,7 +452,8 @@ export const products: Product[] = [
 
   {
     id: "r10pro max",
-    name: "SIVIR SRC-95 Refrigerator Gray",
+    slug: "sivir-src-95-refrigerator-gray",
+    name: "SIVIR Refrigerator Gray",
     category: "Refrigerators",
     price: 1900,
     originalPrice: 2299,
@@ -444,7 +479,8 @@ export const products: Product[] = [
   },
   {
     id: "r11",
-    name: "VENEZIA VIND-130 Retro Refrigerator Cream",
+    slug: "venezia-vind-130-retro-refrigerator-cream",
+    name: "VENEZIA Refrigerator Cream",
     category: "Refrigerators",
     price: 2500,
     originalPrice: 2799,
@@ -470,7 +506,8 @@ export const products: Product[] = [
   },
   {
     id: "r12",
-    name: "Venizia Retro 200L Turquoise",
+    slug: "venezia-refrigerator-turquoise",
+    name: "VENEZIA Refrigerator Turquoise",
     category: "Refrigerators",
     price: 2400,
     originalPrice: 2699,
@@ -498,7 +535,8 @@ export const products: Product[] = [
   },
   {
     id: "r13",
-    name: "Venizia Retro 200L Turquoise",
+    slug: "venezia-refrigerator-cream",
+    name: "VENEZIA Refrigerator Cream",
     category: "Refrigerators",
     price: 2400,
     originalPrice: 2699,
@@ -523,7 +561,8 @@ export const products: Product[] = [
   },
   {
     id: "r14",
-    name: "Venizia Retro 200L Classic Red",
+    slug: "venezia-refrigerator-red",
+    name: "VENEZIA Refrigerator Red",
     category: "Refrigerators",
     price: 2400,
     originalPrice: 2699,
@@ -553,7 +592,8 @@ export const products: Product[] = [
   // WASHING MACHINES
   {
     id: "w1",
-    name: "VENEZIA R1000 Front Load Steam",
+    slug: "venezia-washing-machine-steam",
+    name: "VENEZIA Washing Machine Steam",
     category: "Washing Machines",
     price: 2700,
     originalPrice: 2999,
@@ -594,7 +634,8 @@ export const products: Product[] = [
   },
   {
     id: "w2",
-    name: "VENEZIA X1000 Front Load",
+    slug: "venezia-washing-machine-front-load",
+    name: "VENEZIA Washing Machine Front Load",
     category: "Washing Machines",
     price: 2700,
     originalPrice: 2999,
@@ -634,7 +675,8 @@ export const products: Product[] = [
   },
   {
     id: "w3",
-    name: "VENEZIA X1000 Allergy Care",
+    slug: "venezia-washing-machine-allergy-care",
+    name: "VENEZIA Washing Machine Allergy Care",
     category: "Washing Machines",
     price: 2700,
     originalPrice: 2999,
@@ -674,7 +716,8 @@ export const products: Product[] = [
   },
   {
     id: "w4",
-    name: "VENEZIA Front Load Steam Wash",
+    slug: "venezia-washing-machine-steam",
+    name: "VENEZIA Washing Machine Steam",
     category: "Washing Machines",
     price: 2700,
     originalPrice: 2999,
@@ -714,7 +757,8 @@ export const products: Product[] = [
   },
   {
     id: "w5",
-    name: "VENEZIA Dishwasher 13 Couverts Silver",
+    slug: "venezia-dishwasher-silver",
+    name: "VENEZIA Dishwasher Silver",
     category: "Washing Machines",
     price: 3199,
     originalPrice: 3699,
@@ -743,7 +787,8 @@ export const products: Product[] = [
   },
   {
     id: "w6",
-    name: "VENEZIA Top Load Semi Automatic 8kg Flower",
+    slug: "venezia-semi-automatic-top-load",
+    name: "VENEZIA Semi Automatic Top Load",
     category: "Washing Machines",
     price: 1999,
     originalPrice: 2200,
@@ -771,7 +816,8 @@ export const products: Product[] = [
   },
   {
     id: "w7",
-    name: "VENEZIA Top Load Semi Automatic 8kg Flower",
+    slug: "venezia-top-load-automatic",
+    name: "VENEZIA Top Load Automatic",
     category: "Washing Machines",
     price: 1299,
     originalPrice: 1500,
@@ -799,7 +845,8 @@ export const products: Product[] = [
   },
   {
     id: "w8",
-    name: "VENEZIA Top Load Semi Automatic 8kg Flower",
+    slug: "venezia-top-load-automatic",
+    name: "VENEZIA Top Load Automatic",
     category: "Washing Machines",
     price: 1649,
     originalPrice: 2000,
@@ -827,7 +874,8 @@ export const products: Product[] = [
   },
   {
     id: "w9",
-    name: "VENEZIA Top Load Semi Automatic 15kg Flower",
+    slug: "venezia-top-load-automatic",
+    name: "VENEZIA Top Load Automatic",
     category: "Washing Machines",
     price: 1799,
     originalPrice: 2000,
@@ -855,7 +903,8 @@ export const products: Product[] = [
 
   {
     id: "w9prime",
-    name: "VENEZIA Top Load Semi Automatic 11kg Flower",
+    slug: "venezia-top-load-automatic",
+    name: "VENEZIA Top Load Automatic",
     category: "Washing Machines",
     price: 1549,
     originalPrice: 2000,
@@ -883,7 +932,8 @@ export const products: Product[] = [
 
   {
     id: "w9pro",
-    name: "VENEZIA Top Load Semi Automatic 13kg Flower",
+    slug: "venezia-top-load-automatic",
+    name: "VENEZIA Top Load Automatic",
     category: "Washing Machines",
     price: 1599,
     originalPrice: 2000,
@@ -911,7 +961,8 @@ export const products: Product[] = [
 
   {
     id: "w9promax",
-    name: "VENEZIA Top Load Semi Automatic 15kg Flower",
+    slug: "venezia-top-load-automatic",
+    name: "VENEZIA Top Load Automatic",
     category: "Washing Machines",
     price: 1799,
     originalPrice: 2000,
@@ -940,7 +991,8 @@ export const products: Product[] = [
 
   {
     id: "w9minipro",
-    name: "VENEZIA Top Load Semi Automatic 10kg Flower",
+    slug: "venezia-top-load-automatic",
+    name: "VENEZIA Top Load Automatic",
     category: "Washing Machines",
     price: 1299,
     originalPrice: 2000,
@@ -968,7 +1020,8 @@ export const products: Product[] = [
 
   {
     id: "w9minipromax",
-    name: "VENEZIA Top Load Semi Automatic 12kg Flower",
+    slug: "venezia-top-load-automatic",
+    name: "VENEZIA Top Load Automatic",
     category: "Washing Machines",
     price: 1299,
     originalPrice: 2000,
@@ -996,7 +1049,8 @@ export const products: Product[] = [
   // TELEVISIONS
   {
     id: "t1",
-    name: 'VENEZIA Google TV 4K QLED GTV95',
+    slug: "venezia-4k-qled-tv",
+    name: "VENEZIA 4K QLED TV",
     category: "Televisions",
     price: 1399,
     originalPrice: 1799,
@@ -1036,7 +1090,8 @@ export const products: Product[] = [
 
   {
     id: "t2",
-    name: 'KÖLN Android 14 Smart TV KH32SM',
+    slug: "koln-smart-tv",
+    name: "KÖLN Android 14 Smart TV",
     category: "Televisions",
     price: 2299,
     originalPrice: 2699,
@@ -1070,7 +1125,8 @@ export const products: Product[] = [
 
   {
     id: "af1",
-    name: "Robot de cuisine mixer 8L",
+    slug: "vospeed-stand-mixer-8l",
+    name: "Vospeed Stand Mixer 8L",
     category: "Air Fryers",
     price: 899,
     originalPrice: 1199,
@@ -1095,7 +1151,8 @@ export const products: Product[] = [
   },
   {
     id: "af2",
-    name: "Robot de cuisine mixer 10L",
+    slug: "venezia-stand-mixer-10l",
+    name: "VENEZIA Stand Mixer 10L",
     category: "Air Fryers",
     price: 1399,
     originalPrice: 1599,
@@ -1120,7 +1177,8 @@ export const products: Product[] = [
   },
   {
     id: "af3",
-    name: "Robot de cuisine mixer 12L",
+    slug: "venezia-stand-mixer-12l",
+    name: "VENEZIA Stand Mixer 12L",
     category: "Air Fryers",
     price: 1599,
     originalPrice: 1899,
@@ -1145,7 +1203,8 @@ export const products: Product[] = [
   },
   {
     id: "af4",
-    name: "Robot de cuisine mixer 12L",
+    slug: "venezia-stand-mixer-12l-black",
+    name: "VENEZIA Stand Mixer 12L Black",
     category: "Air Fryers",
     price: 1599,
     originalPrice: 1899,
@@ -1171,7 +1230,8 @@ export const products: Product[] = [
 
   {
     id: "af5prime",
-    name: "Robot de cuisine mixer 12L",
+    slug: "venezia-stand-mixer-12l-red",
+    name: "VENEZIA Stand Mixer 12L Red",
     category: "Air Fryers",
     price: 1599,
     originalPrice: 1899,
@@ -1196,7 +1256,8 @@ export const products: Product[] = [
   },
   {
     id: "af5premium1",
-    name: "Robot de cuisine mixer 10L",
+    slug: "venezia-stand-mixer-10l-creamy",
+    name: "VENEZIA Stand Mixer 10L Creamy",
     category: "Air Fryers",
     price: 1399,
     originalPrice: 1599,
@@ -1221,7 +1282,8 @@ export const products: Product[] = [
   },
   {
     id: "af5premium2",
-    name: "Robot de cuisine mixer 7L",
+    slug: "venezia-stand-mixer-7l-red",
+    name: "VENEZIA Stand Mixer 7L Red",
     category: "Air Fryers",
     price: 899,
     originalPrice: 1099,
@@ -1246,7 +1308,8 @@ export const products: Product[] = [
   },
   {
     id: "af5premium3",
-    name: "Robot de cuisine mixer 8L",
+    slug: "venezia-stand-mixer-8l-gold",
+    name: "VENEZIA Stand Mixer 8L Gold",
     category: "Air Fryers",
     price: 899,
     originalPrice: 1099,
@@ -1271,7 +1334,8 @@ export const products: Product[] = [
   },
   {
     id: "af6",
-    name: "Air fryer VENEZIA 9L",
+    slug: "venezia-air-fryer-9l",
+    name: "VENEZIA Air Fryer 9L",
     category: "Air Fryers",
     price: 999,
     originalPrice: 1099,
@@ -1296,7 +1360,8 @@ export const products: Product[] = [
   },
   {
     id: "af7",
-    name: "Air fryer VENEZIA Digital 8L",
+    slug: "venezia-air-fryer-8l",
+    name: "VENEZIA Air Fryer 8L",
     category: "Air Fryers",
     price: 899,
     originalPrice: 1099,
@@ -1321,7 +1386,8 @@ export const products: Product[] = [
   },
   {
     id: "af8",
-    name: "Air fryer VENEZIA Digital 6.5L",
+    slug: "venezia-air-fryer-6-5l",
+    name: "VENEZIA Air Fryer 6.5L",
     category: "Air Fryers",
     price: 899,
     originalPrice: 999,
@@ -1347,7 +1413,8 @@ export const products: Product[] = [
   // COFFEE MACHINES
   {
     id: "c1",
-    name: "KOLN Espresso Machine",
+    slug: "koln-espresso-machine",
+    name: "KÖLN Espresso Machine",
     category: "Coffee Machines",
     price: 649,
     originalPrice: 999,
@@ -1373,6 +1440,7 @@ export const products: Product[] = [
   {
     id: "c2",
     name: "VENEZIA Capsule Coffee Machine",
+    slug: "venezia-capsule-coffee-machine",
     category: "Coffee Machines",
     price: 749,
     originalPrice: 999,
@@ -1398,6 +1466,7 @@ export const products: Product[] = [
   {
     id: "c3",
     name: "KOLN Automatic Espresso",
+    slug: "koln-automatic-espresso",
     category: "Coffee Machines",
     price: 649,
     originalPrice: 999,
@@ -1424,6 +1493,7 @@ export const products: Product[] = [
   {
     id: "c4",
     name: "KOLN Espresso Machine",
+    slug: "koln-espresso-machine",
     category: "Coffee Machines",
     price: 649,
     originalPrice: 999,
@@ -1450,6 +1520,7 @@ export const products: Product[] = [
   {
     id: "c5",
     name: "KOLN Espresso Machine ",
+    slug: "koln-espresso-machine",
     category: "Coffee Machines",
     price: 599,
     originalPrice: 999,
@@ -1478,6 +1549,7 @@ export const products: Product[] = [
   {
     id: "k1",
     name: "VENEZIA Industrial Vacuum 20L",
+    slug: "venezia-industrial-vacuum-20l",
     category: "Kitchen Appliances",
     price: 1199,
     originalPrice: 1399,
@@ -1504,6 +1576,7 @@ export const products: Product[] = [
 
   {
     id: "k2",
+    slug: "venezia-water-filter-5-stages",
     name: "VENEZIA Water Filter 5 Stages",
     category: "Kitchen Appliances",
     price: 1699,
@@ -1531,6 +1604,7 @@ export const products: Product[] = [
   {
     id: "k3",
     name: "KOLN Vacuum Cleaner 2L",
+    slug: "koln-vacuum-cleaner-2l",
     category: "Kitchen Appliances",
     price: 549,
     originalPrice: 649,
@@ -1556,6 +1630,7 @@ export const products: Product[] = [
 
   {
     id: "k4",
+    slug: "venezia-gas-water-heater-6l",
     name: "VENEZIA Gas Water Heater 6L",
     category: "Kitchen Appliances",
     price: 1299,
@@ -1582,6 +1657,7 @@ export const products: Product[] = [
 
   {
     id: "k5",
+    slug: "venezia-electric-water-heater-100l",
     name: "VENEZIA Electric Water Heater 100L",
     category: "Kitchen Appliances",
     price: 1599,
@@ -1609,6 +1685,7 @@ export const products: Product[] = [
   {
     id: "k6",
     name: "VENEZIA Kitchen Hood Inox",
+    slug: "venezia-kitchen-hood-inox",
     category: "Kitchen Appliances",
     price: 1599,
     originalPrice: 1999,
@@ -1640,6 +1717,7 @@ export const products: Product[] = [
   {
     id: "k7",
     name: "Adjustable Stand Fan",
+    slug: "adjustable-stand-fan",
     category: "Kitchen Appliances",
     price: 1199,
     originalPrice: 2999,
@@ -1666,6 +1744,7 @@ export const products: Product[] = [
   {
     id: "k8",
     name: "KOLN Stand Fan 16\"",
+    slug: "koln-stand-fan-16-inch",
     category: "Kitchen Appliances",
     price: 349,
     originalPrice: 369,
@@ -1699,6 +1778,7 @@ export const products: Product[] = [
   {
     id: "k8prime",
     name: "KOLN Air Conditioner",
+    slug: "koln-air-conditioner",
     category: "Kitchen Appliances",
     price: 3849,
     originalPrice: 4699,
@@ -1733,6 +1813,7 @@ export const products: Product[] = [
   {
     id: "k9",
     name: "VENEZIA Electric BBQ 50cm",
+    slug: "venezia-electric-bbq-50cm",
     category: "Kitchen Appliances",
     price: 349,
     originalPrice: 399,
@@ -1765,6 +1846,7 @@ export const products: Product[] = [
   {
     id: "k10",
     name: "VENEZIA Citrus Juicer",
+    slug: "venezia-citrus-juicer",
     category: "Kitchen Appliances",
     price: 449,
     originalPrice: 529,
@@ -1791,6 +1873,7 @@ export const products: Product[] = [
   {
     id: "k11",
     name: "KOLN Hand Blender 4in1",
+    slug: "koln-hand-blender-4in1",
     category: "Kitchen Appliances",
     price: 499,
     originalPrice: 599,
@@ -1817,6 +1900,7 @@ export const products: Product[] = [
   {
     id: "k12",
     name: "KOLN Food Processor Inox 2L",
+    slug: "koln-food-processor-2l",
     category: "Kitchen Appliances",
     price: 179,
     originalPrice: 199,
@@ -1849,6 +1933,7 @@ export const products: Product[] = [
   {
     id: "k13",
     name: "KOLN Blender 1.5L Classic",
+    slug: "koln-blender-1-5l-classic",
     category: "Kitchen Appliances",
     price: 299,
     originalPrice: 379,
@@ -1875,6 +1960,7 @@ export const products: Product[] = [
   {
     id: "k14",
     name: "VENEZIA Blender 2L Inox",
+    slug: "venezia-blender-2l-inox",
     category: "Kitchen Appliances",
     price: 179,
     originalPrice: 209,
@@ -1900,6 +1986,7 @@ export const products: Product[] = [
 
   {
     id: "k15",
+    slug: "koln-blender-3l-premium",
     name: "KOLN Blender 3L Premium",
     category: "Kitchen Appliances",
     price: 169,
@@ -1927,6 +2014,7 @@ export const products: Product[] = [
   {
     id: "k16",
     name: "KOLN Blender + Grinder 1.5L",
+    slug: "koln-blender-grinder-1-5l",
     category: "Kitchen Appliances",
     price: 189,
     originalPrice: 249,
@@ -1952,6 +2040,7 @@ export const products: Product[] = [
 
   {
     id: "k17",
+    slug: "koln-blender-1-25l-multifunction",
     name: "KOLN Multifunction Blender 1.25L",
     category: "Kitchen Appliances",
     price: 139,
@@ -1979,6 +2068,7 @@ export const products: Product[] = [
   {
     id: "k18",
     name: "KOLN Electric Iron 1200W",
+    slug: "koln-electric-iron-1200w",
     category: "Kitchen Appliances",
     price: 169,
     originalPrice: 219,
@@ -2005,6 +2095,7 @@ export const products: Product[] = [
   {
     id: "k19",
     name: "BEST MARK Panini Grill",
+    slug: "best-mark-panini-grill",
     category: "Kitchen Appliances",
     price: 129,
     originalPrice: 179,
@@ -2030,6 +2121,7 @@ export const products: Product[] = [
   {
     id: "k20",
     name: "VENEZIA Sandwich Maker 2000W",
+    slug: "venezia-sandwich-maker-2000w",
     category: "Kitchen Appliances",
     price: 119,
     originalPrice: 149,
@@ -2056,6 +2148,7 @@ export const products: Product[] = [
   {
     id: "k21",
     name: "VENEZIA Panini Grill 2200W",
+    slug: "venezia-panini-grill-2200w",
     category: "Kitchen Appliances",
     price: 399,
     originalPrice: 449,
@@ -2082,6 +2175,7 @@ export const products: Product[] = [
   {
     id: "k22",
     name: "KOLN Electric Kettle 1.7L Inox",
+    slug: "koln-electric-kettle-1-7l-inox",
     category: "Kitchen Appliances",
     price: 129,
     originalPrice: 189,
@@ -2108,6 +2202,7 @@ export const products: Product[] = [
   {
     id: "k23",
     name: "KOLN Electric Kettle 1.8L",
+    slug: "koln-electric-kettle-1-8l",
     category: "Kitchen Appliances",
     price: 129,
     originalPrice: 159,
@@ -2134,6 +2229,7 @@ export const products: Product[] = [
   {
     id: "k24",
     name: "DAMAI Electric Grinder 300g",
+    slug: "damai-electric-grinder-300g",
     category: "Kitchen Appliances",
     price: 549,
     originalPrice: 629,
@@ -2160,6 +2256,7 @@ export const products: Product[] = [
   {
     id: "k25",
     name: "DAMAI Electric Grinder 350g",
+    slug: "damai-electric-grinder-350g",
     category: "Kitchen Appliances",
     price: 649,
     originalPrice: 749,
@@ -2185,6 +2282,7 @@ export const products: Product[] = [
 
   {
     id: "k26",
+    slug: "damai-electric-grinder-pro",
     name: "DAMAI Electric Grinder Pro",
     category: "Kitchen Appliances",
     price: 549,
@@ -2216,6 +2314,7 @@ export const products: Product[] = [
   {
     id: "k27",
     name: "Stainless Steel Steamer Pot",
+    slug: "stainless-steel-steamer-pot",
     category: "Kitchen Appliances",
     price: 189,
     originalPrice: 249,
@@ -2249,6 +2348,7 @@ export const products: Product[] = [
   {
     id: "k28",
     name: "EleVida Pressure Cooker 6L Pro",
+    slug: "elevida-pressure-cooker-6l-pro",
     category: "Kitchen Appliances",
     price: 799,
     originalPrice: 999,
@@ -2274,6 +2374,7 @@ export const products: Product[] = [
 
   {
     id: "k29",
+    slug: "elevida-pressure-cooker",
     name: "EleVida Pressure Cooker",
     category: "Kitchen Appliances",
     price: 349,
@@ -2307,6 +2408,7 @@ export const products: Product[] = [
   },
   {
     id: "k30",
+    slug: "elevida-stainless-cooking-pot",
     name: "EleVida Stainless Cooking Pot",
     category: "Kitchen Appliances",
     price: 169,
@@ -2338,6 +2440,7 @@ export const products: Product[] = [
 
   {
     id: "k31",
+    slug: "elevida-luxury-tea-set",
     name: "EleVida Luxury Tea Set",
     category: "Kitchen Appliances",
     price: 249,
@@ -2364,6 +2467,7 @@ export const products: Product[] = [
 
   {
     id: "k32",
+    slug: "elevida-gold-serving-plates-set",
     name: "EleVida Gold Serving Plates Set",
     category: "Kitchen Appliances",
     price: 499,
@@ -2391,6 +2495,7 @@ export const products: Product[] = [
   {
     id: "k33",
     name: "EleVida Gold Serving Tray",
+    slug: "elevida-gold-serving-tray",
     category: "Kitchen Appliances",
     price: 499,
     originalPrice: 599,
@@ -2417,6 +2522,7 @@ export const products: Product[] = [
   {
     id: "k34",
     name: "EleVida Silver Serving Tray",
+    slug: "elevida-silver-serving-tray",
     category: "Kitchen Appliances",
     price: 499,
     originalPrice: 599,
@@ -2442,6 +2548,7 @@ export const products: Product[] = [
   {
     id: "k35",
     name: "EleVida Luxury Serving Set",
+    slug: "elevida-luxury-serving-set",
     category: "Kitchen Appliances",
     price: 499,
     originalPrice: 549,
@@ -2468,6 +2575,7 @@ export const products: Product[] = [
   {
     id: "k36",
     name: "EleVida Round Serving Tray",
+    slug: "elevida-round-serving-tray",
     category: "Kitchen Appliances",
     price: 499,
     originalPrice: 549,
@@ -2494,6 +2602,7 @@ export const products: Product[] = [
   {
     id: "k37",
     name: "EleVida Dish Rack 3 Tier",
+    slug: "elevida-dish-rack-3-tier",
     category: "Kitchen Appliances",
     price: 499,
     originalPrice: 549,
@@ -2520,6 +2629,7 @@ export const products: Product[] = [
   {
     id: "k38",
     name: "EleVida Dish Rack 2 Tier",
+    slug: "elevida-dish-rack-2-tier",
     category: "Kitchen Appliances",
     price: 349,
     originalPrice: 379,
@@ -2546,6 +2656,7 @@ export const products: Product[] = [
   {
     id: "k39",
     name: "EleVida Dish Rack Compact",
+    slug: "elevida-dish-rack-compact",
     category: "Kitchen Appliances",
     price: 289,
     originalPrice: 249,
@@ -2572,6 +2683,7 @@ export const products: Product[] = [
   {
     id: "k40",
     name: "EleVida Chest Freezer",
+    slug: "elevida-chest-freezer",
     category: "Kitchen Appliances",
     price: 1899,
     originalPrice: 2499,
@@ -2601,6 +2713,7 @@ export const products: Product[] = [
 
   {
     id: "k41",
+    slug: "elevida-large-chest-freezer",
     name: "EleVida Large Chest Freezer",
     category: "Kitchen Appliances",
     price: 4999,
@@ -2628,6 +2741,7 @@ export const products: Product[] = [
   {
     id: "k42",
     name: "EleVida Wall Clock Classic",
+    slug: "elevida-wall-clock-classic",
     category: "Kitchen Appliances",
     price: 149,
     originalPrice: 199,
@@ -2653,6 +2767,7 @@ export const products: Product[] = [
 
   {
     id: "k43",
+    slug: "elevida-wooden-wall-clock",
     name: "EleVida Wooden Wall Clock",
     category: "Kitchen Appliances",
     price: 65,
@@ -2680,6 +2795,7 @@ export const products: Product[] = [
   {
     id: "k44",
     name: "EleVida Islamic Wall Clock",
+    slug: "elevida-islamic-wall-clock",
     category: "Kitchen Appliances",
     price: 55,
     originalPrice: 99,
@@ -2705,6 +2821,7 @@ export const products: Product[] = [
 
   {
     id: "k45",
+    slug: "elevida-decorative-wall-clock",
     name: "EleVida Decorative Wall Clock",
     category: "Kitchen Appliances",
     price: 55,
@@ -2731,6 +2848,7 @@ export const products: Product[] = [
 
   {
     id: "k46",
+    slug: "elevida-arabic-calligraphy-clock",
     name: "EleVida Arabic Calligraphy Clock",
     category: "Kitchen Appliances",
     price: 55,
@@ -2757,6 +2875,7 @@ export const products: Product[] = [
 
   {
     id: "k47",
+    slug: "elevida-islamic-gold-clock",
     name: "EleVida Islamic Gold Clock",
     category: "Kitchen Appliances",
     price: 55,
@@ -2783,6 +2902,7 @@ export const products: Product[] = [
 
   {
     id: "k48",
+    slug: "elevida-horizontal-wall-clock",
     name: "EleVida Horizontal Wall Clock",
     category: "Kitchen Appliances",
     price: 55,
@@ -2809,6 +2929,7 @@ export const products: Product[] = [
 
   {
     id: "k49",
+    slug: "elevida-ocean-wall-clock",
     name: "EleVida Ocean Wall Clock",
     category: "Kitchen Appliances",
     price: 55,
@@ -2836,6 +2957,7 @@ export const products: Product[] = [
 
   {
     id: "ov0",
+    slug: "koln-gas-stove-4-burners",
     name: "KOLN Gas Stove 4 Burners",
     category: "Ovens",
     price: 449,
@@ -2862,6 +2984,7 @@ export const products: Product[] = [
 
   {
     id: "ov1",
+    slug: "venezia-gas-stove-4-burners",
     name: "VENEZIA Gas Stove 4 Burners",
     category: "Ovens",
     price: 899,
@@ -2888,6 +3011,7 @@ export const products: Product[] = [
 
   {
     id: "ov2",
+    slug: "venezia-gas-stove-4-burners-2",
     name: "VENEZIA Gas Stove 4 Burners",
     category: "Ovens",
     price: 599,
@@ -2913,6 +3037,7 @@ export const products: Product[] = [
   },
   {
     id: "ov3",
+    slug: "litimat-gas-stove-4-burners",
     name: "LITIMAT Gas Stove 4 Burners",
     category: "Ovens",
     price: 0,
@@ -2939,6 +3064,7 @@ export const products: Product[] = [
   },
   {
     id: "ov4",
+    slug: "venezia-gas-stove-4-burners-2",
     name: "VENEZIA Gas Stove 4 Burners",
     category: "Ovens",
     price: 599,
@@ -2964,6 +3090,7 @@ export const products: Product[] = [
   },
   {
     id: "ov5",
+    slug: "litimat-gas-stove-4-burners-2",
     name: "LITIMAT Gas Stove 4 Burners",
     category: "Ovens",
     price: 349,
@@ -2990,6 +3117,7 @@ export const products: Product[] = [
 
   {
     id: "ov5prime",
+    slug: "litimat-gas-stove-3-burners",
     name: "LITIMAT Gas Stove 3 Burners",
     category: "Ovens",
     price: 349,
@@ -3016,6 +3144,7 @@ export const products: Product[] = [
 
   {
     id: "ov6",
+    slug: "koln-gas-stove-3-burners",
     name: "KOLN Gas Stove 3 Burners",
     category: "Ovens",
     price: 449,
@@ -3041,6 +3170,7 @@ export const products: Product[] = [
   },
   {
     id: "ov7",
+    slug: "venezia-gas-stove-2-burners",
     name: "VENEZIA Gas Stove 2 Burners",
     category: "Ovens",
     price: 0,
@@ -3067,6 +3197,7 @@ export const products: Product[] = [
   },
   {
     id: "ov8",
+    slug: "koln-gas-stove-2-burners",
     name: "KOLN Gas Stove 2 Burners",
     category: "Ovens",
     price: 599,
@@ -3093,6 +3224,7 @@ export const products: Product[] = [
   },
   {
     id: "ov9",
+    slug: "koln-gas-stove-2-burners-2",
     name: "KOLN Gas Stove 2 Burners",
     category: "Ovens",
     price: 689,
@@ -3119,6 +3251,7 @@ export const products: Product[] = [
   },
   {
     id: "ov10",
+    slug: "litimat-electric-stove-2-burners",
     name: "LITIMAT Electric Stove 2 Burners",
     category: "Ovens",
     price: 0,
@@ -3146,6 +3279,7 @@ export const products: Product[] = [
   },
   {
     id: "ov10new",
+    slug: "litimat-gas-stove-4-burners",
     name: "LITIMAT Gas Stove 4 Burners",
     category: "Ovens",
     price: 999,
@@ -3173,6 +3307,7 @@ export const products: Product[] = [
   },
   {
     id: "ov10new01",
+    slug: "litimat-built-in-gas-hob-4-burners",
     name: "LITIMAT Built-in Gas Hob 4 Burners",
     category: "Ovens",
     price: 799,
@@ -3202,6 +3337,7 @@ export const products: Product[] = [
 
   {
     id: "ov11prime",
+    slug: "venezia-built-in-gas-hob-4-burners",
     name: "VENEZIA Built-in Gas Hob 4 Burners",
     category: "Ovens",
     price: 699,
@@ -3230,6 +3366,7 @@ export const products: Product[] = [
 
   {
     id: "ov12prime",
+    slug: "venezia-built-in-gas-hob-6-burners",
     name: "VENEZIA Built-in Gas Hob 6 Burners",
     category: "Ovens",
     price: 1599,
@@ -3258,6 +3395,7 @@ export const products: Product[] = [
 
   {
     id: "ov12pro",
+    slug: "venezia-built-in-gas-hob-5-burners",
     name: "VENEZIA Built-in Gas Hob 5 Burners",
     category: "Ovens",
     price: 1399,
@@ -3285,6 +3423,7 @@ export const products: Product[] = [
   },
   {
     id: "ov12promax",
+    slug: "venezia-built-in-gas-hob-5-burners-2",
     name: "VENEZIA Built-in Gas Hob 5 Burners",
     category: "Ovens",
     price: 999,
@@ -3312,6 +3451,7 @@ export const products: Product[] = [
   },
   {
     id: "ov12",
+    slug: "venezia-built-in-gas-hob-4-burners",
     name: "VENEZIA Built-in Gas Hob 4 Burners",
     category: "Ovens",
     price: 799,
@@ -3339,6 +3479,7 @@ export const products: Product[] = [
   },
   {
     id: "ov13",
+    slug: "venezia-built-in-gas-hob-4-burners-2",
     name: "VENEZIA Built-in Gas Hob 4 Burners",
     category: "Ovens",
     price: 899,
@@ -3368,6 +3509,7 @@ export const products: Product[] = [
 
   {
     id: "ov14",
+    slug: "venezia-built-in-gas-hob-5-burners",
     name: "VENEZIA Built-in Gas Hob 5 Burners",
     category: "Ovens",
     price: 1399,
@@ -3395,6 +3537,7 @@ export const products: Product[] = [
   },
   {
     id: "ov15",
+    slug: "venezia-built-in-gas-hob-5-burners-2",
     name: "VENEZIA Built-in Gas Hob 5 Burners",
     category: "Ovens",
     price: 1399,
@@ -3422,6 +3565,7 @@ export const products: Product[] = [
   },
   {
     id: "ov16",
+    slug: "venezia-built-in-gas-hob-5-burners-3",
     name: "VENEZIA Built-in Gas Hob 5 Burners",
     category: "Ovens",
     price: 1199,
@@ -3449,6 +3593,7 @@ export const products: Product[] = [
   },
   {
     id: "ov17",
+    slug: "venezia-built-in-gas-hob-5-burners-4",
     name: "VENEZIA Built-in Gas Hob 5 Burners",
     category: "Ovens",
     price: 699,
@@ -3476,6 +3621,7 @@ export const products: Product[] = [
   },
   {
     id: "ov18",
+    slug: "venezia-built-in-gas-hob-5-burners-5",
     name: "VENEZIA Built-in Gas Hob 5 Burners",
     category: "Ovens",
     price: 1199,
@@ -3503,6 +3649,7 @@ export const products: Product[] = [
   },
   {
     id: "ov19",
+    slug: "venezia-built-in-gas-hob-5-burners-6",
     name: "VENEZIA Built-in Gas Hob 5 Burners",
     category: "Ovens",
     price: 0,
@@ -3532,6 +3679,7 @@ export const products: Product[] = [
 
   {
     id: "ov20",
+    slug: "venezia-built-in-gas-hob-5-burners-7",
     name: "VENEZIA Built-in Gas Hob 5 Burners",
     category: "Ovens",
     price: 1399,
@@ -3559,6 +3707,7 @@ export const products: Product[] = [
   },
   {
     id: "ov21",
+    slug: "venezia-built-in-gas-hob-5-burners-8",
     name: "VENEZIA Built-in Gas Hob 5 Burners",
     category: "Ovens",
     price: 1299,
@@ -3586,6 +3735,7 @@ export const products: Product[] = [
   },
   {
     id: "ov22",
+    slug: "venezia-built-in-gas-hob-4-burners-2",
     name: "VENEZIA Built-in Gas Hob 4 Burners",
     category: "Ovens",
     price: 1099,
@@ -3613,6 +3763,7 @@ export const products: Product[] = [
   },
   {
     id: "ov23",
+    slug: "venezia-built-in-gas-hob-5-burners",
     name: "VENEZIA Built-in Gas Hob 5 Burners",
     category: "Ovens",
     price: 1299,
@@ -3642,6 +3793,7 @@ export const products: Product[] = [
 
   {
     id: "ov24",
+    slug: "venezia-electric-oven-65l",
     name: "VENEZIA Electric Oven 65L",
     category: "Ovens",
     price: 1199,
@@ -3669,6 +3821,7 @@ export const products: Product[] = [
   },
   {
     id: "ov25",
+    slug: "venezia-built-in-microwave",
     name: "VENEZIA Built-in Microwave ",
     category: "Ovens",
     price: 1599,
@@ -3696,6 +3849,7 @@ export const products: Product[] = [
   },
   {
     id: "ov26",
+    slug: "venezia-built-in-microwave-2",
     name: "VENEZIA Built-in Microwave",
     category: "Ovens",
     price: 1599,
@@ -3723,6 +3877,7 @@ export const products: Product[] = [
   },
   {
     id: "ov27prime",
+    slug: "venezia-built-in-electric-oven",
     name: "VENEZIA Built-in Electric Oven",
     category: "Ovens",
     price: 3799,
@@ -3752,6 +3907,7 @@ export const products: Product[] = [
 
   {
     id: "ov27pro",
+    slug: "venezia-built-in-electric-oven-70l-air-fryer",
     name: "VENEZIA Built-in Electric Oven 70L Air Fryer",
     category: "Ovens",
     price: 2199,
@@ -3783,6 +3939,7 @@ export const products: Product[] = [
 
   {
     id: "ov27promaxv",
+    slug: "venezia-built-in-electric-oven-70l",
     name: "VENEZIA Built-in Electric Oven 70L",
     category: "Ovens",
     price: 2399,
@@ -3812,6 +3969,7 @@ export const products: Product[] = [
 
   {
     id: "ov27",
+    slug: "venezia-built-in-electric-oven-70l-2",
     name: "VENEZIA Built-in Electric Oven 70L",
     category: "Ovens",
     price: 2399,
@@ -3841,6 +3999,7 @@ export const products: Product[] = [
 
   {
     id: "ov28",
+    slug: "venezia-built-in-electric-oven-60l",
     name: "VENEZIA Built-in Electric Oven 60L",
     category: "Ovens",
     price: 1799,
@@ -3869,6 +4028,7 @@ export const products: Product[] = [
 
   {
     id: "ov29",
+    slug: "kumtel-built-in-electric-oven-60l",
     name: "KUMTEL Built-in Electric Oven 60L",
     category: "Ovens",
     price: 1599,
@@ -3897,6 +4057,7 @@ export const products: Product[] = [
   },
   {
     id: "ov30",
+    slug: "venezia-countertop-electric-oven-65l",
     name: "VENEZIA Countertop Electric Oven 65L",
     category: "Ovens",
     price: 1199,
@@ -3925,6 +4086,7 @@ export const products: Product[] = [
 
   {
     id: "ov31prime",
+    slug: "itimat-freestanding-gas-oven-90cm",
     name: "Itimat Freestanding Gas Oven 90cm",
     category: "Ovens",
     price: 3899,
@@ -3952,6 +4114,7 @@ export const products: Product[] = [
   },
   {
     id: "ov31",
+    slug: "dream-freestanding-gas-oven-60cm",
     name: "DREAM Freestanding Gas Oven 60cm",
     category: "Ovens",
     price: 2799,
@@ -3980,6 +4143,7 @@ export const products: Product[] = [
 
   {
     id: "ov32",
+    slug: "dream-freestanding-gas-oven-60cm-2",
     name: "DREAM Freestanding Gas Oven 60cm",
     category: "Ovens",
     price: 2549,
@@ -4007,6 +4171,7 @@ export const products: Product[] = [
   },
   {
     id: "ov33",
+    slug: "dream-double-gas-oven-70cm",
     name: "DREAM Double Gas Oven 70cm",
     category: "Ovens",
     price: 2199,
@@ -4034,6 +4199,7 @@ export const products: Product[] = [
   },
   {
     id: "ov34",
+    slug: "dream-double-gas-oven-70cm-2",
     name: "DREAM Double Gas Oven 70cm",
     category: "Ovens",
     price: 2299,
@@ -4061,6 +4227,7 @@ export const products: Product[] = [
   },
   {
     id: "ov35",
+    slug: "dream-double-gas-oven-60cm",
     name: "DREAM Double Gas Oven 60cm",
     category: "Ovens",
     price: 2049,
@@ -4103,6 +4270,7 @@ export const promotionProductIds = [
 export const packs: Pack[] = [
   {
     id: "pack1",
+    slug: "pack-cuisine-salon-connecte",
     name: "Pack Cuisine & Salon Connecté",
     products: [
       "VENEZIA Refrigerator 200L Bottom Freezer",
@@ -4122,6 +4290,7 @@ export const packs: Pack[] = [
   },
   {
     id: "pack2",
+    slug: "pack-barista-patisserie",
     name: "Pack Barista & Pâtisserie",
     products: [
       "KOLN Espresso Machine 15 Bar",
@@ -4141,6 +4310,7 @@ export const packs: Pack[] = [
   },
   {
     id: "pack3",
+    slug: "pack-tv-pause-cafe",
     name: "Pack TV & Pause Café",
     products: [
       'VENEZIA Google TV 75" 4K QLED',
@@ -4160,6 +4330,7 @@ export const packs: Pack[] = [
   },
   {
     id: "pack4",
+    slug: "pack-lavage-confort",
     name: "Pack Lavage & Confort",
     products: [
       "VENEZIA R1000 Front Load 9kg Steam",
@@ -4179,6 +4350,7 @@ export const packs: Pack[] = [
   },
   {
     id: "pack5",
+    slug: "pack-chef-maison-premium",
     name: "Pack Chef Maison Premium",
     products: [
       "VENEZIA Stand Mixer OU-6118 7L",
@@ -4198,6 +4370,7 @@ export const packs: Pack[] = [
   },
   {
     id: "pack6",
+    slug: "pack-maison-familiale",
     name: "Pack Maison Familiale",
     products: [
       "VENEZIA Refrigerator 420L Inverter",
@@ -4217,6 +4390,7 @@ export const packs: Pack[] = [
   },
   {
     id: "pack7",
+    slug: "pack-air-fry-grill",
     name: "Pack Air Fry & Grill",
     products: [
       "VENEZIA Air Fryer 3L",
@@ -4236,6 +4410,7 @@ export const packs: Pack[] = [
   },
   {
     id: "pack8",
+    slug: "pack-espresso-master",
     name: "Pack Espresso Master",
     products: [
       "VENEZIA Capsule Coffee Machine",
@@ -4255,6 +4430,7 @@ export const packs: Pack[] = [
   },
   {
     id: "pack9",
+    slug: "pack-nettoyage-eau-pure",
     name: "Pack Nettoyage & Eau Pure",
     products: [
       "VENEZIA Industrial Vacuum Cleaner 20L",
@@ -4274,6 +4450,7 @@ export const packs: Pack[] = [
   },
   {
     id: "pack10",
+    slug: "pack-tv-tech-vision",
     name: "Pack TV & Tech Vision",
     products: [
       'VENEZIA Google TV 75" 4K QLED',

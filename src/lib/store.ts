@@ -10,6 +10,8 @@ export interface CartItem {
     image: string
     quantity: number
     category: string
+    packName?: string;
+    packImage?: string;
 }
 
 interface CartStore {

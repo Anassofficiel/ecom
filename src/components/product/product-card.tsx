@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { ShoppingCart, Star, Tag, Gift } from "lucide-react"
 import { useCart } from "@/lib/store"
 import type { Product } from "@/lib/data"
@@ -19,8 +20,9 @@ const stockConfig = {
   "out-of-stock": { label: "Rupture", className: "bg-red-100 text-red-600" },
 } as const
 
+// 🔥 ALT optimized SEO
 function getProductImageAlt(product: Product) {
-  return `${product.name} - ${product.category} chez Electro Mostafa`
+  return `${product.name} ${product.category} prix Maroc Electro Mostafa`
 }
 
 function ProductCardComponent({
@@ -76,6 +78,7 @@ function ProductCardComponent({
         quantity: 1,
         category: product.category,
       })
+
       setAdded(true)
 
       if (timeoutRef.current) clearTimeout(timeoutRef.current)
@@ -102,38 +105,39 @@ function ProductCardComponent({
       >
         {isPromo && (
           <div className="absolute left-3 top-3 z-30 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-pink-500 to-red-500 px-3 py-1 text-[12px] font-extrabold text-white shadow-lg">
-            <Tag className="h-3.5 w-3.5" aria-hidden="true" />
+            <Tag className="h-3.5 w-3.5" />
             <span>{displayDiscount > 0 ? `${displayDiscount}% OFF` : "OFFRE"}</span>
           </div>
         )}
 
         {isPromo && (
-          <div className="absolute right-3 top-3 z-30 rounded-lg bg-gradient-to-r from-pink-500 to-rose-500 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white shadow-lg">
+          <div className="absolute right-3 top-3 z-30 rounded-lg bg-gradient-to-r from-pink-500 to-rose-500 px-3 py-1 text-[11px] font-extrabold uppercase text-white shadow-lg">
             OFFRE SPÉCIALE
           </div>
         )}
 
         {isPromo && (
           <div className="absolute left-4 top-14 z-30 flex h-14 w-14 items-center justify-center rounded-full border-4 border-red-300 bg-gradient-to-b from-red-400 to-red-600 text-white shadow-xl">
-            <Gift className="h-7 w-7" aria-hidden="true" />
+            <Gift className="h-7 w-7" />
           </div>
         )}
 
         {hasDiscount && !isPromo && (
           <div className="absolute left-3 top-3 z-20 rounded-full bg-red-600 px-2.5 py-1 text-[11px] font-bold text-white shadow-md">
-            -{displayDiscount > 0 ? displayDiscount : 0}%
+            -{displayDiscount}%
           </div>
         )}
 
-        <img
+        {/* 🔥 IMAGE OPTIMIZED */}
+        <Image
           src={productImage}
           alt={productAlt}
           title={product.name}
-          className="h-full w-full object-contain p-4 transition-transform duration-500 group-hover:scale-105"
-          loading="lazy"
-          decoding="async"
-          width={400}
-          height={400}
+          fill
+          sizes="(max-width: 768px) 100vw, 300px"
+          className="object-contain p-4 transition-transform duration-500 group-hover:scale-105"
+          placeholder="blur"
+          blurDataURL="/placeholder.png"
         />
       </Link>
 
@@ -149,22 +153,17 @@ function ProductCardComponent({
 
         <Link
           href={`/product/${productId}`}
-          aria-label={`Ouvrir la fiche produit ${product.name}`}
-          title={product.name}
-          className="mb-3 line-clamp-2 min-h-[48px] text-[15px] font-extrabold leading-6 text-slate-800 transition-colors hover:text-red-600"
+          className="mb-3 line-clamp-2 min-h-[48px] text-[15px] font-extrabold text-slate-800 hover:text-red-600"
         >
           {product.name}
         </Link>
 
         <div className="mb-3 flex items-center gap-2">
-          <div className="flex gap-0.5" aria-hidden="true">
+          <div className="flex gap-0.5">
             {[1, 2, 3, 4, 5].map((s) => (
               <Star key={s} className="h-4 w-4 fill-amber-400 text-amber-400" />
             ))}
           </div>
-          <span className="sr-only">
-            Note {productRating.toFixed(1)} sur 5 basée sur {productReviews} avis
-          </span>
           <span className="text-[13px] font-bold text-slate-700">
             {productRating.toFixed(1)}
           </span>
@@ -172,40 +171,32 @@ function ProductCardComponent({
         </div>
 
         <div className="mb-4 mt-auto flex items-end gap-3">
-          <span className="text-[18px] font-extrabold tracking-tight text-red-600">
+          <span className="text-[18px] font-extrabold text-red-600">
             {isTelevisionWithVariants
               ? `À partir de ${startingPrice.toLocaleString("fr-FR")} DH`
               : `${product.price.toLocaleString("fr-FR")} DH`}
           </span>
 
           {!isTelevisionWithVariants && product.originalPrice && (
-            <span className="text-[13px] font-semibold text-slate-800 line-through opacity-80">
+            <span className="text-[13px] line-through text-slate-800 opacity-80">
               {product.originalPrice.toLocaleString("fr-FR")} DH
             </span>
           )}
         </div>
 
         <button
-          type="button"
           onClick={handleAddToCart}
           disabled={!product.inStock || added}
-          aria-label={
-            !product.inStock
-              ? `${product.name} en rupture de stock`
-              : added
-                ? `${product.name} ajouté au panier`
-                : `Ajouter ${product.name} au panier`
-          }
           className={cn(
-            "flex h-12 w-full items-center justify-center gap-2 rounded-xl text-sm font-extrabold transition-all duration-200",
+            "flex h-12 w-full items-center justify-center gap-2 rounded-xl text-sm font-extrabold transition",
             product.inStock
               ? added
-                ? "bg-emerald-600 text-white shadow-md"
-                : "bg-red-600 text-white shadow-md hover:bg-red-700 hover:shadow-lg"
-              : "cursor-not-allowed bg-gray-100 text-gray-400"
+                ? "bg-emerald-600 text-white"
+                : "bg-red-600 text-white hover:bg-red-700"
+              : "bg-gray-100 text-gray-400"
           )}
         >
-          <ShoppingCart className="h-4 w-4" aria-hidden="true" />
+          <ShoppingCart className="h-4 w-4" />
           {!product.inStock ? "Rupture" : added ? "Ajouté ✓" : "Ajouter"}
         </button>
       </div>

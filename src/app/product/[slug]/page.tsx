@@ -104,7 +104,7 @@ function setMetaTag({
 export default function ProductPage() {
   const params = useParams()
   const router = useRouter()
-  const id = (params?.id as string) ?? ""
+  const slug = (params?.slug as string) ?? ""
 
   const { addItem } = useCart()
   const [product, setProduct] = React.useState<Product | null>(null)
@@ -121,7 +121,7 @@ export default function ProductPage() {
     const loadProduct = async () => {
       try {
         setIsLoading(true)
-        const foundProduct = await getProductById(id)
+        const foundProduct = await getProductById(slug)
 
         if (!active) return
 
@@ -144,7 +144,7 @@ export default function ProductPage() {
       }
     }
 
-    if (id) {
+    if (slug) {
       loadProduct()
     } else {
       router.replace("/")
@@ -153,7 +153,7 @@ export default function ProductPage() {
     return () => {
       active = false
     }
-  }, [id, router])
+  }, [slug, router])
 
   React.useEffect(() => {
     if (!product) return
@@ -312,7 +312,7 @@ export default function ProductPage() {
   const categorySlug = categoryToSlug(product.category)
   const categoryLabel = categoryDisplayName(product.category)
   const cleanDescription = stripEmojis(product.description)
-  const productUrl = `${BASE_URL}/product/${product.id}`
+  const productUrl = `${BASE_URL}/product/${product.slug}`
 
   const whatsappMessage = encodeURIComponent(
     `Bonjour, je suis intéressé par ce produit: ${product.name}${selectedVariant ? ` - ${selectedVariant.label}` : ""

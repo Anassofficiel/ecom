@@ -17,9 +17,14 @@ const outfit = Outfit({
 
 const siteUrl = "https://veneziaelectro.vercel.app";
 const siteName = "Electro Mostafa Maroc";
-const siteTitle = "Electro Mostafa Maroc | Électroménager, TV et Cuisine au Maroc";
+
+// 🔥 Title optimized (قصير وقوي)
+const siteTitle = "Electro Mostafa Maroc | TV, Frigo, Machine à laver";
+
+// 🔥 Description optimized (150-160)
 const siteDescription =
-  "Achetez électroménager, TV, réfrigérateurs, lave-linge, fours et équipements de cuisine chez Electro Mostafa au Maroc. Promotions, showrooms et livraison rapide.";
+  "Achetez TV, frigo, machine à laver et électroménager au Maroc. Prix promo, livraison rapide et qualité garantie chez Electro Mostafa.";
+
 const phone = "+212508788782";
 
 export const metadata: Metadata = {
@@ -27,29 +32,34 @@ export const metadata: Metadata = {
 
   title: {
     default: siteTitle,
-    template: "%s | Electro Mostafa Maroc",
+    template: "%s | Electro Mostafa",
   },
 
   description: siteDescription,
+
+  keywords: [
+    "electroménager maroc",
+    "tv maroc",
+    "frigo maroc",
+    "machine à laver maroc",
+    "Electro Mostafa",
+    "électroménager casablanca",
+  ],
 
   alternates: {
     canonical: "/",
   },
 
   applicationName: siteName,
-
   category: "shopping",
 
   robots: {
     index: true,
     follow: true,
-    nocache: false,
     googleBot: {
       index: true,
       follow: true,
       "max-image-preview": "large",
-      "max-snippet": -1,
-      "max-video-preview": -1,
     },
   },
 
@@ -60,139 +70,52 @@ export const metadata: Metadata = {
     title: siteTitle,
     description: siteDescription,
     locale: "fr_MA",
+    images: [
+      {
+        url: "/placeholder.png", // 🔥 مهم تضيف صورة حقيقية من بعد
+        width: 1200,
+        height: 630,
+      },
+    ],
   },
 
   twitter: {
     card: "summary_large_image",
     title: siteTitle,
     description: siteDescription,
+    images: ["/placeholder.png"],
   },
 
   other: {
     "geo.region": "MA",
     "geo.placename": "Casablanca, Marrakech",
-    "format-detection": "telephone=yes",
   },
 };
 
 const structuredData = {
   "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "Organization",
-      "@id": `${siteUrl}/#organization`,
-      name: siteName,
-      url: siteUrl,
-      telephone: phone,
-      sameAs: [
-        "https://www.facebook.com/profile.php?id=100089842077600",
-        "https://www.instagram.com/wny8868/",
-        "https://www.tiktok.com/@electromostafa55",
-        "https://www.youtube.com/اواني مصطفى",
-      ],
-      contactPoint: [
-        {
-          "@type": "ContactPoint",
-          telephone: phone,
-          contactType: "customer service",
-          areaServed: "MA",
-          availableLanguage: ["fr", "ar"],
-        },
-      ],
-    },
-    {
-      "@type": "WebSite",
-      "@id": `${siteUrl}/#website`,
-      url: siteUrl,
-      name: siteName,
-      publisher: {
-        "@id": `${siteUrl}/#organization`,
-      },
-      inLanguage: "fr-MA",
-    },
-    {
-      "@type": "Store",
-      "@id": `${siteUrl}/#casablanca-store`,
-      name: "Electro Mostafa — Casablanca",
-      url: siteUrl,
-      telephone: phone,
-      image:
-        "https://commons.wikimedia.org/wiki/Special:FilePath/Sunrise%20in%20Casablanca%20with%20Hassan%20II%20Mosque.jpg",
-      address: {
-        "@type": "PostalAddress",
-        streetAddress: "Bd Bassatine, Tit Mellil",
-        addressLocality: "Casablanca",
-        addressCountry: "MA",
-      },
-      openingHoursSpecification: [
-        {
-          "@type": "OpeningHoursSpecification",
-          dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-          opens: "09:00",
-          closes: "19:00",
-        },
-        {
-          "@type": "OpeningHoursSpecification",
-          dayOfWeek: "Sunday",
-          opens: "10:00",
-          closes: "17:00",
-        },
-      ],
-      sameAs: [
-        "https://www.google.com/maps/place/Bd+Bassatine,+Tit+Mellil/@33.5491441,-7.4848297,17z/data=!4m6!3m5!1s0xda63523cf416c45:0xca8831957dc753a4!8m2!3d33.5491441!4d-7.4822548!16s%2Fg%2F1tk9s3jd?entry=ttu&g_ep=EgoyMDI2MDMyNC4wIKXMDSoASAFQAw%3D%3D",
-      ],
-      parentOrganization: {
-        "@id": `${siteUrl}/#organization`,
-      },
-    },
-    {
-      "@type": "Store",
-      "@id": `${siteUrl}/#marrakech-store`,
-      name: "Electro Mostafa — Marrakech",
-      url: siteUrl,
-      telephone: phone,
-      image:
-        "https://commons.wikimedia.org/wiki/Special:FilePath/Maroc%20Marrakech%20Jemaa-el-Fna%20Luc%20Viatour.JPG",
-      address: {
-        "@type": "PostalAddress",
-        streetAddress: "HXP5+R7X",
-        addressLocality: "Marrakech",
-        addressCountry: "MA",
-      },
-      openingHoursSpecification: [
-        {
-          "@type": "OpeningHoursSpecification",
-          dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-          opens: "09:00",
-          closes: "19:30",
-        },
-        {
-          "@type": "OpeningHoursSpecification",
-          dayOfWeek: "Sunday",
-          opens: "10:00",
-          closes: "17:00",
-        },
-      ],
-      sameAs: [
-        "https://www.google.com/maps/search/?api=1&query=31.587111,-8.041778",
-      ],
-      parentOrganization: {
-        "@id": `${siteUrl}/#organization`,
-      },
-    },
+  "@type": "Organization",
+  name: siteName,
+  url: siteUrl,
+  telephone: phone,
+  sameAs: [
+    "https://www.facebook.com/profile.php?id=100089842077600",
+    "https://www.instagram.com/wny8868/",
+    "https://www.tiktok.com/@electromostafa55",
   ],
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="fr" className="scroll-smooth">
       <body
         className={`${inter.variable} ${outfit.variable} bg-white font-sans antialiased text-gray-900`}
       >
+        {/* 🔥 Structured Data */}
         <Script
           id="structured-data"
           type="application/ld+json"

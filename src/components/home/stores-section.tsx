@@ -5,7 +5,6 @@ import { MapPin, Clock, Phone, ArrowRight, ChevronLeft, ChevronRight } from "luc
 
 const SITE_URL = "https://veneziaelectro.vercel.app"
 const MAIN_PHONE = "+212 508788782"
-
 const storesContent = [
   {
     id: "casa",
@@ -76,16 +75,24 @@ const storesJsonLd = {
 }
 
 /* ─── sub-component ─── */
-function StoreCard({ store }: { store: any }) {
+function StoreCard({
+  store,
+  priority = false,
+}: {
+  store: (typeof storesContent)[0]
+  priority?: boolean
+}) {
   return (
     <article className="st-card">
       {/* IMAGE */}
       <div className="st-card-img-wrap">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={store.image}
           alt={store.imageAlt}
           className="st-card-img"
-          loading="lazy"
+          loading={priority ? "eager" : "lazy"}
+          decoding="async"
         />
         <div className="st-card-img-overlay" />
         <div className="st-card-badge">
@@ -281,6 +288,7 @@ export function StoresSection() {
           width: 100%;
           height: 100%;
           object-fit: cover;
+          display: block;
           transition: transform 0.8s cubic-bezier(0.16,1,0.3,1);
           filter: brightness(0.85) saturate(0.9);
         }
@@ -294,6 +302,7 @@ export function StoresSection() {
           position: absolute;
           inset: 0;
           background: linear-gradient(to bottom, transparent 25%, rgba(0,0,0,0.52) 100%);
+          z-index: 1;
         }
 
         .st-card-badge {
@@ -312,6 +321,7 @@ export function StoresSection() {
           color: #111;
           backdrop-filter: blur(8px);
           letter-spacing: 0.01em;
+          z-index: 2;
         }
 
         .st-card-badge-dot {
@@ -335,6 +345,7 @@ export function StoresSection() {
           line-height: 1;
           margin: 0;
           text-shadow: 0 2px 10px rgba(0,0,0,0.25);
+          z-index: 2;
         }
 
         /* BODY */
@@ -585,8 +596,8 @@ export function StoresSection() {
 
           {/* DESKTOP */}
           <div className="st-grid">
-            {storesContent.map((store) => (
-              <StoreCard key={store.id} store={store} />
+            {storesContent.map((store, index) => (
+              <StoreCard key={store.id} store={store} priority={index === 0} />
             ))}
           </div>
 
@@ -596,9 +607,9 @@ export function StoresSection() {
               className="st-slider-track"
               style={{ transform: `translateX(calc(-${active * 100}%))` }}
             >
-              {storesContent.map((store) => (
+              {storesContent.map((store, index) => (
                 <div key={store.id} className="st-slider-slide">
-                  <StoreCard store={store} />
+                  <StoreCard store={store} priority={index === 0} />
                 </div>
               ))}
             </div>
