@@ -12,7 +12,7 @@ import {
 const SOCIAL_LINKS = [
   {
     name: "Instagram",
-    href: "https://www.instagram.com/wny8868/",
+    href: "https://www.instagram.com/electro_mostafa55/",
     className:
       "bg-gradient-to-br from-[#F58529] via-[#DD2A7B] to-[#8134AF] hover:scale-105 hover:shadow-[0_10px_30px_rgba(221,42,123,0.35)]",
     icon: (
@@ -171,7 +171,7 @@ export function Footer() {
                   href="tel:+212508788782"
                   className="mt-1 block text-sm text-zinc-400 transition hover:text-white"
                 >
-                  +212 508788782
+                  +212 608788782
                 </a>
                 <a
                   href="https://wa.me/212608788782"
