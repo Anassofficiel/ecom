@@ -2,206 +2,153 @@
 
 import * as React from "react"
 import Link from "next/link"
-import Image from "next/image"
-import { ShoppingCart, Star, Tag, Gift } from "lucide-react"
-import { useCart } from "@/lib/store"
-import type { Product } from "@/lib/data"
-import { cn } from "@/lib/utils"
+import { ShoppingCart, Heart, Eye } from "lucide-react"
+import { motion } from "framer-motion"
+import { useStore } from "@/lib/store"
+import { Product } from "@/lib/data"
 
 interface ProductCardProps {
   product: Product
-  className?: string
-  showPromoBadge?: boolean
+  index?: number
 }
 
-const stockConfig = {
-  "in-stock": { label: "En Stock", className: "bg-emerald-100 text-emerald-700" },
-  "low-stock": { label: "Stock Limité", className: "bg-amber-100 text-amber-700" },
-  "out-of-stock": { label: "Rupture", className: "bg-red-100 text-red-600" },
-} as const
-
-// 🔥 ALT optimized SEO
-function getProductImageAlt(product: Product) {
-  return `${product.name} ${product.category} prix Maroc Electro Mostafa`
-}
-
-function ProductCardComponent({
-  product,
-  className,
-  showPromoBadge = false,
-}: ProductCardProps) {
-  const addItem = useCart((state) => state.addItem)
-  const [added, setAdded] = React.useState(false)
-  const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  React.useEffect(() => {
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current)
-    }
-  }, [])
-
-  const productId = String(product.id)
-  const productImage = product.image || "/placeholder.png"
-  const productRating = typeof product.rating === "number" ? product.rating : 0
-  const productReviews = typeof product.reviews === "number" ? product.reviews : 0
-  const productAlt = getProductImageAlt(product)
-
-  const stock =
-    stockConfig[product.stockStatus as keyof typeof stockConfig] ??
-    stockConfig["in-stock"]
-
-  const hasDiscount =
-    !!product.discount ||
-    (!!product.originalPrice && product.originalPrice > product.price)
-
-  const isPromo = showPromoBadge && hasDiscount
-  const displayDiscount = product.discount ?? 0
-
-  const isTelevisionWithVariants =
-    product.category === "Televisions" && !!product.variants?.length
-
-  const startingPrice =
-    isTelevisionWithVariants
-      ? Math.min(...product.variants!.map((variant) => variant.price))
-      : product.price
-
-  const handleAddToCart = React.useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.preventDefault()
-      if (!product.inStock) return
-
-      addItem({
-        id: productId,
-        name: product.name,
-        price: startingPrice,
-        image: productImage,
-        quantity: 1,
-        category: product.category,
-      })
-
-      setAdded(true)
-
-      if (timeoutRef.current) clearTimeout(timeoutRef.current)
-      timeoutRef.current = setTimeout(() => setAdded(false), 1500)
-    },
-    [addItem, product, productId, productImage, startingPrice]
-  )
+export function ProductCard({ product, index = 0 }: ProductCardProps) {
+  const addToCart = useStore((state) => state.addToCart)
+  const toggleWishlist = useStore((state) => state.toggleWishlist)
+  const isInWishlist = useStore((state) => state.isInWishlist(product.id))
+  
+  const discountPercent = product.discount || 
+    (product.originalPrice && product.originalPrice > product.price 
+      ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) 
+      : 0)
 
   return (
-    <div
-      className={cn(
-        "group flex flex-col overflow-hidden rounded-2xl border bg-white transition-all duration-300",
-        isPromo
-          ? "border-red-200 shadow-sm hover:-translate-y-1 hover:border-red-400 hover:shadow-[0_12px_35px_rgba(220,38,38,0.18)]"
-          : "border-gray-200 hover:-translate-y-1 hover:shadow-lg",
-        className
-      )}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-white border border-gray-100 hover:border-transparent transition-all duration-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)]"
     >
-      <Link
-        href={`/product/${productId}`}
-        aria-label={`Voir le produit ${product.name}`}
-        title={product.name}
-        className="relative block aspect-square overflow-hidden bg-gradient-to-b from-gray-50 to-white"
+      {/* Badges */}
+      <div className="absolute left-3 top-3 z-20 flex flex-col gap-2">
+        {discountPercent > 0 && (
+          <span className="rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white shadow-sm">
+            -{discountPercent}%
+          </span>
+        )}
+        {product.stockStatus === "out-of-stock" && (
+          <span className="rounded-full bg-gray-900 px-3 py-1 text-xs font-bold text-white shadow-sm">
+            Épuisé
+          </span>
+        )}
+        {product.stockStatus === "low-stock" && (
+          <span className="rounded-full bg-orange-500 px-3 py-1 text-xs font-bold text-white shadow-sm">
+            Stock Limité
+          </span>
+        )}
+      </div>
+
+      {/* Wishlist Button */}
+      <button
+        onClick={(e) => {
+          e.preventDefault()
+          toggleWishlist(product.id)
+        }}
+        className="absolute right-3 top-3 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-sm transition-all duration-300 hover:scale-110 hover:bg-gray-50"
       >
-        {isPromo && (
-          <div className="absolute left-3 top-3 z-30 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-pink-500 to-red-500 px-3 py-1 text-[12px] font-extrabold text-white shadow-lg">
-            <Tag className="h-3.5 w-3.5" />
-            <span>{displayDiscount > 0 ? `${displayDiscount}% OFF` : "OFFRE"}</span>
-          </div>
-        )}
+        <Heart className={`h-4 w-4 ${isInWishlist ? "fill-red-500 text-red-500" : "text-gray-400"}`} />
+      </button>
 
-        {isPromo && (
-          <div className="absolute right-3 top-3 z-30 rounded-lg bg-gradient-to-r from-pink-500 to-rose-500 px-3 py-1 text-[11px] font-extrabold uppercase text-white shadow-lg">
-            OFFRE SPÉCIALE
-          </div>
-        )}
-
-        {isPromo && (
-          <div className="absolute left-4 top-14 z-30 flex h-14 w-14 items-center justify-center rounded-full border-4 border-red-300 bg-gradient-to-b from-red-400 to-red-600 text-white shadow-xl">
-            <Gift className="h-7 w-7" />
-          </div>
-        )}
-
-        {hasDiscount && !isPromo && (
-          <div className="absolute left-3 top-3 z-20 rounded-full bg-red-600 px-2.5 py-1 text-[11px] font-bold text-white shadow-md">
-            -{displayDiscount}%
-          </div>
-        )}
-
-        {/* 🔥 IMAGE OPTIMIZED */}
-        <Image
-          src={productImage}
-          alt={productAlt}
-          title={product.name}
-          fill
-          sizes="(max-width: 768px) 100vw, 300px"
-          className="object-contain p-4 transition-transform duration-500 group-hover:scale-105"
-          placeholder="blur"
-          blurDataURL="/placeholder.png"
-        />
+      {/* Image Area */}
+      <Link href={`/product/${product.id}`} className="relative block aspect-[4/5] w-full overflow-hidden bg-[#f8f9fa] p-6">
+        <div className="relative h-full w-full transition-transform duration-500 group-hover:scale-105">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="absolute inset-0 h-full w-full object-contain transition-opacity duration-500 group-hover:opacity-0"
+            loading="lazy"
+          />
+          <img
+            src={product.hoverImage || product.image}
+            alt={`${product.name} Hover`}
+            className="absolute inset-0 h-full w-full object-contain opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+            loading="lazy"
+          />
+        </div>
+        
+        {/* Quick Actions Overlay */}
+        <div className="absolute inset-x-0 bottom-0 z-20 flex translate-y-full items-center justify-center gap-2 bg-gradient-to-t from-white/90 pb-4 pt-8 opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+          <button 
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-gray-900 shadow-md hover:bg-red-600 hover:text-white transition-colors"
+            title="Aperçu rapide"
+          >
+            <Eye className="h-4 w-4" />
+          </button>
+        </div>
       </Link>
 
-      <div className="flex flex-1 flex-col p-4">
-        <span
-          className={cn(
-            "mb-3 self-start rounded-full px-3 py-1 text-[11px] font-semibold",
-            stock.className
-          )}
-        >
-          {stock.label}
-        </span>
-
-        <Link
-          href={`/product/${productId}`}
-          className="mb-3 line-clamp-2 min-h-[48px] text-[15px] font-extrabold text-slate-800 hover:text-red-600"
-        >
-          {product.name}
+      {/* Info Area */}
+      <div className="flex flex-1 flex-col p-5">
+        <div className="mb-2 text-xs font-bold uppercase tracking-wider text-gray-400">
+          {product.category}
+        </div>
+        
+        <Link href={`/product/${product.id}`} className="group-hover:text-red-600 transition-colors">
+          <h3 className="line-clamp-2 text-sm font-semibold leading-tight text-gray-900 sm:text-base">
+            {product.name}
+          </h3>
         </Link>
 
-        <div className="mb-3 flex items-center gap-2">
-          <div className="flex gap-0.5">
-            {[1, 2, 3, 4, 5].map((s) => (
-              <Star key={s} className="h-4 w-4 fill-amber-400 text-amber-400" />
-            ))}
+        {/* Rating */}
+        {product.rating && (
+          <div className="mt-2 flex items-center gap-1">
+            <div className="flex text-yellow-400">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <svg key={i} className={`h-3 w-3 ${i < Math.floor(product.rating) ? 'fill-current' : 'fill-gray-200 text-gray-200'}`} viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              ))}
+            </div>
+            <span className="text-[10px] text-gray-400">({product.reviews})</span>
           </div>
-          <span className="text-[13px] font-bold text-slate-700">
-            {productRating.toFixed(1)}
-          </span>
-          <span className="text-[13px] text-slate-500">({productReviews})</span>
+        )}
+
+        <div className="mt-auto pt-4 flex items-end justify-between">
+          <div>
+            {product.originalPrice && product.originalPrice > product.price && (
+              <div className="text-xs text-gray-400 line-through">
+                {product.originalPrice.toLocaleString("fr-FR")} DH
+              </div>
+            )}
+            <div className="text-lg font-bold text-red-600 sm:text-xl">
+              {product.price.toLocaleString("fr-FR")} DH
+            </div>
+          </div>
+          
+          <button
+            onClick={(e) => {
+              e.preventDefault()
+              if (product.inStock) {
+                // If it has variants, redirect to product page, else add to cart
+                if (product.variants && product.variants.length > 0) {
+                  window.location.href = `/product/${product.id}`
+                } else {
+                  addToCart(product)
+                }
+              }
+            }}
+            disabled={!product.inStock}
+            className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-300 ${
+              product.inStock 
+                ? "bg-gray-900 text-white hover:bg-red-600" 
+                : "bg-gray-100 text-gray-400 cursor-not-allowed"
+            }`}
+          >
+            <ShoppingCart className="h-4 w-4" />
+          </button>
         </div>
-
-        <div className="mb-4 mt-auto flex items-end gap-3">
-          <span className="text-[18px] font-extrabold text-red-600">
-            {isTelevisionWithVariants
-              ? `À partir de ${startingPrice.toLocaleString("fr-FR")} DH`
-              : `${product.price.toLocaleString("fr-FR")} DH`}
-          </span>
-
-          {!isTelevisionWithVariants && product.originalPrice && (
-            <span className="text-[13px] line-through text-slate-800 opacity-80">
-              {product.originalPrice.toLocaleString("fr-FR")} DH
-            </span>
-          )}
-        </div>
-
-        <button
-          onClick={handleAddToCart}
-          disabled={!product.inStock || added}
-          className={cn(
-            "flex h-12 w-full items-center justify-center gap-2 rounded-xl text-sm font-extrabold transition",
-            product.inStock
-              ? added
-                ? "bg-emerald-600 text-white"
-                : "bg-red-600 text-white hover:bg-red-700"
-              : "bg-gray-100 text-gray-400"
-          )}
-        >
-          <ShoppingCart className="h-4 w-4" />
-          {!product.inStock ? "Rupture" : added ? "Ajouté ✓" : "Ajouter"}
-        </button>
       </div>
-    </div>
+    </motion.div>
   )
 }
-
-export const ProductCard = React.memo(ProductCardComponent)

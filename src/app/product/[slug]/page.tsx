@@ -14,7 +14,7 @@ import {
   CreditCard,
   ChevronRight,
 } from "lucide-react"
-import { useCart } from "@/lib/store"
+import { useStore } from "@/lib/store"
 import { cn } from "@/lib/utils"
 
 const WHATSAPP_NUMBER = "212608788782"
@@ -106,7 +106,7 @@ export default function ProductPage() {
   const router = useRouter()
   const slug = (params?.slug as string) ?? ""
 
-  const { addItem } = useCart()
+  const addToCart = useStore((state) => state.addToCart)
   const [product, setProduct] = React.useState<Product | null>(null)
   const [isLoading, setIsLoading] = React.useState(true)
   const [added, setAdded] = React.useState(false)
@@ -383,14 +383,7 @@ export default function ProductPage() {
   }
 
   const handleAddToCart = () => {
-    addItem({
-      id: selectedVariant ? `${product.id}-${selectedVariant.label}` : product.id,
-      name: selectedVariant ? `${product.name} - ${selectedVariant.label}` : product.name,
-      price: currentPrice,
-      image: product.image,
-      quantity: 1,
-      category: product.category,
-    })
+    addToCart(product, selectedVariant, 1)
 
     setAdded(true)
     setTimeout(() => setAdded(false), 1800)
@@ -575,14 +568,16 @@ export default function ProductPage() {
                       : "Ajouter au Panier"}
                 </button>
 
-                <Link
-                  href="/checkout"
+                <button
+                  onClick={() => {
+                    useStore.getState().setCartOpen(true)
+                  }}
                   aria-label="Passer à la caisse"
                   className="flex items-center justify-center gap-2 rounded-xl bg-red-600 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-red-700"
                 >
                   <CreditCard className="h-4 w-4" />
                   Passer à la caisse →
-                </Link>
+                </button>
               </div>
             </div>
           </div>

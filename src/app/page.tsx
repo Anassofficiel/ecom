@@ -3,6 +3,7 @@ import Script from "next/script";
 import { Hero } from "@/components/home/hero";
 import { CategoriesSection } from "@/components/home/categories-section";
 import { PromotionsSection } from "@/components/home/promotions-section";
+import { BestSellersSection } from "@/components/home/best-sellers-section";
 import { PacksSection } from "@/components/home/packs-section";
 import { StoresSection } from "@/components/home/stores-section";
 
@@ -88,6 +89,7 @@ export default function HomePage() {
         </section>
 
         <CategoriesSection />
+        <BestSellersSection />
         <PromotionsSection />
         <PacksSection />
         <StoresSection />

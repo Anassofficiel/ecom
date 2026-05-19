@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { useCart } from "@/lib/store"
+import { useStore } from "@/lib/store"
 import {
   ShieldCheck,
   Truck,
@@ -53,7 +53,8 @@ function Field({ label, error, children }: FieldProps) {
 }
 
 export default function CheckoutPage() {
-  const cart = useCart()
+  const cart = useStore((state) => state.cart)
+  const clearCart = useStore((state) => state.clearCart)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
 
   const [form, setForm] = React.useState({
@@ -66,7 +67,10 @@ export default function CheckoutPage() {
   const [errors, setErrors] = React.useState<Record<string, string>>({})
   const [touched, setTouched] = React.useState<Record<string, boolean>>({})
 
-  const subtotal = cart.totalPrice()
+  const subtotal = cart.reduce((total, item) => {
+    const price = item.variant?.price ?? item.product.price
+    return total + price * item.quantity
+  }, 0)
   const shipping = subtotal > 1000 ? 0 : 50
   const total = subtotal + shipping
 
@@ -122,7 +126,7 @@ export default function CheckoutPage() {
 
     if (Object.values(nextErrors).some(Boolean)) return
 
-    if (!cart.items.length) {
+    if (!cart.length) {
       alert("Votre panier est vide.")
       return
     }
@@ -141,11 +145,11 @@ export default function CheckoutPage() {
         shipping,
         discount: 0,
         paymentMethod: "Cash on Delivery",
-        items: cart.items.map((item) => ({
-          image: item.image,
-          title: item.name,
+        items: cart.map((item) => ({
+          image: item.product.image,
+          title: item.variant ? `${item.product.name} - ${item.variant.label}` : item.product.name,
           qty: item.quantity,
-          price: item.price,
+          price: item.variant?.price ?? item.product.price,
         })),
       }
 
@@ -188,11 +192,11 @@ export default function CheckoutPage() {
         total,
         shipping,
         paymentMethod: "Cash on Delivery",
-        items: cart.items.map((item) => ({
-          image: item.image,
-          title: item.name,
+        items: cart.map((item) => ({
+          image: item.product.image,
+          title: item.variant ? `${item.product.name} - ${item.variant.label}` : item.product.name,
           qty: item.quantity,
-          price: item.price,
+          price: item.variant?.price ?? item.product.price,
         })),
       }
 
@@ -202,7 +206,7 @@ export default function CheckoutPage() {
         JSON.stringify(telegramOrderData)
       )
 
-      cart.clearCart()
+      clearCart()
       window.location.href = `/checkout/success?orderId=${order.id}`
     } catch (error) {
       console.error("Checkout error:", error)
@@ -388,28 +392,31 @@ export default function CheckoutPage() {
               </h2>
 
               <div className="mb-5 max-h-[300px] space-y-4 overflow-y-auto pr-1">
-                {cart.items.map((item) => (
+                {cart.map((item) => {
+                  const price = item.variant?.price ?? item.product.price
+                  const title = item.variant ? `${item.product.name} - ${item.variant.label}` : item.product.name
+                  return (
                   <div key={item.id} className="flex gap-3">
                     <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg bg-gray-50">
                       <img
-                        src={item.image}
-                        alt={item.name}
+                        src={item.product.image}
+                        alt={title}
                         className="h-full w-full object-contain p-1"
                       />
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="line-clamp-2 text-xs font-semibold text-gray-800">
-                        {item.name}
+                        {title}
                       </p>
                       <p className="mt-0.5 text-[11px] text-gray-500">
-                        {item.quantity} × {item.price.toLocaleString("fr-FR")} DH
+                        {item.quantity} × {price.toLocaleString("fr-FR")} DH
                       </p>
                     </div>
                     <span className="self-center whitespace-nowrap text-sm font-bold text-gray-900">
-                      {(item.price * item.quantity).toLocaleString("fr-FR")} DH
+                      {(price * item.quantity).toLocaleString("fr-FR")} DH
                     </span>
                   </div>
-                ))}
+                )})}
               </div>
 
               <div className="mb-5 space-y-2 border-t border-gray-100 pt-4">

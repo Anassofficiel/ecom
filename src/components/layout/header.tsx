@@ -12,20 +12,20 @@ import {
   Plus,
   Minus,
 } from "lucide-react"
-import { useCart } from "@/lib/store"
+import { useStore } from "@/lib/store"
+import { categories } from "@/lib/data"
+
+// Create dynamic nav items from categories
+const categoryNavItems = categories.slice(0, 7).map(cat => ({
+  name: cat,
+  href: `/category/${cat.toLowerCase().replace(/ /g, '-')}`
+}));
 
 const navItems = [
   { name: "🏠 Accueil", href: "/" },
-  { name: "📺 Télévisions", href: "/category/televisions" },
-  { name: "❄️ Réfrigérateurs", href: "/category/refrigerators" },
-  { name: "🔥 Fours", href: "/category/ovens" },
-  { name: "🧺 Machines à laver", href: "/category/washing-machines" },
-  { name: "🍟 Friteuses à air", href: "/category/air-fryers" },
-  { name: "☕ Machines à café", href: "/category/coffee-machines" },
-  { name: "🍳 Petit électroménager", href: "/category/kitchen-appliances" },
+  ...categoryNavItems,
   { name: "🏷️ Promotions", href: "/#promotions" },
   { name: "📍 Nos Magasins", href: "/#magasins" },
-  { name: "🎁 Packs / Offres", href: "/#packs" },
 ]
 
 export function Header() {
@@ -33,7 +33,11 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = React.useState(false)
   const [mounted, setMounted] = React.useState(false)
 
-  const cart = useCart()
+  const cart = useStore((state) => state.cart)
+  const isCartOpen = useStore((state) => state.isCartOpen)
+  const setCartOpen = useStore((state) => state.setCartOpen)
+  const updateQuantity = useStore((state) => state.updateQuantity)
+  const removeFromCart = useStore((state) => state.removeFromCart)
 
   React.useEffect(() => {
     setMounted(true)
@@ -58,10 +62,10 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const totalItems = mounted ? cart.totalItems() : 0
-  const cartItems = mounted ? cart.items : []
-  const cartOpen = mounted ? cart.isOpen : false
-  const totalPrice = mounted ? cart.totalPrice() : 0
+  const totalItems = mounted ? cart.reduce((acc, item) => acc + item.quantity, 0) : 0
+  const cartItems = mounted ? cart : []
+  const cartOpen = mounted ? isCartOpen : false
+  const totalPrice = mounted ? cart.reduce((acc, item) => acc + (item.variant?.price || item.product.price) * item.quantity, 0) : 0
 
   const closeMobileMenu = () => setMobileOpen(false)
   const toggleMobileMenu = () => setMobileOpen((prev) => !prev)
@@ -183,7 +187,7 @@ export function Header() {
             {/* RIGHT: PANIER */}
             <button
               type="button"
-              onClick={cart.openCart}
+              onClick={() => setCartOpen(true)}
               className="relative flex items-center gap-2 rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white shadow-md hover:scale-105 hover:bg-red-700 transition-all duration-200"
             >
               <ShoppingCart className="h-4 w-4" />
@@ -227,8 +231,8 @@ export function Header() {
       {cartOpen && (
         <button
           type="button"
-          className="fixed inset-0 z-[60] bg-black/40"
-          onClick={cart.closeCart}
+          className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm"
+          onClick={() => setCartOpen(false)}
           aria-label="Fermer le panier"
         />
       )}
@@ -246,7 +250,7 @@ export function Header() {
           <h2 className="text-lg font-bold text-gray-900">Mon Panier ({totalItems})</h2>
           <button
             type="button"
-            onClick={cart.closeCart}
+            onClick={() => setCartOpen(false)}
             className="rounded-lg p-2 text-gray-500 hover:bg-gray-100"
             aria-label="Fermer le panier"
           >
@@ -261,7 +265,7 @@ export function Header() {
               <p className="text-sm font-medium text-gray-500">Votre panier est vide</p>
               <button
                 type="button"
-                onClick={cart.closeCart}
+                onClick={() => setCartOpen(false)}
                 className="rounded-lg bg-red-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-700"
               >
                 Continuer les achats
@@ -273,8 +277,8 @@ export function Header() {
                 <div key={item.id} className="flex gap-3">
                   <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-gray-50">
                     <img
-                      src={item.image}
-                      alt={item.name}
+                      src={item.product.image}
+                      alt={item.product.name}
                       className="h-full w-full object-contain p-1"
                       loading="lazy"
                       decoding="async"
@@ -285,16 +289,17 @@ export function Header() {
 
                   <div className="min-w-0 flex-1">
                     <p className="line-clamp-2 text-xs font-semibold text-gray-800">
-                      {item.name}
+                      {item.product.name}
+                      {item.variant && <span className="ml-1 text-gray-500">({item.variant.label})</span>}
                     </p>
                     <p className="mt-0.5 text-xs font-bold text-red-600">
-                      {item.price.toLocaleString("fr-FR")} DH
+                      {(item.variant?.price || item.product.price).toLocaleString("fr-FR")} DH
                     </p>
 
                     <div className="mt-2 flex items-center gap-2">
                       <button
                         type="button"
-                        onClick={() => cart.updateQuantity(item.id, item.quantity - 1)}
+                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         className="flex h-6 w-6 items-center justify-center rounded border border-gray-300 hover:border-red-500"
                         aria-label={`Réduire la quantité de ${item.name}`}
                       >
@@ -307,7 +312,7 @@ export function Header() {
 
                       <button
                         type="button"
-                        onClick={() => cart.updateQuantity(item.id, item.quantity + 1)}
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         className="flex h-6 w-6 items-center justify-center rounded border border-gray-300 hover:border-red-500"
                         aria-label={`Augmenter la quantité de ${item.name}`}
                       >
@@ -318,11 +323,11 @@ export function Header() {
 
                   <div className="flex flex-col items-end gap-1">
                     <span className="text-sm font-bold text-gray-900">
-                      {(item.price * item.quantity).toLocaleString("fr-FR")} DH
+                      {((item.variant?.price || item.product.price) * item.quantity).toLocaleString("fr-FR")} DH
                     </span>
                     <button
                       type="button"
-                      onClick={() => cart.removeItem(item.id)}
+                      onClick={() => removeFromCart(item.id)}
                       className="text-gray-300 hover:text-red-500"
                       aria-label={`Supprimer ${item.name} du panier`}
                     >
@@ -350,7 +355,7 @@ export function Header() {
 
             <Link
               href="/checkout"
-              onClick={cart.closeCart}
+              onClick={() => setCartOpen(false)}
               className="block w-full rounded-lg bg-red-600 py-3.5 text-center text-sm font-bold text-white transition-colors hover:bg-red-700"
             >
               Passer à la caisse →
