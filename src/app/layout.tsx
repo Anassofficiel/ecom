@@ -1,121 +1,128 @@
+// استيراد Type Metadata الخاصة بـ SEO
 import type { Metadata } from "next";
+
+// استيراد Script لإضافة أكواد JSON-LD و SEO
 import Script from "next/script";
+
+// استيراد خطوط Google Fonts
 import { Inter, Outfit } from "next/font/google";
+
+// استيراد CSS العام للموقع
 import "./globals.css";
+
+// استيراد Header و Footer
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 
+// إعداد خط Inter
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
 });
 
+// إعداد خط Outfit
 const outfit = Outfit({
   variable: "--font-outfit",
   subsets: ["latin"],
 });
 
+// الرابط الرئيسي للموقع
 const siteUrl = "https://veneziaelectro.vercel.app";
+
+// اسم الموقع
 const siteName = "Electro Mostafa Maroc";
 
-// 🔥 Title optimized (قصير وقوي)
+// عنوان الموقع الذي يظهر في Google
 const siteTitle = "Electro Mostafa Maroc | TV, Frigo, Machine à laver";
 
-// 🔥 Description optimized (150-160)
+// وصف الموقع لتحسين SEO
 const siteDescription =
-  "Achetez TV, frigo, machine à laver et électroménager au Maroc. Prix promo, livraison rapide et qualité garantie chez Electro Mostafa.";
+  "Achetez TV, frigo, machine à laver et électroménager au Maroc.";
 
+// رقم الهاتف
 const phone = "+212508788782";
 
+// إعدادات SEO الرئيسية للموقع
 export const metadata: Metadata = {
+
+  // الرابط الأساسي
   metadataBase: new URL(siteUrl),
 
+  // عنوان الصفحات
   title: {
     default: siteTitle,
     template: "%s | Electro Mostafa",
   },
 
+  // وصف الموقع
   description: siteDescription,
 
+  // الكلمات المفتاحية
   keywords: [
     "electroménager maroc",
     "tv maroc",
     "frigo maroc",
-    "machine à laver maroc",
-    "Electro Mostafa",
-    "électroménager casablanca",
   ],
 
+  // الرابط الرسمي للصفحة
   alternates: {
     canonical: "/",
   },
 
+  // اسم التطبيق
   applicationName: siteName,
+
+  // نوع الموقع
   category: "shopping",
 
+  // السماح لـ Google بأرشفة الموقع
   robots: {
     index: true,
     follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-image-preview": "large",
-    },
   },
 
+  // بيانات المشاركة على Facebook
   openGraph: {
     type: "website",
     url: siteUrl,
     siteName,
     title: siteTitle,
     description: siteDescription,
-    locale: "fr_MA",
-    images: [
-      {
-        url: "/placeholder.png", // 🔥 مهم تضيف صورة حقيقية من بعد
-        width: 1200,
-        height: 630,
-      },
-    ],
   },
 
+  // بيانات المشاركة على Twitter
   twitter: {
     card: "summary_large_image",
     title: siteTitle,
     description: siteDescription,
-    images: ["/placeholder.png"],
-  },
-
-  other: {
-    "geo.region": "MA",
-    "geo.placename": "Casablanca, Marrakech",
   },
 };
 
+// بيانات Structured Data الخاصة بالشركة
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: siteName,
   url: siteUrl,
   telephone: phone,
-  sameAs: [
-    "https://www.facebook.com/profile.php?id=100089842077600",
-    "https://www.instagram.com/wny8868/",
-    "https://www.tiktok.com/@electromostafa55",
-  ],
 };
 
+// Layout الرئيسي للموقع
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+
   return (
+    // لغة الموقع فرنسية
     <html lang="fr" className="scroll-smooth">
+
       <body
         className={`${inter.variable} ${outfit.variable} bg-white font-sans antialiased text-gray-900`}
       >
-        {/* 🔥 Structured Data */}
+
+        {/* إضافة Structured Data لمحركات البحث */}
         <Script
           id="structured-data"
           type="application/ld+json"
@@ -125,9 +132,17 @@ export default function RootLayout({
           }}
         />
 
+        {/* الهيدر يظهر في جميع الصفحات */}
         <Header />
-        <main className="min-h-screen pt-[90px]">{children}</main>
+
+        {/* محتوى الصفحة الحالية */}
+        <main className="min-h-screen pt-[90px]">
+          {children}
+        </main>
+
+        {/* الفوتر يظهر في جميع الصفحات */}
         <Footer />
+
       </body>
     </html>
   );

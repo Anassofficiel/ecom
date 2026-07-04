@@ -14,7 +14,7 @@ import Link from "next/link"
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ||
   "https://electro-manager-dashboard.onrender.com"
-
+//هاد الفونكسيون كتتحقق من رقم الهاتف.
 function validateMoroccanPhone(value: string) {
   const digits = value.replace(/\D/g, "")
   if (digits.length !== 10) return "Le numéro doit contenir exactement 10 chiffres"
@@ -56,7 +56,7 @@ export default function CheckoutPage() {
   const cart = useStore((state) => state.cart)
   const clearCart = useStore((state) => state.clearCart)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
-
+//كتخزن معلومات الزبون:
   const [form, setForm] = React.useState({
     fullName: "",
     address: "",
@@ -66,7 +66,7 @@ export default function CheckoutPage() {
 
   const [errors, setErrors] = React.useState<Record<string, string>>({})
   const [touched, setTouched] = React.useState<Record<string, boolean>>({})
-
+//مجموع المنتجات فقط
   const subtotal = cart.reduce((total, item) => {
     const price = item.variant?.price ?? item.product.price
     return total + price * item.quantity
@@ -110,7 +110,7 @@ export default function CheckoutPage() {
     const nextErrors = validate(form)
     setErrors((prev) => ({ ...prev, [field]: nextErrors[field] ?? "" }))
   }
-
+//كتخدم ملي المستخدم يضغط confirmer 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -125,7 +125,7 @@ export default function CheckoutPage() {
     setErrors(nextErrors)
 
     if (Object.values(nextErrors).some(Boolean)) return
-
+//كتفحص واش Cart خاوية.
     if (!cart.length) {
       alert("Votre panier est vide.")
       return
@@ -155,7 +155,7 @@ export default function CheckoutPage() {
 
       console.log("Sending order payload:", payload)
       console.log("API_BASE_URL:", API_BASE_URL)
-
+//كتصيفط الطلب للـ API
       const response = await fetch(`${API_BASE_URL}/api/orders`, {
         method: "POST",
         headers: {

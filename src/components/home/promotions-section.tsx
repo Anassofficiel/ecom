@@ -1055,8 +1055,8 @@ export function PromotionsSection() {
                     onClick={() => handleTabChange(tab.id)}
                     aria-pressed={isActive}
                     className={`promo-tab flex items-center gap-1.5 rounded-full border-2 px-5 py-2.5 text-sm font-semibold ${isActive
-                        ? "active border-transparent text-white"
-                        : "border-gray-200 bg-white text-gray-700"
+                      ? "active border-transparent text-white"
+                      : "border-gray-200 bg-white text-gray-700"
                       }`}
                     style={{ fontFamily: "'Barlow',sans-serif" }}
                   >
@@ -1085,7 +1085,7 @@ export function PromotionsSection() {
                 >
                   {paginated.map((product, i) => (
                     <div key={product.id} className="promo-card-anim" style={{ animationDelay: `${i * 55}ms` }}>
-                      <ProductCard product={product} showPromoBadge />
+                      <ProductCard product={product} />
                     </div>
                   ))}
                 </div>

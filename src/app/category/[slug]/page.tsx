@@ -1,14 +1,18 @@
-"use client"
+//هادي صفحة ديناميكية كتستعمل الـ slug من الرابط باش تحدد التصنيف المطلوب، كتجيب المنتجات الخاصة به من البيانات، وكتعرضها باستعمال ProductCard. كذلك كتطبق SEO ديناميكي وStructured Data وPagination لتحسين تجربة المستخدم والظهور في Google.
 
+"use client"
+//[slug] هو Dynamic Route فـ Next.js. كيمكنني نستخدم نفس الصفحة لجميع التصنيفات.
 import * as React from "react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
+// دوال جلب المنتجات
 import {
   getProductsByCategory,
   getPaginatedProducts,
   getTotalPages,
   type Product,
 } from "@/lib/data"
+// Card ديال المنتج
 import { ProductCard } from "@/components/product/product-card"
 import { Pagination } from "@/components/ui/pagination"
 import { ChevronRight } from "lucide-react"
@@ -116,22 +120,23 @@ const categorySeoMap: Record<
       "Retrouvez des ustensiles et accessoires de cuisine sélectionnés pour accompagner votre quotidien et vos préparations.",
   },
 }
-
+//جلب الـ slug من الرابط  
+//مثال:/category/televisions كنديرو slug = televisions
 export default function CategoryPage() {
   const params = useParams()
   const slug = decodeURIComponent((params?.slug as string) ?? "")
-
+  //هاد الفونكسيون كتوحّد النصوص.
   const normalize = React.useCallback(
     (s: string) => s.toLowerCase().replace(/-/g, " ").trim(),
     []
   )
-
+  //مثال:washing-machines كتولي:Washing Machines
   const fallbackCategoryName = React.useMemo(() => {
     return slug
       .replace(/-/g, " ")
       .replace(/\b\w/g, (c) => c.toUpperCase())
   }, [slug])
-
+  //SEO ديال Category
   const seo = React.useMemo(() => {
     return (
       categorySeoMap[slug] ?? {
@@ -143,7 +148,7 @@ export default function CategoryPage() {
       }
     )
   }, [slug, fallbackCategoryName])
-
+  //فلتر المنتجات ديال الـ Category
   const categoryProducts = React.useMemo(() => {
     const exact = getProductsByCategory(seo.dataCategory)
 
@@ -155,13 +160,13 @@ export default function CategoryPage() {
 
     return fallback.filter((p) => normalize(p.category) === normalize(slug))
   }, [seo.dataCategory, fallbackCategoryName, normalize, slug])
-
+  //ترقيم الصفحات
   const [currentPage, setCurrentPage] = React.useState(1)
-
+  //
   React.useEffect(() => {
     setCurrentPage(1)
   }, [slug])
-
+  //هادشي باش كيتغير الـ title و الـ description ديال الـ page
   React.useEffect(() => {
     const pageTitle = `${seo.title} | Electro Mostafa Maroc`
     const pageUrl = `${BASE_URL}/category/${slug}`
@@ -333,6 +338,7 @@ export default function CategoryPage() {
             </div>
 
             {totalPages > 1 && (
+              //<Pagination /> 1234
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}

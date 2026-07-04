@@ -1,9 +1,8 @@
 "use client"
-
-import { useCart } from "@/lib/store"
+//عرض الباكات.
 import { useRouter } from "next/navigation"
 import { packs } from "@/lib/data"
-import type { Pack } from "@/lib/data"
+
 
 const WHATSAPP_NUMBER = "212608788782"
 const BASE_URL = "https://veneziaelectro.vercel.app"
@@ -75,20 +74,10 @@ const PACK_PRODUCT_SPECS: Record<string, Array<Record<string, string>>> = {
 }
 
 // ── Checkout button ───────────────────────────────────────────────────────────
-function CheckoutButton({ pack }: { pack: Pack }) {
-  const addItem = useCart((state: any) => state.addItem)
+function CheckoutButton() {
   const router = useRouter()
 
   const handleCheckout = () => {
-    addItem({
-      id: pack.id,
-      name: pack.name,
-      price: pack.packPrice,
-      image: pack.images?.[0] ?? "",
-      quantity: 1,
-      category: "pack", // مهم باش مايطيحش error
-    })
-
     router.push("/checkout")
   }
 
@@ -474,7 +463,7 @@ export function PacksSection() {
                       </a>
 
                       {/* Checkout */}
-                      <CheckoutButton pack={pack} />
+                      <CheckoutButton />
                     </div>
                   </div>
                 </article>

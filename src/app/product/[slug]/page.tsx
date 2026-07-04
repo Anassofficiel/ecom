@@ -1,5 +1,6 @@
+//هادي صفحة عرض المنتج Product Details Page، ملي المستخدم كيضغط على منتج كتمشي لهد الصفحة وكتجيب المعلومات ديالو وكتعرضها.
 "use client"
-
+//هادشي ديال الروابط الديناميكية {slug} هوDynamic Route
 import * as React from "react"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"

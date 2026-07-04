@@ -3,7 +3,7 @@
 //كياخذ ليستة ديال البراندات (name + logo + link).
 //كيدور عليهم بـ map() وكيصاوب card/logo لكل brand.
 //كيعرضهم فواحد slider أفقي كيتحرك يمين/ليسار.
-
+//Slider ديال الماركات.
 "use client"
 
 import * as React from "react"

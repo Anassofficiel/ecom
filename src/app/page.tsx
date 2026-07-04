@@ -1,5 +1,10 @@
+// استيراد Type Metadata الخاصة بـ SEO
 import type { Metadata } from "next";
+
+// استيراد Script لإضافة JSON-LD
 import Script from "next/script";
+
+// استيراد مكونات الصفحة الرئيسية
 import { Hero } from "@/components/home/hero";
 import { CategoriesSection } from "@/components/home/categories-section";
 import { PromotionsSection } from "@/components/home/promotions-section";
@@ -7,107 +12,162 @@ import { BestSellersSection } from "@/components/home/best-sellers-section";
 import { PacksSection } from "@/components/home/packs-section";
 import { StoresSection } from "@/components/home/stores-section";
 
+// الرابط الرئيسي للموقع
 const BASE_URL = "https://veneziaelectro.vercel.app";
 
+// إعدادات SEO الخاصة بالصفحة الرئيسية
 export const metadata: Metadata = {
-  title: "Electro Mostafa Maroc | Électroménager, TV, Réfrigérateurs et Machines à laver",
+
+  // عنوان الصفحة في Google
+  title:
+    "Electro Mostafa Maroc | Électroménager, TV, Réfrigérateurs et Machines à laver",
+
+  // وصف الصفحة
   description:
-    "Achetez électroménager, téléviseurs, réfrigérateurs, machines à laver, fours et petits appareils chez Electro Mostafa au Maroc. Produits premium, promotions et livraison rapide.",
+    "Achetez électroménager, téléviseurs, réfrigérateurs, machines à laver...",
+
+  // الرابط الرسمي للصفحة
   alternates: {
     canonical: "/",
   },
+
+  // بيانات المشاركة على Facebook
   openGraph: {
     url: `${BASE_URL}/`,
-    title: "Electro Mostafa Maroc | Électroménager, TV, Réfrigérateurs et Machines à laver",
+    title:
+      "Electro Mostafa Maroc | Électroménager, TV, Réfrigérateurs et Machines à laver",
     description:
-      "Achetez électroménager, téléviseurs, réfrigérateurs, machines à laver, fours et petits appareils chez Electro Mostafa au Maroc. Produits premium, promotions et livraison rapide.",
+      "Achetez électroménager, téléviseurs, réfrigérateurs...",
     type: "website",
   },
+
+  // بيانات المشاركة على Twitter
   twitter: {
     card: "summary_large_image",
-    title: "Electro Mostafa Maroc | Électroménager, TV, Réfrigérateurs et Machines à laver",
+    title:
+      "Electro Mostafa Maroc | Électroménager, TV, Réfrigérateurs et Machines à laver",
     description:
-      "Achetez électroménager, téléviseurs, réfrigérateurs, machines à laver, fours et petits appareils chez Electro Mostafa au Maroc. Produits premium, promotions et livraison rapide.",
+      "Achetez électroménager, téléviseurs, réfrigérateurs...",
   },
 };
 
+// الصفحة الرئيسية
 export default function HomePage() {
+
+  // Structured Data لتحسين SEO
   const homePageJsonLd = {
+
     "@context": "https://schema.org",
+
+    // نوع الصفحة
     "@type": "WebPage",
+
+    // اسم الصفحة
     name: "Electro Mostafa Maroc",
+
+    // رابط الصفحة
     url: `${BASE_URL}/`,
+
+    // وصف الصفحة
     description:
-      "Boutique d'électroménager au Maroc : réfrigérateurs, lave-linge, télévisions, fours, cafetières, friteuses à air et petit électroménager.",
+      "Boutique d'électroménager au Maroc",
+
+    // لغة الصفحة
     inLanguage: "fr-MA",
+
+    // الموقع الرئيسي
     isPartOf: {
       "@type": "WebSite",
       name: "Electro Mostafa Maroc",
       url: BASE_URL,
     },
+
+    // المجالات المرتبطة بالموقع
     about: [
       "Électroménager",
       "Réfrigérateurs",
       "Machines à laver",
       "Télévisions",
-      "Fours",
-      "Petit électroménager",
     ],
   };
 
   return (
     <>
+
+      {/* إضافة Structured Data لمحركات البحث */}
       <Script
         id="homepage-jsonld"
         type="application/ld+json"
         strategy="afterInteractive"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(homePageJsonLd) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(homePageJsonLd)
+        }}
       />
 
+      {/* الصفحة الرئيسية */}
       <main className="min-h-screen bg-gray-50">
+
+        {/* البانر الرئيسي */}
         <Hero />
 
-        <section className="container mx-auto relative z-20 -mt-10 px-4">
-          <div className="mx-auto max-w-5xl rounded-3xl border border-red-100 bg-white/95 p-6 shadow-lg backdrop-blur md:p-8">
-            <div className="max-w-3xl">
-              <span className="inline-block rounded-full bg-red-50 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-red-600">
+        {/* تقديم مختصر للموقع */}
+        <section>
+          <div>
+            <div>
+
+              {/* اسم المتجر */}
+              <span>
                 Electro Mostafa Maroc
               </span>
 
-              <h1 className="mt-3 text-2xl font-black tracking-tight text-gray-900 md:text-3xl">
+              {/* العنوان الرئيسي */}
+              <h1>
                 Électroménager Mostafa premium pour votre maison
               </h1>
 
-              <p className="mt-3 text-sm leading-7 text-gray-600 md:text-base">
-                Découvrez notre sélection de réfrigérateurs, machines à laver,
-                télévisions, fours, cafetières, friteuses à air et petit
-                électroménager au Maroc. Profitez de promotions exclusives,
-                packs avantageux et livraison rapide avec Electro Mostafa.
+              {/* وصف المتجر */}
+              <p>
+                Découvrez notre sélection de réfrigérateurs,
+                machines à laver et télévisions...
               </p>
+
             </div>
           </div>
         </section>
 
+        {/* قسم التصنيفات */}
         <CategoriesSection />
+
+        {/* قسم المنتجات الأكثر مبيعاً */}
         <BestSellersSection />
+
+        {/* قسم العروض والتخفيضات */}
         <PromotionsSection />
+
+        {/* قسم الباكات والعروض المجمعة */}
         <PacksSection />
+
+        {/* قسم المتاجر والفروع */}
         <StoresSection />
 
-        <section className="container mx-auto px-4 py-10">
-          <div className="rounded-2xl border border-red-100 bg-white p-5 md:p-6">
-            <h2 className="text-lg font-bold text-gray-900 md:text-xl">
-              Votre magasin d&apos;électroménager Mostafa au Maroc
+        {/* معلومات إضافية عن المتجر */}
+        <section>
+          <div>
+
+            {/* عنوان القسم */}
+            <h2>
+              Votre magasin d'électroménager Mostafa au Maroc
             </h2>
 
-            <p className="mt-3 text-sm leading-7 text-gray-600 md:text-base">
-              Chez Electro Mostafa, nous proposons une large gamme
-              d&apos;appareils pour la maison : électroménager de cuisine,
-              téléviseurs, réfrigérateurs, lave-linge, fours et équipements
-              pratiques pour le quotidien.
+            {/* وصف إضافي */}
+            <p>
+              Electro Mostafa propose une large gamme
+              d'appareils électroménagers.
             </p>
+
           </div>
         </section>
+
       </main>
     </>
   );

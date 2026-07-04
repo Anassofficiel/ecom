@@ -301,7 +301,7 @@ export function Header() {
                         type="button"
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         className="flex h-6 w-6 items-center justify-center rounded border border-gray-300 hover:border-red-500"
-                        aria-label={`Réduire la quantité de ${item.name}`}
+                        aria-label={`Réduire la quantité de ${item.product.name}`}
                       >
                         <Minus className="h-3 w-3" />
                       </button>
@@ -314,7 +314,7 @@ export function Header() {
                         type="button"
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         className="flex h-6 w-6 items-center justify-center rounded border border-gray-300 hover:border-red-500"
-                        aria-label={`Augmenter la quantité de ${item.name}`}
+                        aria-label={`Augmenter la quantité de ${item.product.name}`}
                       >
                         <Plus className="h-3 w-3" />
                       </button>
@@ -329,7 +329,7 @@ export function Header() {
                       type="button"
                       onClick={() => removeFromCart(item.id)}
                       className="text-gray-300 hover:text-red-500"
-                      aria-label={`Supprimer ${item.name} du panier`}
+                      aria-label={`Supprimer ${item.product.name} du panier`}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
