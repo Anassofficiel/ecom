@@ -17,7 +17,7 @@ import { ProductCard } from "@/components/product/product-card"
 import { Pagination } from "@/components/ui/pagination"
 import { ChevronRight } from "lucide-react"
 
-const BASE_URL = "https://veneziaelectro.vercel.app"
+const BASE_URL = "https://electromostafa55.ma"
 
 const categorySeoMap: Record<
   string,
@@ -168,7 +168,7 @@ export default function CategoryPage() {
   }, [slug])
   //هادشي باش كيتغير الـ title و الـ description ديال الـ page
   React.useEffect(() => {
-    const pageTitle = `${seo.title} | Electro Mostafa Maroc`
+    const pageTitle = `${seo.title} | Electro Mostafa 55`
     const pageUrl = `${BASE_URL}/category/${slug}`
 
     document.title = pageTitle
@@ -234,7 +234,7 @@ export default function CategoryPage() {
     return {
       "@context": "https://schema.org",
       "@type": "CollectionPage",
-      name: `${seo.displayName} | Electro Mostafa Maroc`,
+      name: `${seo.displayName} | Electro Mostafa 55`,
       url: `${BASE_URL}/category/${slug}`,
       description: seo.description,
       mainEntity: {
@@ -326,7 +326,7 @@ export default function CategoryPage() {
         ) : (
           <>
             <div className="mb-6 rounded-2xl border border-red-100 bg-white p-4 text-sm leading-6 text-gray-700">
-              <strong className="text-gray-900">Electro Mostafa Maroc :</strong>{" "}
+              <strong className="text-gray-900">Electro Mostafa 55 :</strong>{" "}
               trouvez les meilleurs {seo.displayName.toLowerCase()} avec promotions,
               livraison rapide et produits sélectionnés pour la maison moderne.
             </div>

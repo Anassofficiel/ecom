@@ -33,7 +33,7 @@ export function Hero() {
         <div className="max-w-2xl space-y-6">
 
           <span className="inline-block rounded-full border border-primary/30 bg-primary/20 px-4 py-1 text-xs font-bold uppercase tracking-widest text-primary">
-            Electro Mostafa Maroc
+            Electro Mostafa 55
           </span>
 
           <h2 className="text-4xl font-black uppercase italic leading-tight tracking-tighter text-white md:text-6xl xl:text-7xl">

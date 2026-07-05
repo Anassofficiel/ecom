@@ -56,7 +56,7 @@ const SOCIAL_LINKS = [
   },
   {
     name: "WhatsApp",
-    href: "https://wa.me/212608788782",
+    href: "https://wa.me/212658416769",
     className:
       "bg-[#25D366] hover:scale-105 hover:shadow-[0_10px_30px_rgba(37,211,102,0.35)]",
     icon: (
@@ -93,7 +93,7 @@ export function Footer() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
               <span className="mb-3 inline-flex items-center rounded-full border border-red-500/20 bg-red-500/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-red-400">
-                Electro Mostafa Maroc
+                Electro Mostafa 55
               </span>
               <h2 className="text-2xl font-black tracking-tight text-white md:text-3xl">
                 Électroménager premium, livraison rapide et service client au Maroc
@@ -107,7 +107,7 @@ export function Footer() {
 
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
-                href="https://wa.me/212608788782"
+                href="https://wa.me/212658416769"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-5 py-3 text-sm font-bold text-white transition hover:brightness-105"
@@ -168,13 +168,13 @@ export function Footer() {
               <div>
                 <p className="text-sm font-semibold text-white">Téléphone / WhatsApp</p>
                 <a
-                  href="tel:+212508788782"
+                  href="tel:+212658416769"
                   className="mt-1 block text-sm text-zinc-400 transition hover:text-white"
                 >
-                  +212 608788782
+                  +212 658416769
                 </a>
                 <a
-                  href="https://wa.me/212608788782"
+                  href="https://wa.me/212658416769"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mt-1 inline-block text-sm font-medium text-green-400 transition hover:text-green-300"
@@ -344,7 +344,7 @@ export function Footer() {
       {/* Bottom */}
       <div className="border-t border-zinc-800">
         <div className="container mx-auto flex flex-col gap-3 px-4 py-6 text-xs text-zinc-500 md:flex-row md:items-center md:justify-between">
-          <p>© {new Date().getFullYear()} Electro Mostafa Maroc. Tous droits réservés.</p>
+          <p>© {new Date().getFullYear()} Electro Mostafa 55. Tous droits réservés.</p>
           <p>Casablanca • Marrakech • Électroménager • Téléviseurs • Cuisine • Livraison rapide</p>
         </div>
       </div>

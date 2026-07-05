@@ -82,7 +82,7 @@ export default function PackPage({ params }: Props) {
                 {/* 🔥 BUTTONS */}
                 <div className="flex gap-4 mb-8">
                     <a
-                        href={`https://wa.me/212600000000?text=Bonjour je veux ${pack.name}`}
+                        href={`https://wa.me/212658416769?text=Bonjour je veux ${pack.name}`}
                         className="flex-1 bg-green-500 text-white py-3 rounded-xl text-center font-bold"
                     >
                         WhatsApp

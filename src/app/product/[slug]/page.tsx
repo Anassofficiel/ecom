@@ -18,8 +18,8 @@ import {
 import { useStore } from "@/lib/store"
 import { cn } from "@/lib/utils"
 
-const WHATSAPP_NUMBER = "212608788782"
-const BASE_URL = "https://veneziaelectro.vercel.app"
+const WHATSAPP_NUMBER = "212658416769"
+const BASE_URL = "https://electromostafa55.ma"
 
 const stockConfig = {
   "in-stock": {
@@ -166,7 +166,7 @@ export default function ProductPage() {
     const selectedVariant = product.variants?.[selectedVariantIndex]
     const seoPrice = selectedVariant?.price ?? product.price
 
-    const title = `${product.name} | ${categoryLabel} au Maroc | Electro Mostafa Maroc`
+    const title = `${product.name} | ${categoryLabel} au Maroc | Electro Mostafa 55`
     const description =
       `${product.name} chez Electro Mostafa au Maroc. Prix: ${seoPrice.toLocaleString(
         "fr-FR"
@@ -313,7 +313,7 @@ export default function ProductPage() {
   const categorySlug = categoryToSlug(product.category)
   const categoryLabel = categoryDisplayName(product.category)
   const cleanDescription = stripEmojis(product.description)
-  const productUrl = `${BASE_URL}/product/${product.slug}`
+  const productUrl = `${BASE_URL}/product/${product.id}`
 
   const whatsappMessage = encodeURIComponent(
     `Bonjour, je suis intéressé par ce produit: ${product.name}${selectedVariant ? ` - ${selectedVariant.label}` : ""
@@ -353,7 +353,7 @@ export default function ProductPage() {
       itemCondition: "https://schema.org/NewCondition",
       seller: {
         "@type": "Organization",
-        name: "Electro Mostafa Maroc",
+        name: "Electro Mostafa 55",
       },
     },
   }

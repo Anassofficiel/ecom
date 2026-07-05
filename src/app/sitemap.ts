@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { products } from '@/lib/data'
 
-const baseUrl = 'https://veneziaelectro.vercel.app'
+const baseUrl = 'https://electromostafa55.ma'
 
 // categories اللي تأكدنا بلي خدامين دابا
 const categorySlugs = [

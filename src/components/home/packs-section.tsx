@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation"
 import { packs } from "@/lib/data"
 
 
-const WHATSAPP_NUMBER = "212608788782"
-const BASE_URL = "https://veneziaelectro.vercel.app"
+const WHATSAPP_NUMBER = "212658416769"
+const BASE_URL = "https://electromostafa55.ma"
 
 const badgeColors: Record<string, { bg: string; text: string }> = {
   "Best Seller": { bg: "linear-gradient(135deg,#1d4ed8,#3b82f6)", text: "#fff" },

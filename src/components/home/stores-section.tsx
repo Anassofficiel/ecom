@@ -3,8 +3,8 @@
 import { useState } from "react"
 import { MapPin, Clock, Phone, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react"
 
-const SITE_URL = "https://veneziaelectro.vercel.app"
-const MAIN_PHONE = "+212 508788782"
+const SITE_URL = "https://electromostafa55.ma"
+const MAIN_PHONE = "+212 658416769"
 const storesContent = [
   {
     id: "casa",

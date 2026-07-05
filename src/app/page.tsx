@@ -13,18 +13,16 @@ import { PacksSection } from "@/components/home/packs-section";
 import { StoresSection } from "@/components/home/stores-section";
 
 // الرابط الرئيسي للموقع
-const BASE_URL = "https://veneziaelectro.vercel.app";
+const BASE_URL = "https://electromostafa55.ma";
 
 // إعدادات SEO الخاصة بالصفحة الرئيسية
 export const metadata: Metadata = {
 
-  // عنوان الصفحة في Google
   title:
-    "Electro Mostafa Maroc | Électroménager, TV, Réfrigérateurs et Machines à laver",
+    "Electro Mostafa 55 | Électroménager au Maroc - TV, Frigo, Machines à laver",
 
-  // وصف الصفحة
   description:
-    "Achetez électroménager, téléviseurs, réfrigérateurs, machines à laver...",
+    "Electro Mostafa 55 propose électroménager au Maroc: TV, réfrigérateurs, machines à laver, cuisine, promotions et livraison.",
 
   // الرابط الرسمي للصفحة
   alternates: {
@@ -35,19 +33,18 @@ export const metadata: Metadata = {
   openGraph: {
     url: `${BASE_URL}/`,
     title:
-      "Electro Mostafa Maroc | Électroménager, TV, Réfrigérateurs et Machines à laver",
+      "Electro Mostafa 55 | Électroménager au Maroc - TV, Frigo, Machines à laver",
     description:
-      "Achetez électroménager, téléviseurs, réfrigérateurs...",
+      "Electro Mostafa 55 propose électroménager au Maroc: TV, réfrigérateurs, machines à laver, cuisine, promotions et livraison.",
     type: "website",
   },
 
-  // بيانات المشاركة على Twitter
   twitter: {
     card: "summary_large_image",
     title:
-      "Electro Mostafa Maroc | Électroménager, TV, Réfrigérateurs et Machines à laver",
+      "Electro Mostafa 55 | Électroménager au Maroc - TV, Frigo, Machines à laver",
     description:
-      "Achetez électroménager, téléviseurs, réfrigérateurs...",
+      "Electro Mostafa 55 propose électroménager au Maroc: TV, réfrigérateurs, machines à laver, cuisine, promotions et livraison.",
   },
 };
 
@@ -63,14 +60,12 @@ export default function HomePage() {
     "@type": "WebPage",
 
     // اسم الصفحة
-    name: "Electro Mostafa Maroc",
+    name: "Electro Mostafa 55",
+    description: "Boutique d'électroménager au Maroc",
 
     // رابط الصفحة
     url: `${BASE_URL}/`,
 
-    // وصف الصفحة
-    description:
-      "Boutique d'électroménager au Maroc",
 
     // لغة الصفحة
     inLanguage: "fr-MA",
@@ -78,7 +73,7 @@ export default function HomePage() {
     // الموقع الرئيسي
     isPartOf: {
       "@type": "WebSite",
-      name: "Electro Mostafa Maroc",
+      name: "Electro Mostafa 55",
       url: BASE_URL,
     },
 
@@ -88,6 +83,9 @@ export default function HomePage() {
       "Réfrigérateurs",
       "Machines à laver",
       "Télévisions",
+      "fours",
+      "climatiseurs",
+      "cafetières",
     ],
   };
 
@@ -117,7 +115,7 @@ export default function HomePage() {
 
               {/* اسم المتجر */}
               <span>
-                Electro Mostafa Maroc
+                Electro Mostafa 55
               </span>
 
               {/* العنوان الرئيسي */}
@@ -156,7 +154,7 @@ export default function HomePage() {
 
             {/* عنوان القسم */}
             <h2>
-              Votre magasin d'électroménager Mostafa au Maroc
+              Votre magasin d'électroménager Mostafa 55
             </h2>
 
             {/* وصف إضافي */}

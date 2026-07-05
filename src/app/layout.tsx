@@ -27,20 +27,14 @@ const outfit = Outfit({
 });
 
 // الرابط الرئيسي للموقع
-const siteUrl = "https://veneziaelectro.vercel.app";
-
-// اسم الموقع
-const siteName = "Electro Mostafa Maroc";
-
-// عنوان الموقع الذي يظهر في Google
-const siteTitle = "Electro Mostafa Maroc | TV, Frigo, Machine à laver";
-
-// وصف الموقع لتحسين SEO
+const siteUrl = "https://electromostafa55.ma";
+const siteName = "Electro Mostafa 55";
+const siteTitle = "Electro Mostafa 55 | Électroménager au Maroc";
 const siteDescription =
-  "Achetez TV, frigo, machine à laver et électroménager au Maroc.";
+  "Electro Mostafa 55 est une boutique d'électroménager au Maroc: TV, réfrigérateurs, machines à laver, cuisine, promotions et livraison.";
 
 // رقم الهاتف
-const phone = "+212508788782";
+const phone = "+212 658-416769";
 
 // إعدادات SEO الرئيسية للموقع
 export const metadata: Metadata = {
@@ -59,9 +53,16 @@ export const metadata: Metadata = {
 
   // الكلمات المفتاحية
   keywords: [
-    "electroménager maroc",
-    "tv maroc",
-    "frigo maroc",
+    "Electro Mostafa 55",
+    "Electro Mostafa",
+    "électroménager maroc",
+    "electromenager maroc",
+    "TV Maroc",
+    "frigo Maroc",
+    "réfrigérateur Maroc",
+    "machine à laver Maroc",
+    "électroménager Casablanca",
+    "boutique électroménager Maroc",
   ],
 
   // الرابط الرسمي للصفحة

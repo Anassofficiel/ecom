@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
     },
-    sitemap: 'https://venziaelectro.vercel.app/sitemap.xml',
+    sitemap: 'https://electromostafa55.ma/sitemap.xml',
   }
 }
