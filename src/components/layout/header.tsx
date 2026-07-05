@@ -1,5 +1,5 @@
 "use client"
-
+import Image from "next/image"
 import * as React from "react"
 import Link from "next/link"
 import {
@@ -148,7 +148,7 @@ export function Header() {
     group-hover:scale-105
     group-hover:drop-shadow-[0_0_10px_rgba(255,0,0,0.6)]
   ">
-                    ELECTRO MOSTAFA
+                    ELECTRO MOSTAFA 55
                   </span>
 
                   {/* GLOW LIGHT */}
