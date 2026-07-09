@@ -137,7 +137,7 @@ export default function RootLayout({
         <Header />
 
         {/* محتوى الصفحة الحالية */}
-        <main className="min-h-screen pt-[90px]">
+        <main className="min-h-screen pt-[120px]">
           {children}
         </main>
 

@@ -133,7 +133,7 @@ export const products: Product[] = [
     rating: 4.5,
     reviews: 48,
     image: "https://i.postimg.cc/26HfBfsB/image.png",
-    hoverImage: "https://i.postimg.cc/Zq5rkBfG/Whats-App-Image-2025-08-13-22-38-07-16cf9179.jpg",
+    hoverImage: "https://i.postimg.cc/CKpNWGY7/image.png",
     stockStatus: "in-stock",
     inStock: true,
     description: "ثلاجة VENEZIA IR-590DD بابين، تصميم أنيق باللون Inox، اقتصادية في استهلاك الطاقة بتصنيف A+، باستهلاك سنوي 412 kWh ومستوى ضجيج 41 ديسيبل. ضمان 5 سنوات على الثلاجة و10 سنوات على المحرك.",

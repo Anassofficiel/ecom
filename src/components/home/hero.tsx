@@ -1,5 +1,4 @@
 import Link from "next/link"
-import Image from "next/image"
 
 const heroSlide = {
   title: "Electro Mostafa Premium",
@@ -12,49 +11,48 @@ const heroSlide = {
 
 export function Hero() {
   return (
-    <section className="relative h-[80vh] min-h-[600px] w-full overflow-hidden bg-black">
-
-      {/* 🔥 IMAGE OPTIMIZED */}
-      <div className="absolute inset-0">
-        <Image
+    <section className="relative w-full overflow-hidden bg-black">
+      <div className="relative min-h-[680px] w-full md:min-h-[720px]">
+        <img
           src={heroSlide.image}
           alt={heroSlide.alt}
-          fill
-          priority
-          quality={60}
-          sizes="100vw"
-          className="object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
         />
 
-        <div className="absolute inset-0 z-10 bg-gradient-to-r from-black/80 via-black/45 to-transparent" />
-      </div>
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/75 to-black/20" />
 
-      <div className="container relative z-20 mx-auto flex h-full items-center px-4">
-        <div className="max-w-2xl space-y-6">
+        <div className="container relative z-10 mx-auto flex min-h-[680px] items-center px-4 py-20 md:min-h-[720px]">
+          <div className="max-w-3xl space-y-6">
+            <span className="inline-block rounded-full border border-red-500/40 bg-red-600/20 px-4 py-2 text-xs font-bold uppercase tracking-widest text-red-400">
+              Electro Mostafa 55
+            </span>
 
-          <span className="inline-block rounded-full border border-primary/30 bg-primary/20 px-4 py-1 text-xs font-bold uppercase tracking-widest text-primary">
-            Electro Mostafa 55
-          </span>
+            <h1 className="text-4xl font-black uppercase italic leading-tight tracking-tight text-white md:text-6xl xl:text-7xl">
+              {heroSlide.title}
+              <br />
+              <span className="text-red-600">{heroSlide.subtitle}</span>
+            </h1>
 
-          <h2 className="text-4xl font-black uppercase italic leading-tight tracking-tighter text-white md:text-6xl xl:text-7xl">
-            {heroSlide.title} <br />
-            <span className="text-primary">{heroSlide.subtitle}</span>
-          </h2>
+            <p className="max-w-2xl text-base leading-8 text-zinc-200 md:text-xl">
+              {heroSlide.description}
+            </p>
 
-          <p className="max-w-xl text-base text-zinc-300 md:text-lg">
-            {heroSlide.description}
-          </p>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/#promotions"
+                className="inline-flex items-center justify-center rounded-xl bg-red-600 px-7 py-4 text-sm font-bold text-white shadow-lg transition hover:bg-red-700"
+              >
+                Voir les promotions
+              </Link>
 
-          <div className="flex gap-3">
-            <Link href="/#promotions" className="bg-red-600 px-6 py-3 text-white rounded-xl">
-              Voir les promotions
-            </Link>
-
-            <Link href="/#packs" className="border border-white/20 bg-white/10 px-6 py-3 text-white rounded-xl">
-              Découvrir les packs
-            </Link>
+              <Link
+                href="/#packs"
+                className="inline-flex items-center justify-center rounded-xl border border-white/30 bg-white/10 px-7 py-4 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20"
+              >
+                Découvrir les packs
+              </Link>
+            </div>
           </div>
-
         </div>
       </div>
     </section>

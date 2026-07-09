@@ -1,31 +1,30 @@
 "use client"
-import Image from "next/image"
+
 import * as React from "react"
 import Link from "next/link"
 import {
-  Search,
   ShoppingCart,
   Menu,
-  Phone,
   X,
   Trash2,
   Plus,
   Minus,
 } from "lucide-react"
 import { useStore } from "@/lib/store"
-import { categories } from "@/lib/data"
-
-// Create dynamic nav items from categories
-const categoryNavItems = categories.slice(0, 7).map(cat => ({
-  name: cat,
-  href: `/category/${cat.toLowerCase().replace(/ /g, '-')}`
-}));
 
 const navItems = [
-  { name: "🏠 Accueil", href: "/" },
-  ...categoryNavItems,
-  { name: "🏷️ Promotions", href: "/#promotions" },
-  { name: "📍 Nos Magasins", href: "/#magasins" },
+  { icon: "🏠", name: "Accueil", href: "/" },
+  { icon: "❄️", name: "Refrigerators", href: "/category/refrigerators" },
+  { icon: "🧺", name: "Washing Machines", href: "/category/washing-machines" },
+  { icon: "📺", name: "Televisions", href: "/category/televisions" },
+  { icon: "🔥", name: "Ovens", href: "/category/ovens" },
+  { icon: "🍟", name: "Air Fryers", href: "/category/air-fryers" },
+  { icon: "☕", name: "Coffee Machines", href: "/category/coffee-machines" },
+]
+
+const specialNavItems = [
+  { icon: "🏷️", name: "Promotions", href: "/#promotions" },
+  { icon: "🎁", name: "Packs", href: "/#packs" },
 ]
 
 export function Header() {
@@ -62,10 +61,20 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const totalItems = mounted ? cart.reduce((acc, item) => acc + item.quantity, 0) : 0
+  const totalItems = mounted
+    ? cart.reduce((acc, item) => acc + item.quantity, 0)
+    : 0
+
   const cartItems = mounted ? cart : []
   const cartOpen = mounted ? isCartOpen : false
-  const totalPrice = mounted ? cart.reduce((acc, item) => acc + (item.variant?.price || item.product.price) * item.quantity, 0) : 0
+
+  const totalPrice = mounted
+    ? cart.reduce(
+      (acc, item) =>
+        acc + (item.variant?.price || item.product.price) * item.quantity,
+      0
+    )
+    : 0
 
   const closeMobileMenu = () => setMobileOpen(false)
   const toggleMobileMenu = () => setMobileOpen((prev) => !prev)
@@ -76,119 +85,128 @@ export function Header() {
         className={`fixed left-0 right-0 top-0 z-50 bg-white transition-shadow duration-300 ${isScrolled ? "shadow-md" : "shadow-sm"
           }`}
       >
-        {/* Top ticker - خليه كما هو كيتحرك */}
-        <div className="relative flex overflow-hidden border-b border-red-600 bg-[#ff4d4f] py-1.5 text-white shadow-sm">
-          <div className="animate-ticker-infinite whitespace-nowrap" aria-hidden="true">
+        {/* Top ticker */}
+        <div className="relative flex overflow-hidden border-b border-red-600 bg-[#ff4d4f] py-1 text-white shadow-sm">
+          <div
+            className="animate-ticker-infinite whitespace-nowrap text-sm font-semibold"
+            aria-hidden="true"
+          >
             <span className="inline-flex items-center gap-4 px-4">
-              <span>Premium Quality</span>
-              <span className="text-gray-200 opacity-60">•</span>
-              <span className="flex items-center gap-1.5">
-                <span className="font-black italic text-white">VENEZIA</span> 🇮🇹
-              </span>
-              <span className="text-gray-200 opacity-60">•</span>
-              <span className="flex items-center gap-1.5">
-                <span className="font-black italic text-white">KÖLN</span> 🇩🇪
-              </span>
-              <span className="text-gray-200 opacity-60">•</span>
-              <span>Meilleures Offres au Maroc</span>
-              <span className="text-gray-200 opacity-60">•</span>
-              <span>Livraison Rapide</span>
-              <span className="text-gray-200 opacity-60">•</span>
-              <span className="font-extrabold text-white">ELECTRO MOSTAFA</span>
-              <span className="text-gray-200 opacity-60">•</span>
-              <span>Service Client 7j/7</span>
-              <span className="text-gray-200 opacity-60">•</span>
+              <span>⭐ Premium Quality</span>
+              <span className="text-white/60">•</span>
+              <span className="font-black italic text-white">VENEZIA 🇮🇹</span>
+              <span className="text-white/60">•</span>
+              <span className="font-black italic text-white">KÖLN 🇩🇪</span>
+              <span className="text-white/60">•</span>
+              <span>🏷️ Meilleures Offres au Maroc</span>
+              <span className="text-white/60">•</span>
+              <span>🚚 Livraison Rapide</span>
+              <span className="text-white/60">•</span>
+              <span className="font-extrabold text-white">⚡ ELECTRO MOSTAFA</span>
+              <span className="text-white/60">•</span>
+              <span>☎️ Service Client 7j/7</span>
+              <span className="text-white/60">•</span>
             </span>
 
             <span className="inline-flex items-center gap-4 px-4">
-              <span>Premium Quality</span>
-              <span className="text-gray-200 opacity-60">•</span>
-              <span className="flex items-center gap-1.5">
-                <span className="font-black italic text-white">VENEZIA</span> 🇮🇹
-              </span>
-              <span className="text-gray-200 opacity-60">•</span>
-              <span className="flex items-center gap-1.5">
-                <span className="font-black italic text-white">KÖLN</span> 🇩🇪
-              </span>
-              <span className="text-gray-200 opacity-60">•</span>
-              <span>Meilleures Offres au Maroc</span>
-              <span className="text-gray-200 opacity-60">•</span>
-              <span>Livraison Rapide</span>
-              <span className="text-gray-200 opacity-60">•</span>
-              <span className="font-extrabold text-white">ELECTRO MOSTAFA</span>
-              <span className="text-gray-200 opacity-60">•</span>
-              <span>Service Client 7j/7</span>
-              <span className="text-gray-200 opacity-60">•</span>
+              <span>⭐ Premium Quality</span>
+              <span className="text-white/60">•</span>
+              <span className="font-black italic text-white">VENEZIA 🇮🇹</span>
+              <span className="text-white/60">•</span>
+              <span className="font-black italic text-white">KÖLN 🇩🇪</span>
+              <span className="text-white/60">•</span>
+              <span>🏷️ Meilleures Offres au Maroc</span>
+              <span className="text-white/60">•</span>
+              <span>🚚 Livraison Rapide</span>
+              <span className="text-white/60">•</span>
+              <span className="font-extrabold text-white">⚡ ELECTRO MOSTAFA</span>
+              <span className="text-white/60">•</span>
+              <span>☎️ Service Client 7j/7</span>
+              <span className="text-white/60">•</span>
             </span>
           </div>
         </div>
 
         <div className="border-b border-gray-100 bg-white">
-          <div className="container mx-auto flex h-12 items-center justify-between px-4">
-
-            {/* LEFT: MENU + LOGO */}
-            <div className="flex items-center gap-3">
+          <div className="mx-auto flex min-h-[68px] w-full max-w-[1920px] items-center justify-between gap-3 px-5">
+            {/* Logo + Mobile menu */}
+            <div className="flex shrink-0 items-center gap-2">
               <button
                 type="button"
                 onClick={toggleMobileMenu}
-                className="rounded-md p-2 text-gray-600 hover:text-red-600 lg:hidden"
+                className="rounded-md p-2 text-gray-600 hover:text-red-600 xl:hidden"
+                aria-label="Ouvrir le menu"
               >
-                {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                {mobileOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
               </button>
 
               <Link href="/" className="flex items-center">
-                <span className="relative inline-block group cursor-pointer">
-
-                  {/* TEXT */}
-                  <span className="relative z-10 text-xl sm:text-2xl font-black tracking-widest uppercase
-    bg-gradient-to-r from-red-600 via-orange-500 to-red-700 
-    bg-[length:200%_200%] bg-clip-text text-transparent
-    animate-gradient-move
-    transition-all duration-300
-    group-hover:scale-105
-    group-hover:drop-shadow-[0_0_10px_rgba(255,0,0,0.6)]
-  ">
+                <span className="group relative inline-block cursor-pointer whitespace-nowrap">
+                  <span
+                    className="relative z-10 bg-gradient-to-r from-red-600 via-orange-500 to-red-700 
+                    bg-[length:200%_200%] bg-clip-text text-[17px] font-black uppercase tracking-[0.20em]
+                    text-transparent transition-all duration-300 animate-gradient-move
+                    group-hover:drop-shadow-[0_0_10px_rgba(255,0,0,0.45)]
+                    sm:text-[19px] lg:text-[20px] 2xl:text-[22px]"
+                  >
                     ELECTRO MOSTAFA 55
                   </span>
 
-                  {/* GLOW LIGHT */}
-                  <span className="absolute inset-0 rounded-md blur-xl opacity-20 
-    bg-gradient-to-r from-red-500 to-orange-500
-    transition-all duration-500
-    group-hover:opacity-40
-    group-hover:scale-110
-  "></span>
+                  <span
+                    className="absolute inset-0 rounded-md bg-gradient-to-r from-red-500 to-orange-500
+                    opacity-20 blur-xl transition-all duration-500 group-hover:opacity-35"
+                  />
 
-                  {/* UNDERLINE ANIMATION */}
-                  <span className="absolute left-0 -bottom-1 h-[2px] w-0 
-    bg-gradient-to-r from-red-600 to-orange-500
-    transition-all duration-500
-    group-hover:w-full
-  "></span>
-
+                  <span
+                    className="absolute left-0 -bottom-1 h-[2px] w-0 bg-gradient-to-r
+                    from-red-600 to-orange-500 transition-all duration-500 group-hover:w-full"
+                  />
                 </span>
               </Link>
             </div>
 
-            {/* CENTER: NAV (desktop) */}
-            <div className="hidden lg:flex items-center gap-2">
-              {navItems.slice(0, 6).map((item) => (
+            {/* Desktop nav */}
+            <nav className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 xl:flex">
+              {navItems.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-red-600 relative group"
+                  className="group relative inline-flex items-center gap-1 rounded-full px-1.5 py-2 text-[10.5px] font-bold leading-tight text-gray-700 transition-all duration-300 hover:bg-red-50 hover:text-red-600 2xl:px-2 2xl:text-[11.5px]"
                 >
-                  {item.name}
-                  <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-red-600 transition-all duration-300 group-hover:w-full"></span>
+                  <span className="text-[14px] leading-none" aria-hidden="true">
+                    {item.icon}
+                  </span>
+
+                  <span className="whitespace-nowrap">{item.name}</span>
+
+                  <span className="absolute left-3 right-3 -bottom-0.5 h-[2px] scale-x-0 rounded-full bg-red-600 transition-transform duration-300 group-hover:scale-x-100" />
                 </Link>
               ))}
-            </div>
 
-            {/* RIGHT: PANIER */}
+              {specialNavItems.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="ml-1 inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-red-200 bg-red-50 px-2.5 py-2 text-[10.5px] font-black uppercase tracking-wide text-red-700 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-red-500 hover:bg-red-600 hover:text-white hover:shadow-md 2xl:px-3 2xl:text-[11.5px]"
+                >
+                  <span className="text-[13px]" aria-hidden="true">
+                    {item.icon}
+                  </span>
+                  <span>{item.name}</span>
+                </Link>
+              ))}
+            </nav>
+
+            {/* Panier */}
             <button
               type="button"
               onClick={() => setCartOpen(true)}
-              className="relative flex items-center gap-2 rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white shadow-md hover:scale-105 hover:bg-red-700 transition-all duration-200"
+              className="relative flex shrink-0 items-center gap-2 rounded-full bg-red-600 px-4 py-2.5 text-sm font-bold text-white shadow-md transition-all duration-200 hover:scale-105 hover:bg-red-700 2xl:px-5"
+              aria-label="Ouvrir le panier"
             >
               <ShoppingCart className="h-4 w-4" />
               <span className="hidden sm:inline">Panier</span>
@@ -202,26 +220,34 @@ export function Header() {
           </div>
         </div>
 
-
-
-        {/* Mobile nav */}
+        {/* Mobile / tablet nav */}
         {mobileOpen && (
           <div
             id="mobile-navigation"
-            className="border-t border-gray-100 bg-white shadow-xl animate-slide-down lg:hidden"
+            className="animate-slide-down border-t border-gray-100 bg-white shadow-xl xl:hidden"
           >
+            <nav className="flex flex-col bg-white py-3">
+              {[...navItems, ...specialNavItems].map((item) => {
+                const isSpecial =
+                  item.name === "Promotions" || item.name === "Packs"
 
-            <nav className="flex flex-col py-3 bg-white">
-              {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  onClick={closeMobileMenu}
-                  className="flex items-center gap-3 px-6 py-4 text-[15px] font-semibold text-gray-800 border-b border-gray-100 transition-all duration-200 hover:bg-red-50 hover:text-red-600"
-                >
-                  {item.name}
-                </Link>
-              ))}
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    onClick={closeMobileMenu}
+                    className={`mx-4 my-1 flex items-center gap-3 rounded-xl px-4 py-4 text-[15px] font-semibold transition-all duration-200 ${isSpecial
+                        ? "border border-red-200 bg-red-50 text-red-700 hover:bg-red-600 hover:text-white"
+                        : "border-b border-gray-100 text-gray-800 hover:bg-red-50 hover:text-red-600"
+                      }`}
+                  >
+                    <span className="text-lg" aria-hidden="true">
+                      {item.icon}
+                    </span>
+                    <span>{item.name}</span>
+                  </Link>
+                )
+              })}
             </nav>
           </div>
         )}
@@ -239,7 +265,9 @@ export function Header() {
 
       {/* Cart drawer */}
       <aside
-        className={`fixed right-0 top-0 z-[70] flex h-full w-full flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out will-change-transform sm:w-[400px] ${cartOpen ? "translate-x-0 pointer-events-auto" : "translate-x-full pointer-events-none"
+        className={`fixed right-0 top-0 z-[70] flex h-full w-full flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out will-change-transform sm:w-[400px] ${cartOpen
+            ? "translate-x-0 pointer-events-auto"
+            : "translate-x-full pointer-events-none"
           }`}
         role="dialog"
         aria-modal="true"
@@ -247,7 +275,10 @@ export function Header() {
         aria-hidden={!cartOpen}
       >
         <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
-          <h2 className="text-lg font-bold text-gray-900">Mon Panier ({totalItems})</h2>
+          <h2 className="text-lg font-bold text-gray-900">
+            Mon Panier ({totalItems})
+          </h2>
+
           <button
             type="button"
             onClick={() => setCartOpen(false)}
@@ -262,7 +293,11 @@ export function Header() {
           {cartItems.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
               <ShoppingCart className="h-16 w-16 text-gray-200" />
-              <p className="text-sm font-medium text-gray-500">Votre panier est vide</p>
+
+              <p className="text-sm font-medium text-gray-500">
+                Votre panier est vide
+              </p>
+
               <button
                 type="button"
                 onClick={() => setCartOpen(false)}
@@ -290,16 +325,26 @@ export function Header() {
                   <div className="min-w-0 flex-1">
                     <p className="line-clamp-2 text-xs font-semibold text-gray-800">
                       {item.product.name}
-                      {item.variant && <span className="ml-1 text-gray-500">({item.variant.label})</span>}
+                      {item.variant && (
+                        <span className="ml-1 text-gray-500">
+                          ({item.variant.label})
+                        </span>
+                      )}
                     </p>
+
                     <p className="mt-0.5 text-xs font-bold text-red-600">
-                      {(item.variant?.price || item.product.price).toLocaleString("fr-FR")} DH
+                      {(item.variant?.price || item.product.price).toLocaleString(
+                        "fr-FR"
+                      )}{" "}
+                      DH
                     </p>
 
                     <div className="mt-2 flex items-center gap-2">
                       <button
                         type="button"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        onClick={() =>
+                          updateQuantity(item.id, item.quantity - 1)
+                        }
                         className="flex h-6 w-6 items-center justify-center rounded border border-gray-300 hover:border-red-500"
                         aria-label={`Réduire la quantité de ${item.product.name}`}
                       >
@@ -312,7 +357,9 @@ export function Header() {
 
                       <button
                         type="button"
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        onClick={() =>
+                          updateQuantity(item.id, item.quantity + 1)
+                        }
                         className="flex h-6 w-6 items-center justify-center rounded border border-gray-300 hover:border-red-500"
                         aria-label={`Augmenter la quantité de ${item.product.name}`}
                       >
@@ -323,8 +370,13 @@ export function Header() {
 
                   <div className="flex flex-col items-end gap-1">
                     <span className="text-sm font-bold text-gray-900">
-                      {((item.variant?.price || item.product.price) * item.quantity).toLocaleString("fr-FR")} DH
+                      {(
+                        (item.variant?.price || item.product.price) *
+                        item.quantity
+                      ).toLocaleString("fr-FR")}{" "}
+                      DH
                     </span>
+
                     <button
                       type="button"
                       onClick={() => removeFromCart(item.id)}
@@ -344,6 +396,7 @@ export function Header() {
           <div className="space-y-3 border-t border-gray-200 bg-gray-50 px-5 py-4">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">Total estimé</span>
+
               <span className="text-xl font-bold text-red-600">
                 {totalPrice.toLocaleString("fr-FR")} DH
               </span>
