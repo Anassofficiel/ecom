@@ -1,7 +1,8 @@
 "use client"
 //عرض الباكات.
 import { useRouter } from "next/navigation"
-import { packs } from "@/lib/data"
+import { packs, type Pack, type Product } from "@/lib/data"
+import { useStore } from "@/lib/store"
 
 
 const WHATSAPP_NUMBER = "212658416769"
@@ -74,10 +75,37 @@ const PACK_PRODUCT_SPECS: Record<string, Array<Record<string, string>>> = {
 }
 
 // ── Checkout button ───────────────────────────────────────────────────────────
-function CheckoutButton() {
+function CheckoutButton({ pack }: { pack: Pack }) {
   const router = useRouter()
+  const addToCart = useStore((state) => state.addToCart)
 
   const handleCheckout = () => {
+    const packAsProduct: Product = {
+      id: pack.id,
+      slug: pack.slug ?? pack.id,
+      name: pack.name,
+      category: "Packs",
+      price: pack.packPrice,
+      originalPrice: pack.originalPrice,
+      discount: pack.discount,
+      rating: 4.8,
+      reviews: 96,
+      image: pack.images?.[0] ?? "",
+      hoverImage: pack.images?.[1] ?? pack.images?.[0] ?? "",
+      images: pack.images,
+      stockStatus: "in-stock",
+      inStock: true,
+      description: pack.description,
+      specs: {
+        Type: "Pack électroménager",
+        Produits: pack.products.join(" + "),
+        Économie: `${(pack.originalPrice - pack.packPrice).toLocaleString("fr-FR")} DH`,
+      },
+      isPromotion: true,
+      isActive: true,
+    }
+
+    addToCart(packAsProduct, undefined, 1)
     router.push("/checkout")
   }
 
@@ -463,7 +491,7 @@ export function PacksSection() {
                       </a>
 
                       {/* Checkout */}
-                      <CheckoutButton />
+                      <CheckoutButton pack={pack} />
                     </div>
                   </div>
                 </article>

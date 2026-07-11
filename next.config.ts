@@ -17,15 +17,11 @@ const nextConfig: NextConfig = {
         destination: "https://electromostafa55.ma/:path*",
         permanent: true,
       },
-      {
-        source: "/checkout",
-        destination: "/",
-        permanent: false,
-      },
     ];
   },
 
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",

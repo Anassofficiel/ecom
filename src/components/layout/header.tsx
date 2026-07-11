@@ -237,8 +237,8 @@ export function Header() {
                     href={item.href}
                     onClick={closeMobileMenu}
                     className={`mx-4 my-1 flex items-center gap-3 rounded-xl px-4 py-4 text-[15px] font-semibold transition-all duration-200 ${isSpecial
-                        ? "border border-red-200 bg-red-50 text-red-700 hover:bg-red-600 hover:text-white"
-                        : "border-b border-gray-100 text-gray-800 hover:bg-red-50 hover:text-red-600"
+                      ? "border border-red-200 bg-red-50 text-red-700 hover:bg-red-600 hover:text-white"
+                      : "border-b border-gray-100 text-gray-800 hover:bg-red-50 hover:text-red-600"
                       }`}
                   >
                     <span className="text-lg" aria-hidden="true">
@@ -266,8 +266,8 @@ export function Header() {
       {/* Cart drawer */}
       <aside
         className={`fixed right-0 top-0 z-[70] flex h-full w-full flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out will-change-transform sm:w-[400px] ${cartOpen
-            ? "translate-x-0 pointer-events-auto"
-            : "translate-x-full pointer-events-none"
+          ? "translate-x-0 pointer-events-auto"
+          : "translate-x-full pointer-events-none"
           }`}
         role="dialog"
         aria-modal="true"
@@ -310,17 +310,42 @@ export function Header() {
             <div className="space-y-5">
               {cartItems.map((item) => (
                 <div key={item.id} className="flex gap-3">
-                  <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-gray-50">
-                    <img
-                      src={item.product.image}
-                      alt={item.product.name}
-                      className="h-full w-full object-contain p-1"
-                      loading="lazy"
-                      decoding="async"
-                      width={64}
-                      height={64}
-                    />
-                  </div>
+
+                  {item.product.category === "Packs" &&
+                    item.product.images &&
+                    item.product.images.length > 1 ? (
+                    <div className="grid h-24 w-32 flex-shrink-0 grid-cols-3 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md">
+                      {item.product.images.slice(0, 3).map((image, imageIndex) => (
+                        <div
+                          key={`${item.id}-pack-image-${imageIndex}`}
+                          className="flex items-center justify-center border-r border-gray-100 bg-white last:border-r-0"
+                        >
+                          <img
+                            src={image}
+                            alt={`${item.product.name} produit ${imageIndex + 1}`}
+                            className="h-full w-full object-contain p-1"
+                            loading="lazy"
+                            decoding="async"
+                            width={96}
+                            height={96}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-gray-50">
+                      <img
+                        src={item.product.image}
+                        alt={item.product.name}
+                        className="h-full w-full object-contain p-1"
+                        loading="lazy"
+                        decoding="async"
+                        width={64}
+                        height={64}
+                      />
+                    </div>
+                  )}
+
 
                   <div className="min-w-0 flex-1">
                     <p className="line-clamp-2 text-xs font-semibold text-gray-800">
