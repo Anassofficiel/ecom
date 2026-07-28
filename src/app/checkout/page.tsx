@@ -45,6 +45,15 @@ const COUNTRIES = [
 
 type Country = (typeof COUNTRIES)[number]
 
+type CheckoutForm = {
+  fullName: string
+  address: string
+  city: string
+  phone: string
+}
+
+type FormField = keyof CheckoutForm
+
 function FlagImage({
   country,
   className = "h-5 w-7",
@@ -66,8 +75,12 @@ function FlagImage({
 function validatePhone(value: string) {
   const digits = value.replace(/\D/g, "")
 
-  if (digits.length < 6 || digits.length > 15) {
-    return "Numéro de téléphone invalide"
+  if (!digits) {
+    return "Numéro de téléphone obligatoire"
+  }
+
+  if (digits.length !== 10) {
+    return "Le numéro doit contenir exactement 10 chiffres"
   }
 
   return null
@@ -109,21 +122,89 @@ export default function CheckoutPage() {
   const clearCart = useStore((state) => state.clearCart)
 
   const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const [submitProgress, setSubmitProgress] = React.useState(0)
+  const progressIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(
+    null
+  )
+
   const [countryOpen, setCountryOpen] = React.useState(false)
   const [selectedCountry, setSelectedCountry] = React.useState<Country>(
     COUNTRIES[0]
   )
   const countryDropdownRef = React.useRef<HTMLDivElement | null>(null)
 
-  const [form, setForm] = React.useState({
+  const [form, setForm] = React.useState<CheckoutForm>({
     fullName: "",
     address: "",
     city: "",
     phone: "",
   })
 
-  const [errors, setErrors] = React.useState<Record<string, string>>({})
-  const [touched, setTouched] = React.useState<Record<string, boolean>>({})
+  const [errors, setErrors] = React.useState<Partial<Record<FormField, string>>>({})
+  const [touched, setTouched] = React.useState<Partial<Record<FormField, boolean>>>({})
+
+  const stopProgress = React.useCallback(() => {
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current)
+      progressIntervalRef.current = null
+    }
+  }, [])
+
+  const startProgress = React.useCallback(() => {
+    stopProgress()
+    setSubmitProgress(0)
+
+    progressIntervalRef.current = setInterval(() => {
+      setSubmitProgress((current) => {
+        if (current >= 94) return 94
+        if (current < 30) return Math.min(current + 7, 94)
+        if (current < 60) return Math.min(current + 4, 94)
+        if (current < 85) return Math.min(current + 2, 94)
+        return Math.min(current + 1, 94)
+      })
+    }, 300)
+  }, [stopProgress])
+
+  const finishProgress = React.useCallback(() => {
+    stopProgress()
+    setSubmitProgress(100)
+  }, [stopProgress])
+
+  React.useEffect(() => {
+    return () => stopProgress()
+  }, [stopProgress])
+
+  // Réveille le serveur Render dès l’arrivée sur la page checkout.
+  // Le client peut remplir le formulaire pendant que le backend démarre.
+  React.useEffect(() => {
+    const controller = new AbortController()
+    const timeoutId = window.setTimeout(() => controller.abort(), 20000)
+
+    void fetch(`${API_BASE_URL}/api/health`, {
+      method: "GET",
+      cache: "no-store",
+      signal: controller.signal,
+    })
+      .catch(() => {
+        // Fallback utile si /api/health n’est pas encore déployé.
+        return fetch(`${API_BASE_URL}/healthz`, {
+          method: "GET",
+          mode: "no-cors",
+          cache: "no-store",
+        })
+      })
+      .catch(() => {
+        // Le préchauffage ne doit jamais bloquer la page checkout.
+      })
+      .finally(() => {
+        window.clearTimeout(timeoutId)
+      })
+
+    return () => {
+      window.clearTimeout(timeoutId)
+      controller.abort()
+    }
+  }, [])
 
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -158,8 +239,8 @@ export default function CheckoutPage() {
   const shipping = subtotal > 1000 ? 0 : 50
   const total = subtotal + shipping
 
-  function validate(f: typeof form) {
-    const e: Record<string, string> = {}
+  function validate(f: CheckoutForm) {
+    const e: Partial<Record<FormField, string>> = {}
 
     if (!f.fullName.trim() || f.fullName.trim().length < 3) {
       e.fullName = "Nom complet requis (min. 3 caractères)"
@@ -179,35 +260,61 @@ export default function CheckoutPage() {
     return e
   }
 
-  const set = (field: keyof typeof form, value: string) => {
-    setForm((prev) => ({ ...prev, [field]: value }))
+  const set = (field: FormField, value: string) => {
+    setForm((previousForm) => {
+      const nextForm = { ...previousForm, [field]: value }
 
-    if (touched[field]) {
-      const nextForm = { ...form, [field]: value }
-      const nextErrors = validate(nextForm)
+      if (touched[field]) {
+        const nextErrors = validate(nextForm)
+        setErrors((previousErrors) => ({
+          ...previousErrors,
+          [field]: nextErrors[field] ?? "",
+        }))
+      }
 
-      setErrors((prev) => ({
-        ...prev,
-        [field]: nextErrors[field] ?? "",
-      }))
-    }
+      return nextForm
+    })
   }
 
-  const blur = (field: keyof typeof form) => {
-    setTouched((prev) => ({ ...prev, [field]: true }))
+  const blur = (field: FormField) => {
+    setTouched((previousTouched) => ({
+      ...previousTouched,
+      [field]: true,
+    }))
 
     const nextErrors = validate(form)
 
-    setErrors((prev) => ({
-      ...prev,
+    setErrors((previousErrors) => ({
+      ...previousErrors,
       [field]: nextErrors[field] ?? "",
     }))
   }
 
-  const fullPhone = `${selectedCountry.dialCode} ${form.phone.trim()}`
+  const liveErrors = validate(form)
+
+  const isFieldValid = (field: FormField) => {
+    return form[field].trim().length > 0 && !liveErrors[field]
+  }
+
+  const inputStateClass = (field: FormField) => {
+    if (isFieldValid(field)) {
+      return "border-emerald-500 bg-emerald-50/70 focus:border-emerald-600 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.12)]"
+    }
+
+    return "border-red-400 bg-red-50/70 focus:border-red-500 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.10)]"
+  }
+
+  const phoneDigits = form.phone.replace(/\D/g, "")
+  const normalizedLocalPhone =
+    selectedCountry.iso === "MA" && phoneDigits.startsWith("0")
+      ? phoneDigits.slice(1)
+      : phoneDigits
+  const fullPhone = `${selectedCountry.dialCode}${normalizedLocalPhone}`
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (isSubmitting) return
 
     setTouched({
       fullName: true,
@@ -227,8 +334,23 @@ export default function CheckoutPage() {
     }
 
     setIsSubmitting(true)
+    startProgress()
+
+    const controller = new AbortController()
+    const timeoutId = window.setTimeout(() => controller.abort(), 30000)
+    let orderCreated = false
 
     try {
+      const orderItems = cart.map((item) => ({
+        image: item.product.image,
+        images: item.product.images ?? [item.product.image],
+        title: item.variant
+          ? `${item.product.name} - ${item.variant.label}`
+          : item.product.name,
+        qty: item.quantity,
+        price: item.variant?.price ?? item.product.price,
+      }))
+
       const payload = {
         customerName: form.fullName.trim(),
         customerPhone: fullPhone,
@@ -240,15 +362,7 @@ export default function CheckoutPage() {
         shipping,
         discount: 0,
         paymentMethod: "Cash on Delivery",
-        items: cart.map((item) => ({
-          image: item.product.image,
-          images: item.product.images ?? [item.product.image],
-          title: item.variant
-            ? `${item.product.name} - ${item.variant.label}`
-            : item.product.name,
-          qty: item.quantity,
-          price: item.variant?.price ?? item.product.price,
-        })),
+        items: orderItems,
       }
 
       console.log("Sending order payload:", payload)
@@ -260,6 +374,8 @@ export default function CheckoutPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
+        signal: controller.signal,
+        cache: "no-store",
       })
 
       const rawText = await response.text()
@@ -277,8 +393,10 @@ export default function CheckoutPage() {
         throw new Error("La réponse de l'API n'est pas un JSON valide.")
       }
 
-      if (!order?.id) {
-        throw new Error("Commande créée, mais ID introuvable dans la réponse API.")
+      if (!order.id) {
+        throw new Error(
+          "Commande créée, mais ID introuvable dans la réponse API."
+        )
       }
 
       const telegramOrderData = {
@@ -290,15 +408,7 @@ export default function CheckoutPage() {
         total,
         shipping,
         paymentMethod: "Cash on Delivery",
-        items: cart.map((item) => ({
-          image: item.product.image,
-          images: item.product.images ?? [item.product.image],
-          title: item.variant
-            ? `${item.product.name} - ${item.variant.label}`
-            : item.product.name,
-          qty: item.quantity,
-          price: item.variant?.price ?? item.product.price,
-        })),
+        items: orderItems,
       }
 
       sessionStorage.setItem("send_order_notification", "1")
@@ -307,12 +417,25 @@ export default function CheckoutPage() {
         JSON.stringify(telegramOrderData)
       )
 
+      orderCreated = true
+      finishProgress()
+
+      // Très court délai pour afficher 100 % sans ralentir la redirection.
+      await new Promise((resolve) => window.setTimeout(resolve, 100))
+
       clearCart()
-      window.location.href = `/checkout/success?orderId=${order.id}`
+      window.location.assign(`/checkout/success?orderId=${order.id}`)
     } catch (error) {
       console.error("Checkout error:", error)
 
-      if (error instanceof TypeError && error.message.includes("fetch")) {
+      stopProgress()
+      setSubmitProgress(0)
+
+      if (error instanceof DOMException && error.name === "AbortError") {
+        alert(
+          "Le serveur a pris trop de temps pour répondre. Veuillez réessayer dans quelques instants."
+        )
+      } else if (error instanceof TypeError && error.message.includes("fetch")) {
         alert(
           "Impossible de contacter le serveur de commande. Vérifiez l'URL API et le CORS côté dashboard."
         )
@@ -324,7 +447,11 @@ export default function CheckoutPage() {
         )
       }
     } finally {
-      setIsSubmitting(false)
+      window.clearTimeout(timeoutId)
+
+      if (!orderCreated) {
+        setIsSubmitting(false)
+      }
     }
   }
 
@@ -390,10 +517,13 @@ export default function CheckoutPage() {
                         onChange={(e) => set("fullName", e.target.value)}
                         onBlur={() => blur("fullName")}
                         placeholder="ex: Ahmed El Alaoui"
-                        className={`h-14 w-full rounded-2xl border-2 px-4 text-sm font-semibold text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.10)] ${touched.fullName && errors.fullName
-                            ? "border-red-400 bg-red-50/70 focus:border-red-500"
-                            : "border-gray-200 bg-white focus:border-red-500"
-                          }`}
+                        autoComplete="name"
+                        required
+                        minLength={3}
+                        aria-invalid={!isFieldValid("fullName")}
+                        className={`h-14 w-full rounded-2xl border-2 px-4 text-sm font-semibold text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 ${inputStateClass(
+                          "fullName"
+                        )}`}
                       />
                     </Field>
                   </div>
@@ -409,10 +539,13 @@ export default function CheckoutPage() {
                         onChange={(e) => set("address", e.target.value)}
                         onBlur={() => blur("address")}
                         placeholder="ex: 12 Rue Hassan II, Appt 3"
-                        className={`h-14 w-full rounded-2xl border-2 px-4 text-sm font-semibold text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.10)] ${touched.address && errors.address
-                            ? "border-red-400 bg-red-50/70 focus:border-red-500"
-                            : "border-gray-200 bg-white focus:border-red-500"
-                          }`}
+                        autoComplete="street-address"
+                        required
+                        minLength={5}
+                        aria-invalid={!isFieldValid("address")}
+                        className={`h-14 w-full rounded-2xl border-2 px-4 text-sm font-semibold text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 ${inputStateClass(
+                          "address"
+                        )}`}
                       />
                     </Field>
                   </div>
@@ -427,10 +560,13 @@ export default function CheckoutPage() {
                       onChange={(e) => set("city", e.target.value)}
                       onBlur={() => blur("city")}
                       placeholder="ex: Casablanca"
-                      className={`h-14 w-full rounded-2xl border-2 px-4 text-sm font-semibold text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.10)] ${touched.city && errors.city
-                          ? "border-red-400 bg-red-50/70 focus:border-red-500"
-                          : "border-gray-200 bg-white focus:border-red-500"
-                        }`}
+                      autoComplete="address-level2"
+                      required
+                      minLength={2}
+                      aria-invalid={!isFieldValid("city")}
+                      className={`h-14 w-full rounded-2xl border-2 px-4 text-sm font-semibold text-gray-900 outline-none transition-all duration-300 placeholder:text-gray-400 ${inputStateClass(
+                        "city"
+                      )}`}
                     />
                   </Field>
 
@@ -440,9 +576,9 @@ export default function CheckoutPage() {
                   >
                     <div ref={countryDropdownRef} className="relative z-[9999]">
                       <div
-                        className={`flex h-14 w-full min-w-0 overflow-hidden rounded-2xl border-2 bg-white transition-all duration-300 focus-within:shadow-[0_0_0_4px_rgba(239,68,68,0.10)] ${touched.phone && errors.phone
-                            ? "border-red-400 bg-red-50/70"
-                            : "border-gray-200 focus-within:border-red-500"
+                        className={`flex h-14 w-full min-w-0 overflow-hidden rounded-2xl border-2 transition-all duration-300 ${isFieldValid("phone")
+                          ? "border-emerald-500 bg-emerald-50/70 focus-within:border-emerald-600 focus-within:shadow-[0_0_0_4px_rgba(16,185,129,0.12)]"
+                          : "border-red-400 bg-red-50/70 focus-within:border-red-500 focus-within:shadow-[0_0_0_4px_rgba(239,68,68,0.10)]"
                           }`}
                       >
                         <button
@@ -464,15 +600,19 @@ export default function CheckoutPage() {
                         <input
                           type="tel"
                           inputMode="numeric"
+                          autoComplete="tel-national"
+                          required
+                          maxLength={10}
                           value={form.phone}
                           onChange={(e) => {
-                            const val = e.target.value
-                              .replace(/[^\d\s]/g, "")
-                              .slice(0, 15)
-                            set("phone", val)
+                            const digits = e.target.value
+                              .replace(/\D/g, "")
+                              .slice(0, 10)
+                            set("phone", digits)
                           }}
                           onBlur={() => blur("phone")}
-                          placeholder={selectedCountry.placeholder}
+                          placeholder="06XXXXXXXX"
+                          aria-invalid={!isFieldValid("phone")}
                           className="min-w-0 flex-1 bg-transparent px-4 text-sm font-semibold text-gray-900 outline-none placeholder:text-gray-400"
                         />
                       </div>
@@ -488,8 +628,8 @@ export default function CheckoutPage() {
                                 setCountryOpen(false)
                               }}
                               className={`flex h-14 w-full items-center gap-3 border-b border-gray-100 px-4 text-left text-sm font-bold transition-all duration-200 last:border-b-0 hover:bg-red-50 ${selectedCountry.iso === country.iso
-                                  ? "bg-red-50 text-red-600"
-                                  : "text-gray-800"
+                                ? "bg-red-50 text-red-600"
+                                : "text-gray-800"
                                 }`}
                             >
                               <FlagImage country={country} />
@@ -508,12 +648,15 @@ export default function CheckoutPage() {
                         </div>
                       )}
 
-                      {!errors.phone && form.phone.length > 0 && (
-                        <div className="mt-2 flex items-center gap-2 text-xs font-medium text-gray-400">
-                          <FlagImage country={selectedCountry} className="h-4 w-6" />
+                      {isFieldValid("phone") && (
+                        <div className="mt-2 flex items-center gap-2 text-xs font-semibold text-emerald-600">
+                          <FlagImage
+                            country={selectedCountry}
+                            className="h-4 w-6"
+                          />
                           <span>
-                            Code sélectionné: {selectedCountry.name}{" "}
-                            {selectedCountry.dialCode}
+                            Numéro valide : {selectedCountry.dialCode}{" "}
+                            {form.phone}
                           </span>
                         </div>
                       )}
@@ -660,13 +803,28 @@ export default function CheckoutPage() {
                 type="submit"
                 form="checkout-form"
                 disabled={isSubmitting}
-                className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-2xl bg-red-600 py-4 text-base font-black text-white shadow-lg shadow-red-600/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-red-700 hover:shadow-xl hover:shadow-red-600/35 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:shadow-none"
+                aria-busy={isSubmitting}
+                className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-2xl bg-red-600 py-4 text-base font-black text-white shadow-lg shadow-red-600/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-red-700 hover:shadow-xl hover:shadow-red-600/35 disabled:cursor-wait disabled:bg-red-600 disabled:opacity-100 disabled:shadow-lg"
               >
-                <span className="absolute inset-y-0 -left-20 w-16 rotate-12 bg-white/30 blur-sm transition-all duration-700 group-hover:left-[120%]" />
-                <ShieldCheck className="relative h-5 w-5" />
-                <span className="relative">
+                {isSubmitting ? (
+                  <>
+                    <span
+                      className="absolute inset-y-0 left-0 bg-red-800/35 transition-[width] duration-300 ease-out"
+                      style={{ width: `${submitProgress}%` }}
+                    />
+                    <span
+                      className="absolute bottom-0 left-0 h-1 bg-white transition-[width] duration-300 ease-out"
+                      style={{ width: `${submitProgress}%` }}
+                    />
+                  </>
+                ) : (
+                  <span className="absolute inset-y-0 -left-20 w-16 rotate-12 bg-white/30 blur-sm transition-all duration-700 group-hover:left-[120%]" />
+                )}
+
+                <ShieldCheck className="relative z-10 h-5 w-5" />
+                <span className="relative z-10">
                   {isSubmitting
-                    ? "Traitement en cours..."
+                    ? `Traitement en cours... ${submitProgress}%`
                     : "Confirmer la Commande"}
                 </span>
               </button>
