@@ -48,16 +48,17 @@ const withSlug = <T extends { name: string; slug?: string }>(product: T) => ({
 })
 
 export interface Pack {
-  id: string;
-  slug?: string;
-  name: string;
-  products: string[];
-  images: string[];
-  originalPrice: number;
-  packPrice: number;
-  discount: number;
-  description: string;
-  badge?: string;
+  id: string
+  slug?: string
+  name: string
+  products: string[]
+  heroImage?: string
+  images: string[]
+  originalPrice: number
+  packPrice: number
+  discount: number
+  description: string
+  badge?: string
 }
 
 export interface StoreLocation {
@@ -4267,208 +4268,40 @@ export const promotionProductIds = [
 ];
 
 // ─── Packs ────────────────────────────────────────────────────────────────────
+// ─── Packs ────────────────────────────────────────────────────────────────────
 export const packs: Pack[] = [
   {
     id: "pack1",
     slug: "pack-cuisine-salon-connecte",
     name: "Pack Cuisine & Salon Connecté",
+
+    // بدّلها من بعد بصورة كبيرة فيها الباك كامل
+    heroImage: "https://i.postimg.cc/wTm8D0fX/image.png",
+
     products: [
-      "VENEZIA Refrigerator 200L Bottom Freezer",
-      "VENEZIA Electric Oven 45L",
-      'VENEZIA Google TV 4K QLED 55"',
+      "VENEZIA HOTE",
+      "VENEZIA Electric Oven ",
+      'VENEZIA MICROONDES',
+      'CADEAU',
     ],
+
     images: [
-      "https://i.postimg.cc/0NbcHwHD/image.png",
-      "https://i.postimg.cc/d3JKP6Cd/image.png",
-      "https://i.postimg.cc/W1Xgdxsk/Whats-App-Image-2025-08-26-01-17-40-257a67df.jpg",
+      "https://i.postimg.cc/vH3qg9Mf/image.png",
+
+      "https://i.postimg.cc/q7g9Mw3N/image.png",
+      "https://i.postimg.cc/xCNDg5jD/image.png",
+      "https://i.postimg.cc/k5X7NWRf/image.png",
     ],
-    originalPrice: 7797,
-    packPrice: 6999,
-    discount: 10,
-    description: "Un pack harmonieux pour équiper votre cuisine et votre espace TV avec des essentiels modernes et élégants.",
+
+    originalPrice: 5550,
+    packPrice: 4749,
+    discount: 60,
+    description:
+      "Un pack harmonieux pour équiper votre cuisine et votre espace TV avec des essentiels modernes et élégants.",
     badge: "Best Seller",
   },
-  {
-    id: "pack2",
-    slug: "pack-barista-patisserie",
-    name: "Pack Barista & Pâtisserie",
-    products: [
-      "KOLN Espresso Machine 15 Bar",
-      "Vospeed Stand Mixer 5.5L",
-      "VENEZIA Panini Grill 2200W",
-    ],
-    images: [
-      "https://i.postimg.cc/3JrQFW80/image.png",
-      "https://i.postimg.cc/Dz1hw0d9/image.png",
-      "https://i.postimg.cc/j2wjqR30/image.png",
-    ],
-    originalPrice: 3997,
-    packPrice: 3299,
-    discount: 17,
-    description: "Le pack idéal pour les amateurs de café, pâtisserie et snacks maison avec un style premium.",
-    badge: "Hot Deal",
-  },
-  {
-    id: "pack3",
-    slug: "pack-tv-pause-cafe",
-    name: "Pack TV & Pause Café",
-    products: [
-      'VENEZIA Google TV 75" 4K QLED',
-      "KOLN Espresso Machine 15 Bar",
-      "VENEZIA Sandwich Grill 2000W",
-    ],
-    images: [
-      "https://i.postimg.cc/76YW2kss/Whats-App.jpg",
-      "https://i.postimg.cc/vBzcKVD6/image.png",
-      "https://i.postimg.cc/Zq3Cv9Z5/image.png",
-    ],
-    originalPrice: 9797,
-    packPrice: 8699,
-    discount: 11,
-    description: "Profitez d’un grand écran immersif avec une vraie ambiance snack & café à la maison.",
-    badge: "Lifestyle",
-  },
-  {
-    id: "pack4",
-    slug: "pack-lavage-confort",
-    name: "Pack Lavage & Confort",
-    products: [
-      "VENEZIA R1000 Front Load 9kg Steam",
-      "KOLN Electric Water Heater 50L",
-      "KOLN Electric Iron 1200W",
-    ],
-    images: [
-      "https://i.postimg.cc/5yTvPJQY/Whats-App.jpg",
-      "https://i.postimg.cc/sgpMqPN5/image.png",
-      "https://i.postimg.cc/LXZ2WyGT/image.png",
-    ],
-    originalPrice: 5577,
-    packPrice: 4799,
-    discount: 14,
-    description: "Un pack pratique pour le quotidien: lavage, eau chaude et repassage dans une seule offre.",
-    badge: "New",
-  },
-  {
-    id: "pack5",
-    slug: "pack-chef-maison-premium",
-    name: "Pack Chef Maison Premium",
-    products: [
-      "VENEZIA Stand Mixer OU-6118 7L",
-      "KOLN Pro Inox Blender 2L",
-      "VENEZIA Air Fryer Digital 5L",
-    ],
-    images: [
-      "https://i.postimg.cc/wBCCdRK0/image.png",
-      "https://i.postimg.cc/3Jt6hPCf/image.png",
-      "https://i.postimg.cc/LXZ2WyGT/image.png",
-    ],
-    originalPrice: 5097,
-    packPrice: 4299,
-    discount: 16,
-    description: "Un trio puissant pour préparer pâtes, smoothies, sauces et repas croustillants comme un chef.",
-    badge: "Premium",
-  },
-  {
-    id: "pack6",
-    slug: "pack-maison-familiale",
-    name: "Pack Maison Familiale",
-    products: [
-      "VENEZIA Refrigerator 420L Inverter",
-      "VENEZIA X1000 Front Load 10kg",
-      "VENEZIA Wall Mounted Hood 60cm Black",
-    ],
-    images: [
-      "https://i.postimg.cc/WbN23XxZ/image.png",
-      "https://i.postimg.cc/ydMkFwwH/image.png",
-      "https://i.postimg.cc/xTjMrdRP/image.png",
-    ],
-    originalPrice: 11288,
-    packPrice: 9899,
-    discount: 12,
-    description: "Des équipements grands formats et élégants pour une cuisine familiale moderne et performante.",
-    badge: "Family",
-  },
-  {
-    id: "pack7",
-    slug: "pack-air-fry-grill",
-    name: "Pack Air Fry & Grill",
-    products: [
-      "VENEZIA Air Fryer 3L",
-      "VENEZIA Air Fryer Digital 5L",
-      "VENEZIA Electric Barbecue 70cm",
-    ],
-    images: [
-      "https://i.postimg.cc/Zq4J8J74/image.png",
-      "https://i.postimg.cc/kXKW6FPJ/image.png",
-      "https://i.postimg.cc/Y9ZT9nBZ/image.png",
-    ],
-    originalPrice: 3297,
-    packPrice: 2799,
-    discount: 15,
-    description: "Le combo parfait pour cuisiner sainement, croustillant et convivial à la maison.",
-    badge: "Trending",
-  },
-  {
-    id: "pack8",
-    slug: "pack-espresso-master",
-    name: "Pack Espresso Master",
-    products: [
-      "VENEZIA Capsule Coffee Machine",
-      "KOLN Espresso Pro Touch 20 Bar",
-      "KOLN Automatic Espresso Machine Grinder 20 Bar",
-    ],
-    images: [
-      "https://i.postimg.cc/QxvrVnmD/image.png",
-      "https://i.postimg.cc/d3JKP6Cd/image.png",
-      "https://i.postimg.cc/8z3cskVr/image.png",
-    ],
-    originalPrice: 5697,
-    packPrice: 4899,
-    discount: 14,
-    description: "Trois styles de machines à café pour créer votre coin barista maison selon vos envies.",
-    badge: "Limited",
-  },
-  {
-    id: "pack9",
-    slug: "pack-nettoyage-eau-pure",
-    name: "Pack Nettoyage & Eau Pure",
-    products: [
-      "VENEZIA Industrial Vacuum Cleaner 20L",
-      "KOLN Home Vacuum Cleaner 2L",
-      "VENEZIA Water Purifier 5 Stages",
-    ],
-    images: [
-      "https://i.postimg.cc/8PLj8Mqn/image.png",
-      "https://i.postimg.cc/Zq3Cv9Z5/image.png",
-      "https://i.postimg.cc/j2VLtm5t/image.png",
-    ],
-    originalPrice: 3747,
-    packPrice: 3199,
-    discount: 15,
-    description: "Gardez votre maison propre et votre eau plus pure avec ce pack pratique et utile au quotidien.",
-    badge: "Smart Choice",
-  },
-  {
-    id: "pack10",
-    slug: "pack-tv-tech-vision",
-    name: "Pack TV & Tech Vision",
-    products: [
-      'VENEZIA Google TV 75" 4K QLED',
-      'VENEZIA Google TV 4K QLED 55"',
-      'KÖLN Android 14 Smart TV 32"',
-    ],
-    images: [
-      "https://i.postimg.cc/ydMkFwwH/image.png",
-      "https://i.postimg.cc/ZR6HmHHd/image.png",
-      "https://i.postimg.cc/QCtHRcZD/image.png",
-    ],
-    originalPrice: 22297,
-    packPrice: 19499,
-    discount: 13,
-    description: "Un pack orienté divertissement avec trois écrans complémentaires pour le salon, la chambre ou le bureau.",
-    badge: "VIP",
-  },
-];
+
+]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function enrichProduct(product: Product): Product {

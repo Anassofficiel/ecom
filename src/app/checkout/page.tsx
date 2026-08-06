@@ -4,6 +4,10 @@ import * as React from "react"
 import Link from "next/link"
 import { useStore } from "@/lib/store"
 import {
+  savePendingPurchase,
+  trackInitiateCheckout,
+} from "@/lib/meta-pixel"
+import {
   ShieldCheck,
   Truck,
   CreditCard,
@@ -126,6 +130,7 @@ export default function CheckoutPage() {
   const progressIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(
     null
   )
+  const initiateCheckoutTrackedRef = React.useRef(false)
 
   const [countryOpen, setCountryOpen] = React.useState(false)
   const [selectedCountry, setSelectedCountry] = React.useState<Country>(
@@ -238,6 +243,81 @@ export default function CheckoutPage() {
 
   const shipping = subtotal > 1000 ? 0 : 50
   const total = subtotal + shipping
+
+  const metaContents = React.useMemo(
+    () =>
+      cart.map((item) => ({
+        id: String(item.productId),
+        quantity: item.quantity,
+        item_price: item.variant?.price ?? item.product.price,
+      })),
+    [cart]
+  )
+
+  const metaContentIds = React.useMemo(
+    () => metaContents.map((item) => item.id),
+    [metaContents]
+  )
+
+  const totalItems = React.useMemo(
+    () => cart.reduce((sum, item) => sum + item.quantity, 0),
+    [cart]
+  )
+
+  // Envoie InitiateCheckout une seule fois pendant cette visite.
+  // Le petit retry laisse le temps au script Meta Pixel de se charger.
+  React.useEffect(() => {
+    if (!cart.length || initiateCheckoutTrackedRef.current) {
+      return
+    }
+
+    let attempts = 0
+    let retryTimeoutId: number | null = null
+    let cancelled = false
+
+    function sendEvent() {
+      if (cancelled || initiateCheckoutTrackedRef.current) {
+        return
+      }
+
+      attempts += 1
+
+      const sent = trackInitiateCheckout({
+        value: total,
+        currency: "MAD",
+        contentIds: metaContentIds,
+        contents: metaContents,
+        numItems: totalItems,
+      })
+
+      if (sent) {
+        initiateCheckoutTrackedRef.current = true
+        return
+      }
+
+      if (attempts < 10) {
+        retryTimeoutId = window.setTimeout(() => {
+          sendEvent()
+        }, 500)
+      }
+    }
+
+    sendEvent()
+
+    return () => {
+      cancelled = true
+
+      if (retryTimeoutId !== null) {
+        window.clearTimeout(retryTimeoutId)
+      }
+    }
+  }, [
+    cart.length,
+    metaContentIds,
+    metaContents,
+    total,
+    totalItems,
+  ])
 
   function validate(f: CheckoutForm) {
     const e: Partial<Record<FormField, string>> = {}
@@ -416,6 +496,17 @@ export default function CheckoutPage() {
         "telegram_order_data",
         JSON.stringify(telegramOrderData)
       )
+
+      // On sauvegarde les données du Purchase uniquement après que
+      // l'API a réellement créé la commande et retourné un orderId.
+      savePendingPurchase({
+        orderId: order.id,
+        value: total,
+        currency: "MAD",
+        contentIds: metaContentIds,
+        contents: metaContents,
+        numItems: totalItems,
+      })
 
       orderCreated = true
       finishProgress()

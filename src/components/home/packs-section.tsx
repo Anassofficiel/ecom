@@ -1,506 +1,731 @@
 "use client"
-//عرض الباكات.
-import { useRouter } from "next/navigation"
+
+import Image from "next/image"
+import {
+  Check,
+  MessageCircle,
+  ShieldCheck,
+  ShoppingCart,
+  Star,
+  Truck,
+} from "lucide-react"
+
 import { packs, type Pack, type Product } from "@/lib/data"
 import { useStore } from "@/lib/store"
 
-
 const WHATSAPP_NUMBER = "212658416769"
-const BASE_URL = "https://electromostafa55.ma"
 
-const badgeColors: Record<string, { bg: string; text: string }> = {
-  "Best Seller": { bg: "linear-gradient(135deg,#1d4ed8,#3b82f6)", text: "#fff" },
-  "Hot Deal": { bg: "linear-gradient(135deg,#ea580c,#f97316)", text: "#fff" },
-  "New": { bg: "linear-gradient(135deg,#059669,#10b981)", text: "#fff" },
-  "Premium": { bg: "linear-gradient(135deg,#7c3aed,#a78bfa)", text: "#fff" },
-  "Trending": { bg: "linear-gradient(135deg,#db2777,#f472b6)", text: "#fff" },
-  "Limited": { bg: "linear-gradient(135deg,#be123c,#fb7185)", text: "#fff" },
-  "VIP": { bg: "linear-gradient(135deg,#b45309,#fcd34d)", text: "#1a1a1a" },
-  "Lifestyle": { bg: "linear-gradient(135deg,#dc2626,#f87171)", text: "#fff" },
-  "Family": { bg: "linear-gradient(135deg,#4d7c0f,#84cc16)", text: "#fff" },
-  "Smart Choice": { bg: "linear-gradient(135deg,#0369a1,#38bdf8)", text: "#fff" },
+/*
+ * Formatter ثابت باش السيرفر والمتصفح يعطيو نفس النتيجة.
+ * كيتجنب Hydration Error ديال 6,999 / 6 999.
+ */
+function formatPrice(value: number) {
+  return Math.round(value)
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
 }
 
-const PACK_PRODUCT_SPECS: Record<string, Array<Record<string, string>>> = {
-  pack1: [
-    { Type: "Réfrigérateur bottom freezer", Capacité: "200 L", Refroidissement: "Multi Air Flow" },
-    { Type: "Four électrique", Capacité: "45 L", Puissance: "2000 W" },
-    { Type: "TV 4K QLED", Taille: '55"', Système: "Google TV" },
-  ],
-  pack2: [
-    { Type: "Machine Expresso", Pression: "15 bar", Réservoir: "1.5 L" },
-    { Type: "Stand Mixer", Capacité: "5.5 L", Puissance: "1000 W" },
-    { Type: "Panini Grill", Puissance: "2200 W", Surface: "Double non-stick" },
-  ],
-  pack3: [
-    { Type: "Google TV 4K QLED", Taille: '75"', WiFi: "WiFi 5" },
-    { Type: "Machine Expresso", Pression: "15 bar", Réservoir: "1.5 L" },
-    { Type: "Panini Grill", Puissance: "2000 W", Usage: "Sandwich / Grill" },
-  ],
-  pack4: [
-    { Type: "Lave-linge frontal", Capacité: "9 kg", RPM: "1400" },
-    { Type: "Chauffe-eau électrique", Capacité: "50 L", Puissance: "2000 W" },
-    { Type: "Fer électrique", Puissance: "1200 W", Semelle: "Anti-adhésive" },
-  ],
-  pack5: [
-    { Type: "Stand Mixer", Capacité: "7 L", Puissance: "1000 W" },
-    { Type: "Blender Inox", Capacité: "2 L", Puissance: "700 W" },
-    { Type: "Air Fryer Digital", Capacité: "5 L", Programmes: "7" },
-  ],
-  pack6: [
-    { Type: "Réfrigérateur top freezer", Capacité: "420 L", Technologie: "Inverter" },
-    { Type: "Lave-linge frontal", Capacité: "10 kg", Technologie: "Smart Digital Motor" },
-    { Type: "Hotte murale", Débit: "650 m3/h", Éclairage: "LED" },
-  ],
-  pack7: [
-    { Type: "Air Fryer", Capacité: "3 L", Puissance: "1500 W" },
-    { Type: "Air Fryer Digital", Capacité: "5 L", Puissance: "1700 W" },
-    { Type: "Barbecue électrique", Longueur: "70 cm", Puissance: "2000 W" },
-  ],
-  pack8: [
-    { Type: "Machine capsules", Réservoir: "0.8 L", Fonction: "Automatique" },
-    { Type: "Expresso Pro", Pression: "20 bar", Programmes: "20" },
-    { Type: "Expresso auto", Pression: "20 bar", Moulin: "Intégré" },
-  ],
-  pack9: [
-    { Type: "Aspirateur industriel", Capacité: "20 L", Puissance: "1600 W" },
-    { Type: "Aspirateur maison", Capacité: "2 L", Filtre: "HEPA" },
-    { Type: "Purificateur d'eau", Système: "5 étapes", Débit: "75 GPD" },
-  ],
-  pack10: [
-    { Type: "Google TV 4K QLED", Taille: '75"', Résolution: "4K" },
-    { Type: "TV 4K QLED", Taille: '55"', Résolution: "4K Ultra HD" },
-    { Type: "Smart TV Android", Taille: '32"', Système: "Android 14" },
-  ],
-}
+/*
+ * تحويل Pack إلى Product باش يتزاد للسلة كعنصر واحد.
+ */
+function packToProduct(pack: Pack): Product {
+  return {
+    id: pack.id,
+    slug: pack.slug ?? pack.id,
+    name: pack.name,
+    category: "Packs",
 
-// ── Checkout button ───────────────────────────────────────────────────────────
-function CheckoutButton({ pack }: { pack: Pack }) {
-  const router = useRouter()
-  const addToCart = useStore((state) => state.addToCart)
+    price: pack.packPrice,
+    originalPrice: pack.originalPrice,
+    discount: pack.discount,
 
-  const handleCheckout = () => {
-    const packAsProduct: Product = {
-      id: pack.id,
-      slug: pack.slug ?? pack.id,
-      name: pack.name,
-      category: "Packs",
-      price: pack.packPrice,
-      originalPrice: pack.originalPrice,
-      discount: pack.discount,
-      rating: 4.8,
-      reviews: 96,
-      image: pack.images?.[0] ?? "",
-      hoverImage: pack.images?.[1] ?? pack.images?.[0] ?? "",
-      images: pack.images,
-      stockStatus: "in-stock",
-      inStock: true,
-      description: pack.description,
-      specs: {
-        Type: "Pack électroménager",
-        Produits: pack.products.join(" + "),
-        Économie: `${(pack.originalPrice - pack.packPrice).toLocaleString("fr-FR")} DH`,
-      },
-      isPromotion: true,
-      isActive: true,
-    }
+    rating: 5,
+    reviews: 245,
 
-    addToCart(packAsProduct, undefined, 1)
-    router.push("/checkout")
+    image: pack.heroImage ?? pack.images[0] ?? "",
+    hoverImage:
+      pack.images[0] ??
+      pack.heroImage ??
+      "",
+
+    // صور المنتجات المنفصلة فقط، بلا صورة Hero.
+    images: pack.images,
+
+    stockStatus: "in-stock",
+    inStock: true,
+
+    description: pack.description,
+
+    specs: {
+      Type: "Pack électroménager",
+      Produits: pack.products.join(" + "),
+      Garantie: "2 ans",
+      Livraison: "Gratuite",
+      Économie: `${formatPrice(
+        pack.originalPrice - pack.packPrice
+      )} DH`,
+    },
+
+    isPromotion: true,
+    isActive: true,
   }
+}
+
+/*
+ * صورة الباك الرئيسية + الصور الصغيرة.
+ */
+function PackGallery({ pack }: { pack: Pack }) {
+  const visibleImages = pack.images.slice(0, 4)
+  const remainingProducts = Math.max(pack.images.length - 4, 0)
 
   return (
-    <button
-      type="button"
-      onClick={handleCheckout}
-      className="btn-checkout"
-    >
-      Caisse
-    </button>
+    <div className="bg-white">
+      {/* HERO IMAGE */}
+      <div
+        className="
+          relative
+          h-[370px]
+          overflow-hidden
+          bg-[radial-gradient(circle_at_center,rgba(250,204,21,0.16),transparent_58%),linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)]
+          sm:h-[430px]
+          md:h-[390px]
+          xl:h-[380px]
+        "
+      >
+        {/* Golden corner */}
+        <div
+          className="
+            pointer-events-none
+            absolute
+            left-5
+            top-5
+            z-10
+            h-20
+            w-20
+            rounded-tl-[28px]
+            border-l-[3px]
+            border-t-[3px]
+            border-amber-400
+          "
+        />
+
+        {/* Red corner */}
+        <div
+          className="
+            pointer-events-none
+            absolute
+            bottom-5
+            right-5
+            z-10
+            h-20
+            w-20
+            rounded-br-[28px]
+            border-b-[3px]
+            border-r-[3px]
+            border-red-500
+          "
+        />
+
+        {/* Decorative glow */}
+        <div
+          className="
+            pointer-events-none
+            absolute
+            left-1/2
+            top-10
+            h-40
+            w-40
+            -translate-x-1/2
+            rounded-full
+            bg-amber-300/20
+            blur-3xl
+          "
+        />
+
+        {/* Shadow below product */}
+        <div
+          className="
+            pointer-events-none
+            absolute
+            bottom-7
+            left-12
+            right-12
+            h-8
+            rounded-full
+            bg-black/10
+            blur-2xl
+          "
+        />
+
+        <Image
+          src={pack.heroImage ?? pack.images[0]}
+          alt={pack.name}
+          fill
+          sizes="
+            (max-width: 768px) 100vw,
+            (max-width: 1280px) 50vw,
+            33vw
+          "
+          className="
+            object-contain
+            p-4
+            transition-transform
+            duration-700
+            ease-out
+            group-hover:scale-[1.035]
+            sm:p-6
+          "
+          priority={pack.id === "pack1"}
+        />
+
+        <div
+          className="
+            absolute
+            bottom-4
+            left-1/2
+            z-20
+            -translate-x-1/2
+            whitespace-nowrap
+            rounded-full
+            border
+            border-white/80
+            bg-white/90
+            px-4
+            py-2
+            text-[10px]
+            font-black
+            uppercase
+            tracking-[0.16em]
+            text-gray-700
+            shadow-lg
+            backdrop-blur
+          "
+        >
+          Pack complet
+        </div>
+      </div>
+
+      {/* SMALL PRODUCT IMAGES */}
+      <div
+        className="
+          border-y
+          border-gray-100
+          bg-gradient-to-b
+          from-white
+          to-gray-50
+          px-3
+          py-4
+          sm:px-4
+        "
+      >
+        <div className="grid grid-cols-4 gap-2 sm:gap-3">
+          {visibleImages.map((image, index) => (
+            <div
+              key={`${pack.id}-product-${index}`}
+              className="group/product min-w-0"
+            >
+              <div
+                className="
+                  relative
+                  aspect-square
+                  overflow-hidden
+                  rounded-2xl
+                  border
+                  border-gray-200
+                  bg-white
+                  shadow-sm
+                  transition
+                  duration-300
+                  group-hover/product:-translate-y-1
+                  group-hover/product:border-red-200
+                  group-hover/product:shadow-md
+                "
+              >
+                <Image
+                  src={image}
+                  alt={
+                    pack.products[index] ??
+                    `Produit ${index + 1}`
+                  }
+                  fill
+                  sizes="120px"
+                  className="object-contain p-2 sm:p-3"
+                />
+
+                {index === 3 && remainingProducts > 0 && (
+                  <div
+                    className="
+                      absolute
+                      inset-0
+                      flex
+                      items-center
+                      justify-center
+                      bg-gray-950/70
+                      text-center
+                      text-xs
+                      font-black
+                      text-white
+                      backdrop-blur-[2px]
+                    "
+                  >
+                    +{remainingProducts}
+                    <br />
+                    produits
+                  </div>
+                )}
+              </div>
+
+              <p
+                className="
+                  mt-2
+                  line-clamp-2
+                  min-h-8
+                  text-center
+                  text-[9px]
+                  font-extrabold
+                  leading-4
+                  text-gray-600
+                  sm:text-[10px]
+                "
+              >
+                {pack.products[index] ??
+                  `Produit ${index + 1}`}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   )
 }
 
-// ── Main section ──────────────────────────────────────────────────────────────
-export function PacksSection() {
-  const packsJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    name: "Packs exclusifs Electro Mostafa",
-    itemListElement: packs.map((pack, index) => ({
-      "@type": "ListItem",
-      position: index + 1,
-      item: {
-        "@type": "Offer",
-        name: pack.name,
-        description: pack.description,
-        price: pack.packPrice,
-        priceCurrency: "MAD",
-        url: `${BASE_URL}/#packs`,
-      },
-    })),
+/*
+ * Card ديال Pack.
+ */
+function PackCard({ pack }: { pack: Pack }) {
+  const addToCart = useStore((state) => state.addToCart)
+  const setCartOpen = useStore((state) => state.setCartOpen)
+
+  const savings = Math.max(
+    pack.originalPrice - pack.packPrice,
+    0
+  )
+
+  const handleAddToCart = () => {
+    addToCart(packToProduct(pack), undefined, 1)
+    setCartOpen(true)
   }
 
+  const whatsappText = encodeURIComponent(
+    `Bonjour, je suis intéressé par le pack "${pack.name}" au prix de ${formatPrice(
+      pack.packPrice
+    )} DH.`
+  )
+
   return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700;900&display=swap');
+    <article
+      className="
+        group
+        relative
+        overflow-hidden
+        rounded-[30px]
+        border
+        border-amber-300/80
+        bg-white
+        shadow-[0_18px_60px_rgba(15,23,42,0.10)]
+        transition
+        duration-500
+        hover:-translate-y-2
+        hover:border-red-300
+        hover:shadow-[0_28px_80px_rgba(15,23,42,0.16)]
+      "
+    >
+      {/* Inner shine */}
+      <div
+        className="
+          pointer-events-none
+          absolute
+          inset-0
+          z-30
+          rounded-[30px]
+          ring-1
+          ring-inset
+          ring-white/70
+        "
+      />
 
-        #packs { font-family: 'Barlow', sans-serif; }
+      {/* BADGE */}
+      <div
+        className="
+          absolute
+          left-4
+          top-4
+          z-40
+          rounded-full
+          bg-gradient-to-r
+          from-gray-950
+          to-gray-700
+          px-4
+          py-2
+          text-[10px]
+          font-black
+          uppercase
+          tracking-[0.14em]
+          text-white
+          shadow-xl
+        "
+      >
+        {pack.badge ?? "Pack exclusif"}
+      </div>
 
-        .packs-bg {
-          background:
-            radial-gradient(ellipse at 8% 12%, rgba(251,191,36,0.07) 0%, transparent 45%),
-            radial-gradient(ellipse at 92% 88%, rgba(239,68,68,0.06) 0%, transparent 45%),
-            #f9f9f9;
-        }
+      {/* DISCOUNT */}
+      <div
+        className="
+          absolute
+          right-4
+          top-4
+          z-40
+          flex
+          h-16
+          w-16
+          items-center
+          justify-center
+          rounded-full
+          bg-gradient-to-br
+          from-red-500
+          via-red-600
+          to-rose-800
+          text-sm
+          font-black
+          text-white
+          shadow-[0_10px_28px_rgba(220,38,38,0.38)]
+          ring-4
+          ring-white/80
+        "
+      >
+        -{pack.discount}%
+      </div>
 
-        .packs-title {
-          font-family: 'Bebas Neue', sans-serif;
-          letter-spacing: 0.04em;
-          line-height: 1;
-        }
-        .packs-title-accent {
-          position: relative;
-          display: inline-block;
-        }
-        .packs-title-accent::after {
-          content: '';
-          position: absolute;
-          bottom: -4px;
-          left: 0; right: 0;
-          height: 4px;
-          background: linear-gradient(90deg, #f59e0b, #ef4444, #f59e0b);
-          background-size: 200% 100%;
-          border-radius: 2px;
-          animation: shimLine 3s linear infinite;
-        }
-        @keyframes shimLine {
-          0%   { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
+      <PackGallery pack={pack} />
 
-        .packs-banner {
-          background: linear-gradient(125deg, #831843 0%, #be185d 30%, #f472b6 60%, #fda4af 85%, #fecdd3 100%);
-          background-size: 250% 250%;
-          animation: bannerShift 7s ease infinite;
-        }
-        @keyframes bannerShift {
-          0%   { background-position: 0% 50%; }
-          50%  { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        .banner-title { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+      {/* CONTENT */}
+      <div className="p-5 sm:p-6">
+        <h3
+          className="
+            text-2xl
+            font-black
+            uppercase
+            leading-tight
+            tracking-tight
+            text-gray-950
+          "
+        >
+          {pack.name}
+        </h3>
 
-        .pack-card {
-          position: relative;
-          overflow: hidden;
-          border-radius: 20px;
-          background: #fff;
-          transition: transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.32s ease;
-        }
-        .pack-card::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          border-radius: 20px;
-          padding: 2px;
-          background: linear-gradient(135deg, #f59e0b, #fbbf24, #fcd34d, #f59e0b);
-          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-          -webkit-mask-composite: xor;
-          mask-composite: exclude;
-          transition: background 0.3s ease;
-          z-index: 1;
-          pointer-events: none;
-        }
-        .pack-card:hover { transform: translateY(-8px); box-shadow: 0 28px 70px rgba(0,0,0,0.13); }
-        .pack-card:hover::before { background: linear-gradient(135deg, #ef4444, #f97316, #ef4444); }
+        <p
+          className="
+            mt-2
+            line-clamp-2
+            text-sm
+            leading-6
+            text-gray-500
+          "
+        >
+          {pack.description}
+        </p>
 
-        .pack-badge {
-          position: absolute; left: 13px; top: 13px; z-index: 20;
-          border-radius: 999px; padding: 4px 11px;
-          font-size: 10px; font-family: 'Barlow', sans-serif;
-          font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
-          box-shadow: 0 3px 10px rgba(0,0,0,0.25);
-        }
-
-        .pack-discount {
-          position: absolute; right: 13px; top: 13px; z-index: 20;
-          width: 50px; height: 50px; border-radius: 50%;
-          background: linear-gradient(135deg, #dc2626, #9f1239);
-          color: #fff; display: flex; align-items: center; justify-content: center;
-          font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 0.02em;
-          box-shadow: 0 4px 16px rgba(220,38,38,0.5);
-          animation: discPulse 3s ease infinite;
-        }
-        @keyframes discPulse {
-          0%,100% { box-shadow: 0 4px 16px rgba(220,38,38,0.5), 0 0 0 0 rgba(220,38,38,0.3); }
-          55%      { box-shadow: 0 4px 16px rgba(220,38,38,0.5), 0 0 0 10px rgba(220,38,38,0); }
-        }
-
- .pack-imgs {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  background: linear-gradient(180deg, #ffffff 0%, #f8f8f8 100%);
-  border-bottom: 1px solid rgba(0,0,0,0.06);
-}
-
-.pack-img-cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px 12px 20px;
-  border-right: 1px solid rgba(0,0,0,0.05);
-  background: #ffffff;
-}
-
-.pack-img-cell:last-child {
-  border-right: none;
-}
-.pack-img-cell img {
-  width: 100%;
-  height: clamp(150px, 20vw, 220px);
-  object-fit: contain;
-
-  /* 🔥 blend */
-  mix-blend-mode: multiply;
-
-  /* 🔥 glow */
-  filter:
-    drop-shadow(0 10px 25px rgba(0,0,0,0.15))
-    brightness(1.02);
-
-  transition:
-    transform 0.5s cubic-bezier(0.34, 1.6, 0.64, 1),
-    filter 0.4s ease;
-}
-.pack-img-cell::after {
-  content: "";
-  position: absolute;
-  bottom: 10px;
-  width: 60%;
-  height: 10px;
-  background: radial-gradient(circle, rgba(0,0,0,0.15), transparent 70%);
-  filter: blur(8px);
-  opacity: 0.4;
-}
-.pack-card:hover .pack-img-cell img {
-  transform: scale(1.12) translateY(-6px);
-  filter:
-    drop-shadow(0 18px 40px rgba(0,0,0,0.25))
-    brightness(1.05);
-}
-        .pack-card:hover .pack-img-cell img {
-          transform: scale(1.1) translateY(-4px);
-          filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
-        }
-
-        .pack-specs-strip { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid rgba(0,0,0,0.06); }
-        .pack-spec-col {
-          display: flex; flex-direction: column; gap: 4px;
-          padding: 8px 8px 10px;
-          border-right: 1px solid rgba(0,0,0,0.06); background: #fafafa;
-        }
-        .pack-spec-col:last-child { border-right: none; }
-        .spec-pill {
-          font-size: 9px;
-          padding: 2px 5px;
-          opacity: 0.8;
-          display: inline-flex; align-items: center; gap: 2px;
-          background: #fff; border: 1px solid #e9e9e9; border-radius: 6px;
-          padding: 2px 6px; font-size: 9.5px; color: #4b5563;
-          font-family: 'Barlow', sans-serif; font-weight: 500; line-height: 1.4;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        .spec-pill strong { color: #111; font-weight: 700; }
-
-        .pack-body { padding: 18px 20px 20px; }
-
-        .pack-name {
-          font-family: 'Bebas Neue', sans-serif;
-          font-size: clamp(20px, 2.8vw, 26px);
-          letter-spacing: 0.05em; color: #111827; line-height: 1.1; margin-bottom: 12px;
-        }
-
-        .pack-price-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; margin-bottom: 16px; }
-        .pack-price-new {
-          font-family: 'Bebas Neue', sans-serif;
-          font-size: clamp(24px, 3.5vw, 30px); color: #dc2626; letter-spacing: 0.03em; line-height: 1;
-        }
-        .pack-price-old {
-          font-size: 13px; font-weight: 500; color: #9ca3af;
-          text-decoration: line-through; margin-bottom: 1px; font-family: 'Barlow', sans-serif;
-        }
-        .pack-savings {
-          display: inline-flex; align-items: center; gap: 3px;
-          background: linear-gradient(135deg, #dcfce7, #bbf7d0); border: 1px solid #86efac;
-          color: #15803d; font-size: 10.5px; font-weight: 700; font-family: 'Barlow', sans-serif;
-          border-radius: 999px; padding: 2px 9px; margin-bottom: 1px;
-        }
-
-        .pack-btns { display: flex; gap: 10px; }
-
-        .btn-wa {
-          display: flex; flex: 1; align-items: center; justify-content: center; gap: 6px;
-          border-radius: 12px; padding: 12px 8px;
-          font-family: 'Barlow', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.02em;
-          color: #fff; background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
-          box-shadow: 0 4px 14px rgba(22,163,74,0.3);
-          text-decoration: none; border: none; cursor: pointer;
-          transition: transform 0.22s cubic-bezier(0.34,1.4,0.64,1), box-shadow 0.22s ease, background 0.22s ease;
-        }
-        .btn-wa:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(22,163,74,0.42); background: linear-gradient(135deg, #15803d 0%, #16a34a 100%); }
-        .btn-wa:active { transform: translateY(0); }
-
-        .btn-checkout {
-          display: flex; flex: 1; align-items: center; justify-content: center; gap: 6px;
-          border-radius: 12px; padding: 12px 8px;
-          font-family: 'Barlow', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.02em;
-          color: #fff; background: linear-gradient(135deg, #dc2626 0%, #9f1239 100%);
-          box-shadow: 0 4px 14px rgba(220,38,38,0.3);
-          border: none; cursor: pointer;
-          transition: transform 0.22s cubic-bezier(0.34,1.4,0.64,1), box-shadow 0.22s ease, background 0.22s ease;
-        }
-        .btn-checkout:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(220,38,38,0.42); background: linear-gradient(135deg, #b91c1c 0%, #881337 100%); }
-        .btn-checkout:active { transform: translateY(0); }
-
-        @keyframes cardReveal {
-          from { opacity: 0; transform: translateY(30px) scale(0.96); }
-          to   { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .pack-card-anim { animation: cardReveal 0.48s cubic-bezier(0.34,1.2,0.64,1) both; }
-      `}</style>
-
-      <section id="packs" className="packs-bg py-14" aria-labelledby="packs-title">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(packsJsonLd) }}
-        />
-
-        <div className="container mx-auto px-4">
-
-          {/* Header */}
-          <div className="mb-10 text-center">
-            <div className="mb-4">
-              <span
-                className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-widest shadow-md"
-                style={{ background: "linear-gradient(135deg,#f59e0b,#fbbf24)", color: "#1a1a1a", fontFamily: "'Barlow', sans-serif", letterSpacing: "0.1em" }}
-              >
-                🎁 Offres Groupées
-              </span>
-            </div>
-            <h2 id="packs-title" className="packs-title mb-3" style={{ fontSize: "clamp(32px, 5vw, 56px)", color: "#111827" }}>
-              <span className="packs-title-accent">NOS PACKS</span> EXCLUSIFS 🎁
-            </h2>
-            <p className="mx-auto max-w-xl leading-relaxed text-gray-500" style={{ fontSize: "clamp(13px, 1.6vw, 15px)", fontFamily: "'Barlow', sans-serif" }}>
-              Achetez en pack et économisez davantage sur une sélection d&apos;électroménager,
-              TV, cuisine et petit équipement{" "}
-              <strong className="font-semibold text-gray-700">Electro Mostafa</strong>.
-            </p>
+        {/* RATING */}
+        <div className="mt-4 flex items-center gap-2">
+          <div
+            className="flex text-amber-400"
+            aria-label="5 étoiles"
+          >
+            {Array.from({ length: 5 }).map((_, index) => (
+              <Star
+                key={`${pack.id}-star-${index}`}
+                size={16}
+                fill="currentColor"
+                strokeWidth={1.8}
+              />
+            ))}
           </div>
 
-          {/* Banner */}
-          <div className="packs-banner relative mb-12 overflow-hidden rounded-3xl shadow-xl" style={{ minHeight: "clamp(160px, 22vw, 220px)" }}>
-            <div className="absolute rounded-full" style={{ width: "clamp(120px,20vw,280px)", height: "clamp(120px,20vw,280px)", top: "-30%", left: "-5%", background: "radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%)" }} />
-            <div className="absolute inset-0 flex items-center justify-center p-4">
-              <img src="https://i.postimg.cc/7L37XppJ/image.png" alt="Bannière des packs exclusifs Electro Mostafa" className="h-full w-full object-contain" style={{ opacity: 0.88, filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.2))" }} loading="lazy" />
-            </div>
-            <div className="absolute inset-0" style={{ background: "linear-gradient(100deg, rgba(131,24,67,0.75) 0%, rgba(190,24,93,0.5) 45%, transparent 75%)" }} />
-            <div className="relative z-10 flex h-full items-center px-6 py-8 sm:px-10">
-              <div className="max-w-lg text-white">
-                <h3 className="banner-title mb-2 drop-shadow-md" style={{ fontSize: "clamp(20px, 3.5vw, 36px)" }}>
-                  🎁 ÉCONOMISEZ PLUS EN ACHETANT PLUS
-                </h3>
-                <p className="text-white/85" style={{ fontSize: "clamp(12px, 1.5vw, 15px)", fontFamily: "'Barlow', sans-serif" }}>
-                  Nos packs combinent les meilleurs appareils à des prix imbattables.
-                </p>
-              </div>
-            </div>
-            <div className="absolute inset-x-0 bottom-0 h-px" style={{ background: "linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent)" }} />
-          </div>
-
-          {/* Cards */}
-          <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
-            {packs.map((pack, cardIdx) => {
-              const specs = PACK_PRODUCT_SPECS[pack.id] ?? []
-              const badge = pack.badge ? (badgeColors[pack.badge] ?? null) : null
-              const savings = pack.originalPrice - pack.packPrice
-
-              return (
-                <article key={pack.id} className="pack-card pack-card-anim" style={{ animationDelay: `${cardIdx * 55}ms` }}>
-
-                  {pack.badge && badge && (
-                    <div className="pack-badge" style={{ background: badge.bg, color: badge.text }}>
-                      {pack.badge}
-                    </div>
-                  )}
-
-                  <div className="pack-discount">-{pack.discount}%</div>
-
-                  {/* Images */}
-                  <div className="pack-imgs">
-                    {pack.images.slice(0, 3).map((img, i) => (
-                      <div key={i} className="pack-img-cell">
-                        <img src={img} alt={pack.products?.[i] ?? `${pack.name} produit ${i + 1}`} loading="lazy" />
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Specs */}
-                  <div className="pack-specs-strip">
-                    {pack.images.slice(0, 3).map((_, i) => {
-                      const productSpecs = specs[i] ?? {}
-                      return (
-                        <div key={i} className="pack-spec-col">
-                          {Object.entries(productSpecs).slice(0, 2).map(([key, val]) => (
-                            <span key={key} className="spec-pill">
-                              <strong>{key}:</strong> {val}
-                            </span>
-                          ))}
-                        </div>
-                      )
-                    })}
-                  </div>
-
-                  {/* Body */}
-                  <div className="pack-body">
-                    <h3 className="pack-name">{pack.name}</h3>
-
-                    <div className="pack-price-row">
-                      <span className="pack-price-new">{pack.packPrice.toLocaleString("fr-FR")} DH</span>
-                      <span className="pack-price-old">{pack.originalPrice.toLocaleString("fr-FR")} DH</span>
-                      {savings > 0 && (
-                        <span className="pack-savings">💰 -{savings.toLocaleString("fr-FR")} DH</span>
-                      )}
-                    </div>
-
-                    <div className="pack-btns">
-                      {/* WhatsApp */}
-                      <a
-                        href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-                          `Bonjour, je suis intéressé par le pack: ${pack.name} (${pack.packPrice.toLocaleString("fr-FR")} DH)`
-                        )}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`Commander le pack ${pack.name} via WhatsApp`}
-                        className="btn-wa"
-                      >
-                        <svg className="flex-shrink-0" width="15" height="15" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-                        </svg>
-                        WhatsApp
-                      </a>
-
-                      {/* Checkout */}
-                      <CheckoutButton pack={pack} />
-                    </div>
-                  </div>
-                </article>
-              )
-            })}
-          </div>
-
+          <span className="text-xs font-bold text-gray-500">
+            (245 avis)
+          </span>
         </div>
-      </section>
-    </>
+
+        {/* ADVANTAGES */}
+        <div className="mt-5 grid grid-cols-3 gap-2">
+          <div
+            className="
+              flex
+              min-h-[82px]
+              flex-col
+              items-center
+              justify-center
+              rounded-2xl
+              border
+              border-gray-100
+              bg-gray-50
+              px-2
+              py-3
+              text-center
+              shadow-sm
+            "
+          >
+            <Check className="mb-1 h-5 w-5 text-emerald-600" />
+
+            <span className="text-[11px] font-black leading-4 text-gray-800">
+              {pack.products.length} équipements
+            </span>
+          </div>
+
+          <div
+            className="
+              flex
+              min-h-[82px]
+              flex-col
+              items-center
+              justify-center
+              rounded-2xl
+              border
+              border-gray-100
+              bg-gray-50
+              px-2
+              py-3
+              text-center
+              shadow-sm
+            "
+          >
+            <ShieldCheck className="mb-1 h-5 w-5 text-emerald-600" />
+
+            <span className="text-[11px] font-black leading-4 text-gray-800">
+              Garantie 2 ans
+            </span>
+          </div>
+
+          <div
+            className="
+              flex
+              min-h-[82px]
+              flex-col
+              items-center
+              justify-center
+              rounded-2xl
+              border
+              border-gray-100
+              bg-gray-50
+              px-2
+              py-3
+              text-center
+              shadow-sm
+            "
+          >
+            <Truck className="mb-1 h-5 w-5 text-emerald-600" />
+
+            <span className="text-[11px] font-black leading-4 text-gray-800">
+              Livraison gratuite
+            </span>
+          </div>
+        </div>
+
+        {/* PRICE */}
+        <div className="mt-6 flex flex-wrap items-end gap-x-3 gap-y-2">
+          <span
+            className="
+              text-3xl
+              font-black
+              tracking-tight
+              text-red-600
+              sm:text-[34px]
+            "
+          >
+            {formatPrice(pack.packPrice)} DH
+          </span>
+
+          <span
+            className="
+              pb-1
+              text-sm
+              font-bold
+              text-gray-400
+              line-through
+            "
+          >
+            {formatPrice(pack.originalPrice)} DH
+          </span>
+
+          {savings > 0 && (
+            <span
+              className="
+                mb-0.5
+                rounded-full
+                border
+                border-emerald-200
+                bg-emerald-50
+                px-3
+                py-1
+                text-xs
+                font-black
+                text-emerald-700
+              "
+            >
+              -{formatPrice(savings)} DH
+            </span>
+          )}
+        </div>
+
+        {/* BUTTONS */}
+        <div className="mt-6 grid grid-cols-2 gap-3">
+          <a
+            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappText}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Commander ${pack.name} sur WhatsApp`}
+            className="
+              inline-flex
+              min-h-[54px]
+              items-center
+              justify-center
+              gap-2
+              rounded-2xl
+              bg-gradient-to-r
+              from-green-600
+              to-emerald-500
+              px-3
+              py-3.5
+              text-sm
+              font-black
+              text-white
+              shadow-lg
+              shadow-green-600/25
+              transition
+              duration-300
+              hover:-translate-y-1
+              hover:shadow-xl
+              hover:shadow-green-600/35
+              active:translate-y-0
+            "
+          >
+            <MessageCircle className="h-5 w-5" />
+            WhatsApp
+          </a>
+
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            aria-label={`Ajouter ${pack.name} au panier`}
+            className="
+              inline-flex
+              min-h-[54px]
+              items-center
+              justify-center
+              gap-2
+              rounded-2xl
+              bg-gradient-to-r
+              from-red-600
+              to-rose-700
+              px-3
+              py-3.5
+              text-sm
+              font-black
+              text-white
+              shadow-lg
+              shadow-red-600/25
+              transition
+              duration-300
+              hover:-translate-y-1
+              hover:shadow-xl
+              hover:shadow-red-600/35
+              active:translate-y-0
+            "
+          >
+            <ShoppingCart className="h-5 w-5" />
+            Ajouter
+          </button>
+        </div>
+      </div>
+    </article>
+  )
+}
+
+export function PacksSection() {
+  return (
+    <section
+      id="packs"
+      className="
+        w-full
+        overflow-hidden
+        bg-[radial-gradient(circle_at_top_left,rgba(245,158,11,0.08),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(239,68,68,0.07),transparent_30%),linear-gradient(180deg,#ffffff_0%,#f8fafc_50%,#ffffff_100%)]
+        py-14
+        sm:py-16
+      "
+    >
+      <div className="mx-auto max-w-7xl px-4">
+        {/* HEADER */}
+        <div className="mx-auto mb-10 max-w-3xl text-center">
+          <span
+            className="
+              inline-flex
+              items-center
+              rounded-full
+              border
+              border-amber-200
+              bg-amber-50
+              px-4
+              py-2
+              text-xs
+              font-black
+              uppercase
+              tracking-[0.16em]
+              text-amber-800
+              shadow-sm
+            "
+          >
+            Offres groupées
+          </span>
+
+          <h2
+            className="
+              mt-4
+              text-3xl
+              font-black
+              uppercase
+              tracking-tight
+              text-gray-950
+              sm:text-4xl
+              lg:text-5xl
+            "
+          >
+            Nos Packs Exclusifs
+          </h2>
+
+          <p
+            className="
+              mx-auto
+              mt-3
+              max-w-2xl
+              text-sm
+              leading-6
+              text-gray-500
+              sm:text-base
+            "
+          >
+            Des packs complets, des économies importantes, une
+            garantie officielle et une livraison gratuite partout
+            au Maroc.
+          </p>
+        </div>
+
+        {/* PACKS GRID */}
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
+          {packs.map((pack) => (
+            <PackCard key={pack.id} pack={pack} />
+          ))}
+        </div>
+      </div>
+    </section>
   )
 }
