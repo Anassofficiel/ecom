@@ -229,18 +229,13 @@ export default function RootLayout({
         'https://connect.facebook.net/en_US/fbevents.js'
       );
 
-      try {
-        fbq('init','${META_PIXEL_ID}');
+try {
+  fbq('init','${META_PIXEL_ID}');
+  fbq('track','PageView');
 
-        setTimeout(function(){
-          if(window.fbq){
-            fbq('track','PageView');
-          }
-        },1000);
-
-      } catch(e) {
-        console.warn('Meta Pixel error:',e);
-      }
+} catch(e) {
+  console.warn('Meta Pixel error:',e);
+}
     `,
           }}
         />
