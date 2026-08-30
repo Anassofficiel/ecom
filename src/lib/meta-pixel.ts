@@ -48,48 +48,15 @@ export function trackMetaEvent(
     parameters: Record<string, unknown> = {},
     eventId?: string
 ): boolean {
-    if (!isMetaPixelReady()) {
-        console.warn(
-            `[Meta Pixel] ${eventName} non envoyé: Pixel pas encore chargé.`
-        )
 
-        return false
-    }
+    console.log(
+        "[META TEST DISABLED]",
+        eventName,
+        parameters
+    )
 
-    try {
-        if (eventId) {
-            window.fbq?.(
-                "track",
-                eventName,
-                parameters,
-                {
-                    eventID: eventId,
-                }
-            )
-        } else {
-            window.fbq?.(
-                "track",
-                eventName,
-                parameters
-            )
-        }
-
-        console.log(`[Meta Pixel] ${eventName} envoyé`, {
-            parameters,
-            eventId,
-        })
-
-        return true
-    } catch (error) {
-        console.error(
-            `[Meta Pixel] Erreur pendant l'envoi de ${eventName}:`,
-            error
-        )
-
-        return false
-    }
+    return true
 }
-
 /**
  * تسجيل زيارة الصفحة.
  */
