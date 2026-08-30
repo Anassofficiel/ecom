@@ -195,7 +195,7 @@ export default function RootLayout({
         {/* Meta Pixel */}
         <Script
           id="meta-pixel"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
 (function(f,b,e,v,n,t,s)
@@ -232,7 +232,6 @@ document,
 try {
 
  window.fbq('init','${META_PIXEL_ID}');
- window.fbq('track','PageView');
 
 }
 catch(e){
