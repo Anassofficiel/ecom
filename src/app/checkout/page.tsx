@@ -183,7 +183,7 @@ export default function CheckoutPage() {
   // Le client peut remplir le formulaire pendant que le backend démarre.
   React.useEffect(() => {
     const controller = new AbortController()
-    const timeoutId = window.setTimeout(() => controller.abort(), 20000)
+    const timeoutId = window.setTimeout(() => controller.abort(), 90000)
 
     void fetch(`${API_BASE_URL}/api/health`, {
       method: "GET",
