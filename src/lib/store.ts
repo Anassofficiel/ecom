@@ -160,6 +160,7 @@ export const useStore = create<EcommerceState>()(
       clearCart: () => {
         set({
           cart: [],
+          isCartOpen: false,
         })
       },
 
@@ -197,6 +198,7 @@ export const useStore = create<EcommerceState>()(
       partialize: (state) => ({
         cart: state.cart,
         wishlist: state.wishlist,
+        isCartOpen: false,
       }),
     }
   )

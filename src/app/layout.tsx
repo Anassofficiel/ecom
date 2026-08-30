@@ -233,16 +233,23 @@ export default function RootLayout({
 
     <html lang="fr" className="scroll-smooth">
 
-
       <body
 
         className={`${inter.variable} ${outfit.variable} bg-white font-sans antialiased text-gray-900`}
 
       >
 
+        <Header />
 
-        {/* Meta Pixel isolated */}
+        <main>
+          {children}
+        </main>
 
+        <Footer />
+
+
+
+        {/* Analytics */}
         <MetaPixel />
 
 
