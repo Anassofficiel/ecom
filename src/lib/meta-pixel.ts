@@ -4,6 +4,7 @@ export type MetaPixelContent = {
     item_price?: number
 }
 
+
 export type MetaPurchaseData = {
     orderId: string | number
     value: number
@@ -13,35 +14,44 @@ export type MetaPurchaseData = {
     numItems?: number
 }
 
+
 declare global {
     interface Window {
-        fbq?: (...args: unknown[]) => void
-        _fbq?: (...args: unknown[]) => void
+        fbq?: (
+            ...args: unknown[]
+        ) => void
+
+        _fbq?: (
+            ...args: unknown[]
+        ) => void
     }
 }
 
-const PURCHASE_STORAGE_PREFIX = "meta_purchase_tracked_"
-const PENDING_PURCHASE_KEY = "meta_pending_purchase"
+
+const PURCHASE_STORAGE_PREFIX =
+    "meta_purchase_tracked_"
+
+const PENDING_PURCHASE_KEY =
+    "meta_pending_purchase"
+
+
 
 /**
- * كيتأكد واش Meta Pixel واجد وخدام.
+ * Vérifie si Meta Pixel est chargé
  */
 export function isMetaPixelReady(): boolean {
+
     return (
         typeof window !== "undefined" &&
         typeof window.fbq === "function"
     )
+
 }
 
+
+
 /**
- * إرسال Event standard إلى Meta Pixel.
- *
- * أمثلة:
- * PageView
- * ViewContent
- * AddToCart
- * InitiateCheckout
- * Purchase
+ * Envoi événement Meta Pixel
  */
 export function trackMetaEvent(
     eventName: string,
@@ -49,233 +59,378 @@ export function trackMetaEvent(
     eventId?: string
 ): boolean {
 
-    console.log(
-        "[META TEST DISABLED]",
-        eventName,
-        parameters
-    )
 
-    return true
+    if (!isMetaPixelReady()) {
+
+        console.warn(
+            "[META PIXEL] Not ready:",
+            eventName
+        )
+
+        return false
+    }
+
+
+    try {
+
+
+        if (eventId) {
+
+            window.fbq?.(
+                "track",
+                eventName,
+                parameters,
+                {
+                    eventID: eventId
+                }
+            )
+
+
+        } else {
+
+
+            window.fbq?.(
+                "track",
+                eventName,
+                parameters
+            )
+
+        }
+
+
+        console.log(
+            "[META PIXEL]",
+            eventName,
+            parameters
+        )
+
+
+        return true
+
+
+    } catch (error) {
+
+
+        console.error(
+            "[META PIXEL ERROR]",
+            error
+        )
+
+
+        return false
+
+    }
+
 }
+
+
+
 /**
- * تسجيل زيارة الصفحة.
+ * Page View
  */
 export function trackPageView(): boolean {
-    return trackMetaEvent("PageView")
+
+    return trackMetaEvent(
+        "PageView"
+    )
+
 }
 
+
+
 /**
- * تسجيل الدخول لصفحة Checkout.
+ * Checkout
  */
 export function trackInitiateCheckout({
+
     value,
     contentIds,
     contents,
     numItems,
     currency = "MAD",
+
 }: {
+
     value: number
     contentIds: string[]
     contents: MetaPixelContent[]
     numItems: number
     currency?: string
+
 }): boolean {
-    return trackMetaEvent("InitiateCheckout", {
-        value,
-        currency,
-        content_type: "product",
-        content_ids: contentIds,
-        contents,
-        num_items: numItems,
-    })
+
+
+    return trackMetaEvent(
+        "InitiateCheckout",
+        {
+
+            value,
+
+            currency,
+
+            content_type:
+                "product",
+
+            content_ids:
+                contentIds,
+
+            contents,
+
+            num_items:
+                numItems
+
+        }
+    )
+
 }
 
+
+
+
 /**
- * حفظ معلومات Purchase مؤقتاً قبل الانتقال
- * لصفحة نجاح الطلب.
+ * Sauvegarde Purchase avant success page
  */
 export function savePendingPurchase(
     purchaseData: MetaPurchaseData
 ): boolean {
-    if (typeof window === "undefined") {
+
+
+    if (
+        typeof window === "undefined"
+    ) {
         return false
     }
 
+
     try {
+
+
         sessionStorage.setItem(
+
             PENDING_PURCHASE_KEY,
-            JSON.stringify(purchaseData)
+
+            JSON.stringify(
+                purchaseData
+            )
+
         )
+
 
         return true
+
+
     } catch (error) {
+
+
         console.error(
-            "[Meta Pixel] Impossible de sauvegarder Purchase:",
             error
         )
+
 
         return false
+
     }
+
 }
 
+
+
+
 /**
- * قراءة Purchase المحفوظ من Session Storage.
+ * Récupérer Purchase
  */
-export function getPendingPurchase(): MetaPurchaseData | null {
-    if (typeof window === "undefined") {
+export function getPendingPurchase()
+    : MetaPurchaseData | null {
+
+
+    if (
+        typeof window === "undefined"
+    ) {
         return null
     }
+
 
     try {
-        const savedPurchase =
-            sessionStorage.getItem(PENDING_PURCHASE_KEY)
 
-        if (!savedPurchase) {
+
+        const data =
+            sessionStorage.getItem(
+                PENDING_PURCHASE_KEY
+            )
+
+
+        if (!data)
             return null
-        }
 
-        const parsedPurchase = JSON.parse(
-            savedPurchase
-        ) as MetaPurchaseData
 
-        if (
-            !parsedPurchase.orderId ||
-            typeof parsedPurchase.value !== "number"
-        ) {
-            return null
-        }
 
-        return parsedPurchase
-    } catch (error) {
-        console.error(
-            "[Meta Pixel] Purchase sauvegardé invalide:",
-            error
-        )
+        return JSON.parse(data)
+
+
+    } catch {
+
 
         return null
+
     }
+
 }
 
+
+
+
 /**
- * حذف Purchase المؤقت من Session Storage.
+ * Supprimer Purchase temporaire
  */
-export function clearPendingPurchase(): void {
-    if (typeof window === "undefined") {
+export function clearPendingPurchase() {
+
+
+    if (
+        typeof window === "undefined"
+    )
         return
-    }
 
-    try {
-        sessionStorage.removeItem(PENDING_PURCHASE_KEY)
-    } catch (error) {
-        console.error(
-            "[Meta Pixel] Impossible de supprimer Purchase:",
-            error
-        )
-    }
+
+
+    sessionStorage.removeItem(
+        PENDING_PURCHASE_KEY
+    )
+
 }
 
+
+
+
 /**
- * كيتأكد واش نفس الطلب سبق تسجل عند Meta.
+ * Vérifier doublon achat
  */
 export function wasPurchaseTracked(
     orderId: string | number
 ): boolean {
-    if (typeof window === "undefined") {
-        return false
-    }
 
-    try {
-        return (
-            localStorage.getItem(
-                `${PURCHASE_STORAGE_PREFIX}${orderId}`
-            ) === "1"
-        )
-    } catch {
+
+    if (
+        typeof window === "undefined"
+    )
         return false
-    }
+
+
+
+    return (
+        localStorage.getItem(
+            `${PURCHASE_STORAGE_PREFIX}${orderId}`
+        )
+        ===
+        "1"
+    )
+
 }
 
+
+
+
 /**
- * تسجيل Purchase مرة واحدة فقط.
- *
- * Refresh ديال صفحة success ما غاديش يعاود
- * يحسب نفس الطلبية.
+ * Purchase une seule fois
  */
 export function trackPurchaseOnce(
     purchaseData: MetaPurchaseData
 ): boolean {
+
+
     const {
+
         orderId,
+
         value,
+
         currency = "MAD",
+
         contentIds = [],
+
         contents = [],
-        numItems = 0,
+
+        numItems = 0
+
+
     } = purchaseData
 
-    if (!orderId) {
-        console.warn(
-            "[Meta Pixel] Purchase non envoyé: orderId manquant."
-        )
 
-        return false
-    }
 
     if (
-        typeof value !== "number" ||
-        Number.isNaN(value) ||
-        value < 0
+        !orderId ||
+        typeof value !== "number"
     ) {
-        console.warn(
-            "[Meta Pixel] Purchase non envoyé: valeur invalide."
-        )
-
         return false
     }
 
-    if (wasPurchaseTracked(orderId)) {
-        console.log(
-            `[Meta Pixel] Purchase #${orderId} déjà enregistré.`
-        )
+
+
+    if (
+        wasPurchaseTracked(orderId)
+    ) {
 
         clearPendingPurchase()
 
         return true
+
     }
 
-    const eventId = `purchase_${orderId}`
 
-    const sent = trackMetaEvent(
-        "Purchase",
-        {
-            value,
-            currency,
-            content_type: "product",
-            content_ids: contentIds,
-            contents,
-            num_items: numItems,
-            order_id: String(orderId),
-        },
-        eventId
+
+
+    const sent =
+        trackMetaEvent(
+
+            "Purchase",
+
+            {
+
+                value,
+
+                currency,
+
+                content_type:
+                    "product",
+
+                content_ids:
+                    contentIds,
+
+                contents,
+
+                num_items:
+                    numItems,
+
+                order_id:
+                    String(orderId)
+
+            },
+
+            `purchase_${orderId}`
+
+        )
+
+
+
+    if (!sent)
+        return false
+
+
+
+
+    localStorage.setItem(
+
+        `${PURCHASE_STORAGE_PREFIX}${orderId}`,
+
+        "1"
+
     )
 
-    if (!sent) {
-        return false
-    }
 
-    try {
-        localStorage.setItem(
-            `${PURCHASE_STORAGE_PREFIX}${orderId}`,
-            "1"
-        )
-    } catch (error) {
-        console.warn(
-            "[Meta Pixel] Purchase envoyé mais sauvegarde locale impossible:",
-            error
-        )
-    }
 
     clearPendingPurchase()
 
+
+
     return true
+
 }

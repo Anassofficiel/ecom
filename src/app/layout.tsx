@@ -9,10 +9,12 @@ import { Footer } from "@/components/layout/footer"
 import { MetaPixel } from "@/components/analytics/meta-pixel"
 
 
+
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
 })
+
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -20,33 +22,48 @@ const outfit = Outfit({
 })
 
 
+
 const siteUrl = "https://electromostafa55.ma"
+
 const siteName = "Electro Mostafa 55"
-const siteTitle = "Electro Mostafa 55 | Électroménager au Maroc"
+
+const siteTitle =
+  "Electro Mostafa 55 | Électroménager au Maroc"
+
 
 const siteDescription =
   "Electro Mostafa 55 est une boutique d'électroménager au Maroc: téléviseurs, réfrigérateurs, machines à laver, fours, climatiseurs, air fryers, machines à café, cuisine, promotions et livraison partout au Maroc."
 
+
 const phone = "+212 658-416769"
+
 
 const CLARITY_PROJECT_ID = "y0wuicqrq7"
 
 
+
+
+
 export const metadata: Metadata = {
 
+
   metadataBase: new URL(siteUrl),
+
 
   title: {
     default: siteTitle,
     template: "%s | Electro Mostafa 55",
   },
 
+
   description: siteDescription,
 
+
   applicationName: siteName,
+
   creator: siteName,
+
   publisher: siteName,
-  category: "shopping",
 
 
   keywords: [
@@ -65,12 +82,15 @@ export const metadata: Metadata = {
   ],
 
 
+
   alternates: {
     canonical: "/",
   },
 
 
+
   icons: {
+
     icon: [
       {
         url: "/favicon.ico",
@@ -80,141 +100,279 @@ export const metadata: Metadata = {
         type: "image/png",
       },
     ],
-    apple: "/apple-icon.png",
+
+    apple:
+      "/apple-icon.png",
+
   },
+
 
 
   robots: {
+
     index: true,
+
     follow: true,
 
+
     googleBot: {
+
       index: true,
+
       follow: true,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-      "max-video-preview": -1,
+
+      "max-image-preview":
+        "large",
+
+      "max-snippet":
+        -1,
+
+      "max-video-preview":
+        -1,
+
     },
+
   },
+
+
 
 
   openGraph: {
 
+
     type: "website",
+
     locale: "fr_MA",
+
     url: siteUrl,
+
     siteName,
 
+
     title: siteTitle,
+
     description: siteDescription,
 
+
     images: [
+
       {
+
         url: "/icon.png",
+
         width: 512,
+
         height: 512,
-        alt: "Logo Electro Mostafa 55",
+
+        alt:
+          "Logo Electro Mostafa 55",
+
       },
+
     ],
+
   },
+
+
 
 
   twitter: {
 
-    card: "summary_large_image",
+
+    card:
+      "summary_large_image",
+
+
     title: siteTitle,
-    description: siteDescription,
-    images: ["/icon.png"],
+
+
+    description:
+      siteDescription,
+
+
+    images: [
+      "/icon.png"
+    ],
+
 
   },
 
+
 }
+
+
+
+
 
 
 
 const structuredData = [
 
   {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
 
-    "@id": `${siteUrl}/#website`,
+    "@context":
+      "https://schema.org",
 
-    name: siteName,
+    "@type":
+      "WebSite",
 
-    alternateName: [
+    "@id":
+      `${siteUrl}/#website`,
+
+    "name":
+      siteName,
+
+
+    "alternateName": [
+
       "Electro Mostafa",
+
       "ElectroMostafa55"
+
     ],
 
-    url: siteUrl,
 
-    inLanguage: "fr-MA",
+    "url":
+      siteUrl,
+
+
+    "inLanguage":
+      "fr-MA"
+
 
   },
+
 
 
   {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-
-    "@id": `${siteUrl}/#organization`,
-
-    name: siteName,
-
-    url: siteUrl,
 
 
-    logo: {
-      "@type": "ImageObject",
-      url: `${siteUrl}/icon.png`,
-      width: 512,
-      height: 512,
+    "@context":
+      "https://schema.org",
+
+
+    "@type":
+      "Organization",
+
+
+    "@id":
+      `${siteUrl}/#organization`,
+
+
+    "name":
+      siteName,
+
+
+    "url":
+      siteUrl,
+
+
+    "logo": {
+
+      "@type":
+        "ImageObject",
+
+      "url":
+        `${siteUrl}/icon.png`,
+
+      "width":
+        512,
+
+      "height":
+        512
+
     },
 
 
-    telephone: phone,
+    "telephone":
+      phone,
 
-    description: siteDescription,
+
+    "description":
+      siteDescription
+
 
   },
+
 
 
   {
-    "@context": "https://schema.org",
-    "@type": "Store",
 
-    "@id": `${siteUrl}/#store`,
 
-    name: siteName,
+    "@context":
+      "https://schema.org",
 
-    url: siteUrl,
 
-    image: `${siteUrl}/icon.png`,
+    "@type":
+      "Store",
 
-    telephone: phone,
 
-    priceRange: "$$",
+    "@id":
+      `${siteUrl}/#store`,
 
-    address: {
 
-      "@type": "PostalAddress",
+    "name":
+      siteName,
 
-      addressCountry: "MA",
 
-      addressLocality: "Tit Mellil",
+    "url":
+      siteUrl,
 
-      addressRegion: "Casablanca-Settat",
 
-      postalCode: "20606",
+    "image":
+      `${siteUrl}/icon.png`,
 
-      streetAddress: "Bd Bassatine, Tit Mellil",
 
-    },
+    "telephone":
+      phone,
 
-  },
+
+    "priceRange":
+      "$$",
+
+
+    "address": {
+
+
+      "@type":
+        "PostalAddress",
+
+
+      "addressCountry":
+        "MA",
+
+
+      "addressLocality":
+        "Tit Mellil",
+
+
+      "addressRegion":
+        "Casablanca-Settat",
+
+
+      "postalCode":
+        "20606",
+
+
+      "streetAddress":
+        "Bd Bassatine, Tit Mellil"
+
+
+    }
+
+
+
+  }
+
+
 
 ]
+
+
+
+
+
+
 
 
 
@@ -229,27 +387,53 @@ export default function RootLayout({
 }>) {
 
 
+
   return (
 
-    <html lang="fr" className="scroll-smooth">
+
+    <html
+
+      lang="fr"
+
+      className="scroll-smooth"
+
+    >
+
+
 
       <body
 
-        className={`${inter.variable} ${outfit.variable} bg-white font-sans antialiased text-gray-900`}
+
+        className={
+
+          `${inter.variable} ${outfit.variable} bg-white font-sans antialiased text-gray-900`
+
+        }
+
+
 
       >
 
 
-        {/* Meta Pixel */}
+
+        {/* Meta Pixel فقط */}
+
         <MetaPixel />
+
+
+
 
 
         {/* Microsoft Clarity */}
 
         <Script
+
           id="microsoft-clarity"
+
           strategy="afterInteractive"
+
           dangerouslySetInnerHTML={{
+
             __html: `
 
 (function(c,l,a,r,i,t,y){
@@ -272,24 +456,50 @@ y.parentNode.insertBefore(t,y);
 
 })(window,document,"clarity","script","${CLARITY_PROJECT_ID}");
 
-`,
+`
+
           }}
+
         />
 
 
-        {/* Structured Data */}
+
+
+
+
+
+        {/* SEO Structured Data */}
+
 
         <Script
+
           id="structured-data"
+
           type="application/ld+json"
+
           strategy="afterInteractive"
+
+
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(structuredData),
+
+            __html:
+              JSON.stringify(structuredData)
+
           }}
+
+
         />
+
+
+
+
+
 
 
         <Header />
+
+
+
 
 
         <main className="min-h-screen pt-[120px]">
@@ -299,12 +509,20 @@ y.parentNode.insertBefore(t,y);
         </main>
 
 
+
+
+
         <Footer />
+
+
+
 
 
       </body>
 
+
     </html>
+
 
   )
 
