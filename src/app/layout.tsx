@@ -239,25 +239,17 @@ export default function RootLayout({
 
       >
 
-        <Header />
 
-        <main>
-          {children}
-        </main>
-
-        <Footer />
+        {/* Meta Pixel */}
+        <MetaPixel />
 
 
         {/* Microsoft Clarity */}
 
         <Script
-
           id="microsoft-clarity"
-
           strategy="afterInteractive"
-
           dangerouslySetInnerHTML={{
-
             __html: `
 
 (function(c,l,a,r,i,t,y){
@@ -268,66 +260,36 @@ c[a]=c[a]||function(){
 
 };
 
-
 t=l.createElement(r);
 
 t.async=1;
 
 t.src="https://www.clarity.ms/tag/"+i;
 
-
 y=l.getElementsByTagName(r)[0];
 
 y.parentNode.insertBefore(t,y);
 
+})(window,document,"clarity","script","${CLARITY_PROJECT_ID}");
 
-})(
-
-window,
-
-document,
-
-"clarity",
-
-"script",
-
-"${CLARITY_PROJECT_ID}"
-
-);
-
-`
-
+`,
           }}
-
         />
 
 
-
-
-        {/* Structured Data SEO */}
-
+        {/* Structured Data */}
 
         <Script
-
           id="structured-data"
-
           type="application/ld+json"
-
           strategy="afterInteractive"
-
           dangerouslySetInnerHTML={{
-
             __html: JSON.stringify(structuredData),
-
           }}
-
         />
-
-
 
 
         <Header />
-
 
 
         <main className="min-h-screen pt-[120px]">
@@ -337,12 +299,10 @@ document,
         </main>
 
 
-
         <Footer />
 
 
       </body>
-
 
     </html>
 
