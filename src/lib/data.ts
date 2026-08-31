@@ -857,7 +857,7 @@ export const products: Product[] = [
     discount: 30,
     rating: 4.5,
     reviews: 37,
-    image: "https://i.postimg.cc/PqwHccvg/image.png",
+    image: "https://i.postimg.cc/RFGwCmNr/image.png",
     hoverImage: "https://i.postimg.cc/TP6br1bX/image.png",
     stockStatus: "in-stock",
     inStock: true,
