@@ -248,12 +248,6 @@ export default function RootLayout({
         <Footer />
 
 
-
-        {/* Analytics */}
-        <MetaPixel />
-
-
-
         {/* Microsoft Clarity */}
 
         <Script
