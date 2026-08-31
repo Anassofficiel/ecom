@@ -15,24 +15,35 @@ export type MetaPurchaseData = {
 }
 
 
+
 declare global {
+
     interface Window {
+
         fbq?: (
-            ...args: unknown[]
+            command: string,
+            eventName: string,
+            parameters?: Record<string, unknown>,
+            options?: Record<string, unknown>
         ) => void
 
-        _fbq?: (
-            ...args: unknown[]
-        ) => void
+
+        _fbq?: unknown
+
     }
+
 }
+
 
 
 const PURCHASE_STORAGE_PREFIX =
     "meta_purchase_tracked_"
 
+
 const PENDING_PURCHASE_KEY =
     "meta_pending_purchase"
+
+
 
 
 
@@ -50,8 +61,17 @@ export function isMetaPixelReady(): boolean {
 
 
 
+
+
 /**
  * Envoi événement Meta Pixel
+ *
+ * Events:
+ * PageView
+ * ViewContent
+ * AddToCart
+ * InitiateCheckout
+ * Purchase
  */
 export function trackMetaEvent(
     eventName: string,
@@ -63,12 +83,14 @@ export function trackMetaEvent(
     if (!isMetaPixelReady()) {
 
         console.warn(
-            "[META PIXEL] Not ready:",
+            "[META Pixel] Not ready:",
             eventName
         )
 
         return false
+
     }
+
 
 
     try {
@@ -76,7 +98,8 @@ export function trackMetaEvent(
 
         if (eventId) {
 
-            window.fbq?.(
+
+            window.fbq!(
                 "track",
                 eventName,
                 parameters,
@@ -89,30 +112,34 @@ export function trackMetaEvent(
         } else {
 
 
-            window.fbq?.(
+            window.fbq!(
                 "track",
                 eventName,
                 parameters
             )
 
+
         }
 
 
+
         console.log(
-            "[META PIXEL]",
+            "[META Pixel Event]",
             eventName,
             parameters
         )
 
 
+
         return true
+
 
 
     } catch (error) {
 
 
         console.error(
-            "[META PIXEL ERROR]",
+            "[META Pixel Error]",
             error
         )
 
@@ -121,7 +148,12 @@ export function trackMetaEvent(
 
     }
 
+
 }
+
+
+
+
 
 
 
@@ -130,65 +162,96 @@ export function trackMetaEvent(
  */
 export function trackPageView(): boolean {
 
+
     return trackMetaEvent(
         "PageView"
     )
+
 
 }
 
 
 
+
+
+
+
 /**
- * Checkout
+ * Initiate Checkout
  */
 export function trackInitiateCheckout({
 
     value,
+
     contentIds,
+
     contents,
+
     numItems,
-    currency = "MAD",
+
+    currency = "MAD"
+
 
 }: {
 
     value: number
+
     contentIds: string[]
+
     contents: MetaPixelContent[]
+
     numItems: number
+
     currency?: string
 
 }): boolean {
 
 
+
     return trackMetaEvent(
+
         "InitiateCheckout",
+
         {
+
 
             value,
 
+
             currency,
+
 
             content_type:
                 "product",
 
+
             content_ids:
                 contentIds,
 
+
             contents,
+
 
             num_items:
                 numItems
 
+
         }
+
     )
+
 
 }
 
 
 
 
+
+
+
+
 /**
- * Sauvegarde Purchase avant success page
+ * Sauvegarder Purchase avant page success
  */
 export function savePendingPurchase(
     purchaseData: MetaPurchaseData
@@ -198,8 +261,11 @@ export function savePendingPurchase(
     if (
         typeof window === "undefined"
     ) {
+
         return false
+
     }
+
 
 
     try {
@@ -219,10 +285,12 @@ export function savePendingPurchase(
         return true
 
 
+
     } catch (error) {
 
 
         console.error(
+            "[META] Save purchase error",
             error
         )
 
@@ -236,18 +304,27 @@ export function savePendingPurchase(
 
 
 
+
+
+
+
+
 /**
- * Récupérer Purchase
+ * Récupérer Purchase temporaire
  */
-export function getPendingPurchase()
-    : MetaPurchaseData | null {
+export function getPendingPurchase():
+
+    MetaPurchaseData | null {
 
 
     if (
         typeof window === "undefined"
     ) {
+
         return null
+
     }
+
 
 
     try {
@@ -259,12 +336,19 @@ export function getPendingPurchase()
             )
 
 
-        if (!data)
+
+        if (!data) {
+
             return null
 
+        }
 
 
-        return JSON.parse(data)
+
+        return JSON.parse(
+            data
+        ) as MetaPurchaseData
+
 
 
     } catch {
@@ -274,7 +358,13 @@ export function getPendingPurchase()
 
     }
 
+
 }
+
+
+
+
+
 
 
 
@@ -282,27 +372,51 @@ export function getPendingPurchase()
 /**
  * Supprimer Purchase temporaire
  */
-export function clearPendingPurchase() {
+export function clearPendingPurchase(): void {
 
 
     if (
         typeof window === "undefined"
-    )
+    ) {
+
         return
 
+    }
 
 
-    sessionStorage.removeItem(
-        PENDING_PURCHASE_KEY
-    )
+
+    try {
+
+
+        sessionStorage.removeItem(
+            PENDING_PURCHASE_KEY
+        )
+
+
+    } catch (error) {
+
+
+        console.warn(
+            "[META] Clear purchase error",
+            error
+        )
+
+
+    }
+
 
 }
 
 
 
 
+
+
+
+
+
 /**
- * Vérifier doublon achat
+ * Vérifie si Purchase déjà envoyé
  */
 export function wasPurchaseTracked(
     orderId: string | number
@@ -311,30 +425,59 @@ export function wasPurchaseTracked(
 
     if (
         typeof window === "undefined"
-    )
+    ) {
+
         return false
 
+    }
 
 
-    return (
-        localStorage.getItem(
-            `${PURCHASE_STORAGE_PREFIX}${orderId}`
+
+    try {
+
+
+        return (
+
+            localStorage.getItem(
+
+                `${PURCHASE_STORAGE_PREFIX}${orderId}`
+
+            )
+
+            ===
+
+            "1"
+
         )
-        ===
-        "1"
-    )
+
+
+    } catch {
+
+
+        return false
+
+    }
+
 
 }
 
 
 
 
+
+
+
+
+
 /**
- * Purchase une seule fois
+ * Envoie Purchase une seule fois
  */
 export function trackPurchaseOnce(
+
     purchaseData: MetaPurchaseData
+
 ): boolean {
+
 
 
     const {
@@ -356,12 +499,26 @@ export function trackPurchaseOnce(
 
 
 
+
+
+
+
     if (
         !orderId ||
-        typeof value !== "number"
+        typeof value !== "number" ||
+        Number.isNaN(value)
     ) {
+
+        console.warn(
+            "[META] Invalid purchase data"
+        )
+
         return false
+
     }
+
+
+
 
 
 
@@ -369,7 +526,15 @@ export function trackPurchaseOnce(
         wasPurchaseTracked(orderId)
     ) {
 
+
+        console.log(
+            "[META] Purchase already tracked",
+            orderId
+        )
+
+
         clearPendingPurchase()
+
 
         return true
 
@@ -378,32 +543,45 @@ export function trackPurchaseOnce(
 
 
 
+
+
+
     const sent =
+
         trackMetaEvent(
 
             "Purchase",
 
             {
 
+
                 value,
 
+
                 currency,
+
 
                 content_type:
                     "product",
 
+
                 content_ids:
                     contentIds,
 
+
                 contents,
+
 
                 num_items:
                     numItems,
 
+
                 order_id:
                     String(orderId)
 
+
             },
+
 
             `purchase_${orderId}`
 
@@ -411,19 +589,48 @@ export function trackPurchaseOnce(
 
 
 
-    if (!sent)
+
+
+
+
+    if (!sent) {
+
         return false
 
+    }
 
 
 
-    localStorage.setItem(
 
-        `${PURCHASE_STORAGE_PREFIX}${orderId}`,
 
-        "1"
 
-    )
+
+    try {
+
+
+        localStorage.setItem(
+
+            `${PURCHASE_STORAGE_PREFIX}${orderId}`,
+
+            "1"
+
+        )
+
+
+    } catch (error) {
+
+
+        console.warn(
+            "[META] Cannot save purchase state",
+            error
+        )
+
+
+    }
+
+
+
+
 
 
 
@@ -432,5 +639,7 @@ export function trackPurchaseOnce(
 
 
     return true
+
+
 
 }
