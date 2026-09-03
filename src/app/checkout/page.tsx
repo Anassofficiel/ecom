@@ -1,4 +1,4 @@
-"use client"
+
 
 import * as React from "react"
 import Link from "next/link"
@@ -15,9 +15,6 @@ import {
   AlertCircle,
 } from "lucide-react"
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ||
-  "https://electro-manager-dashboard-1.onrender.com"
 
 const COUNTRIES = [
   { flagCode: "ma", iso: "MA", name: "Maroc", dialCode: "+212", placeholder: "06 xx xx xx xx" },
@@ -179,37 +176,6 @@ export default function CheckoutPage() {
     return () => stopProgress()
   }, [stopProgress])
 
-  // Réveille le serveur Render dès l’arrivée sur la page checkout.
-  // Le client peut remplir le formulaire pendant que le backend démarre.
-  React.useEffect(() => {
-    const controller = new AbortController()
-    const timeoutId = window.setTimeout(() => controller.abort(), 90000)
-
-    void fetch(`${API_BASE_URL}/api/health`, {
-      method: "GET",
-      cache: "no-store",
-      signal: controller.signal,
-    })
-      .catch(() => {
-        // Fallback utile si /api/health n’est pas encore déployé.
-        return fetch(`${API_BASE_URL}/healthz`, {
-          method: "GET",
-          mode: "no-cors",
-          cache: "no-store",
-        })
-      })
-      .catch(() => {
-        // Le préchauffage ne doit jamais bloquer la page checkout.
-      })
-      .finally(() => {
-        window.clearTimeout(timeoutId)
-      })
-
-    return () => {
-      window.clearTimeout(timeoutId)
-      controller.abort()
-    }
-  }, [])
 
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -416,8 +382,6 @@ export default function CheckoutPage() {
     setIsSubmitting(true)
     startProgress()
 
-    const controller = new AbortController()
-    const timeoutId = window.setTimeout(() => controller.abort(), 30000)
     let orderCreated = false
 
     try {
@@ -431,82 +395,59 @@ export default function CheckoutPage() {
         price: item.variant?.price ?? item.product.price,
       }))
 
-      const payload = {
-        customerName: form.fullName.trim(),
-        customerPhone: fullPhone,
-        customerCity: form.city.trim(),
-        customerAddress: form.address.trim(),
-        status: "Pending",
-        total,
-        subtotal,
-        shipping,
-        discount: 0,
-        paymentMethod: "Cash on Delivery",
-        items: orderItems,
-      }
+      const orderId =
+        `EM${Date.now()}`
 
-      console.log("Sending order payload:", payload)
-      console.log("API_BASE_URL:", API_BASE_URL)
-
-      const response = await fetch(`${API_BASE_URL}/api/orders`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-        signal: controller.signal,
-        cache: "no-store",
-      })
-
-      const rawText = await response.text()
-      console.log("Order API raw response:", rawText)
-
-      if (!response.ok) {
-        throw new Error(`API Error ${response.status}: ${rawText}`)
-      }
-
-      let order: { id?: number | string } = {}
-
-      try {
-        order = rawText ? JSON.parse(rawText) : {}
-      } catch {
-        throw new Error("La réponse de l'API n'est pas un JSON valide.")
-      }
-
-      if (!order.id) {
-        throw new Error(
-          "Commande créée, mais ID introuvable dans la réponse API."
-        )
-      }
 
       const telegramOrderData = {
-        orderId: order.id,
+        orderId,
+
         fullName: form.fullName.trim(),
+
         phone: fullPhone,
+
         city: form.city.trim(),
+
         address: form.address.trim(),
+
         total,
+
         shipping,
+
         paymentMethod: "Cash on Delivery",
+
         items: orderItems,
       }
 
-      sessionStorage.setItem("send_order_notification", "1")
+
+      // إرسال Telegram
+      sessionStorage.setItem(
+        "send_order_notification",
+        "1"
+      )
+
+
       sessionStorage.setItem(
         "telegram_order_data",
         JSON.stringify(telegramOrderData)
       )
 
-      // On sauvegarde les données du Purchase uniquement après que
-      // l'API a réellement créé la commande et retourné un orderId.
+
+      // Meta Purchase
       savePendingPurchase({
-        orderId: order.id,
+        orderId,
+
         value: total,
+
         currency: "MAD",
+
         contentIds: metaContentIds,
+
         contents: metaContents,
+
         numItems: totalItems,
       })
+
 
       orderCreated = true
       finishProgress()
@@ -515,7 +456,7 @@ export default function CheckoutPage() {
       await new Promise((resolve) => window.setTimeout(resolve, 100))
 
       clearCart()
-      window.location.assign(`/checkout/success?orderId=${order.id}`)
+      window.location.assign(`/checkout/success?orderId=${orderId}`)
     } catch (error) {
       console.error("Checkout error:", error)
 
@@ -528,7 +469,7 @@ export default function CheckoutPage() {
         )
       } else if (error instanceof TypeError && error.message.includes("fetch")) {
         alert(
-          "Impossible de contacter le serveur de commande. Vérifiez l'URL API et le CORS côté dashboard."
+          "Une erreur est survenue lors de l'envoi de votre commande. Veuillez réessayer."
         )
       } else {
         alert(
@@ -538,8 +479,6 @@ export default function CheckoutPage() {
         )
       }
     } finally {
-      window.clearTimeout(timeoutId)
-
       if (!orderCreated) {
         setIsSubmitting(false)
       }
